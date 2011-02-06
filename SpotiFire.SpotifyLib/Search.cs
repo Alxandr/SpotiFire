@@ -1,0 +1,242 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Linq.Expressions;
+
+namespace SpotiFire.SpotifyLib
+{
+    public delegate void SearchEventHandler(Search sender, EventArgs e);
+    public class Search : DisposeableSpotifyObject
+    {
+        #region Delegates
+        internal delegate void search_complete_cb(IntPtr searchPtr, IntPtr userdataPtr);
+        #endregion
+
+        #region Declarations
+
+        internal IntPtr searchPtr = IntPtr.Zero;
+        private Session session;
+
+        internal static search_complete_cb search_complete = new search_complete_cb(_SearchCompleteCallback);
+
+        private DelegateList<ITrack> tracks;
+        private DelegateList<IAlbum> albums;
+        private DelegateList<IArtist> artists;
+        #endregion
+
+        #region Constructor and setup
+        internal Search(Session session, IntPtr searchPtr)
+        {
+            if (searchPtr == IntPtr.Zero)
+                throw new ArgumentException("searchPtr can't be zero");
+
+            if (session == null)
+                throw new ArgumentNullException("Session can't be null");
+            this.session = session;
+
+            this.searchPtr = searchPtr;
+
+            this.tracks = new DelegateList<ITrack>(() =>
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_num_tracks(searchPtr);
+            }, (index) =>
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return Track.Get(session, libspotify.sp_search_track(searchPtr, index));
+            });
+
+            this.albums = new DelegateList<IAlbum>(() =>
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_num_albums(searchPtr);
+            }, (index) =>
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return Album.Get(session, libspotify.sp_search_album(searchPtr, index));
+            });
+
+            this.artists = new DelegateList<IArtist>(() =>
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_num_artists(searchPtr);
+            }, (index) =>
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return Artist.Get(session, libspotify.sp_search_artist(searchPtr, index));
+            });
+
+            _Complete += new search_complete_cb(Search__Complete);
+        }
+
+        private void Search__Complete(IntPtr searchPtr, IntPtr userdataPtr)
+        {
+            if (searchPtr == this.searchPtr)
+            {
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(s => s.OnComplete, this), new EventArgs()));
+                _Complete -= new search_complete_cb(Search__Complete);
+            }
+        }
+
+        static void _SearchCompleteCallback(IntPtr searchPtr, IntPtr userdataPtr)
+        {
+            if (_Complete != null)
+                _Complete(searchPtr, userdataPtr);
+        }
+
+        #endregion
+
+        #region Properties
+        public Session Session { get { return session; } }
+
+        public sp_error Error
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_error(searchPtr);
+            }
+        }
+
+        public IArray<ITrack> Tracks
+        {
+            get
+            {
+                IsAlive(true);
+                return tracks;
+            }
+        }
+
+        public IArray<IAlbum> Albums
+        {
+            get
+            {
+                IsAlive(true);
+                return albums;
+            }
+        }
+
+        public IArray<IArtist> Artists
+        {
+            get
+            {
+                IsAlive(true);
+                return artists;
+            }
+        }
+
+        public string Query
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.GetString(libspotify.sp_search_query(searchPtr), String.Empty);
+            }
+        }
+
+        public string DidYouMean
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.GetString(libspotify.sp_search_did_you_mean(searchPtr), String.Empty);
+            }
+        }
+
+        public int TotalTracks
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_total_tracks(searchPtr);
+            }
+        }
+
+        public int TotalAlbums
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_total_albums(searchPtr);
+            }
+        }
+
+        public int TotalArtists
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_search_total_artists(searchPtr);
+            }
+        }
+        #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("[Search]");
+            sb.AppendLine("Error=" + Error);
+            sb.AppendLine("Tracks.Length=" + Tracks.Length);
+            sb.AppendLine("Albums.Length=" + Albums.Length);
+            //sb.AppendLine("Artists.Length=" + Artists.Length);
+            sb.AppendLine("Query=" + Query);
+            sb.AppendLine("DidYouMean=" + DidYouMean);
+            sb.AppendLine("TotalTracks=" + TotalTracks);
+
+            return sb.ToString();
+        }
+        #endregion
+
+        #region Cleanup
+
+        protected override void OnDispose()
+        {
+            lock (libspotify.Mutex)
+                libspotify.sp_search_release(searchPtr);
+
+            searchPtr = IntPtr.Zero;
+        }
+
+        #endregion
+
+        #region Private Methods
+        private static Delegate CreateDelegate<T>(Expression<Func<Search, Action<T>>> expr, Search s) where T : EventArgs
+        {
+            return expr.Compile().Invoke(s);
+        }
+        private void ImageLoadedCallback(IntPtr searchPtr, IntPtr userdataPtr)
+        {
+            if (searchPtr == this.searchPtr)
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(s => s.OnComplete, this), new EventArgs()));
+        }
+        #endregion
+
+        #region Protected Methods
+        protected virtual void OnComplete(EventArgs args)
+        {
+            if (this.Complete != null)
+                this.Complete(this, args);
+        }
+        #endregion
+
+        #region Event
+        public event SearchEventHandler Complete;
+        private static event search_complete_cb _Complete;
+        #endregion
+    }
+}
