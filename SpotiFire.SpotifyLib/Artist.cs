@@ -20,11 +20,7 @@ namespace SpotiFire.SpotifyLib
             protected override void OnDispose()
             {
                 Artist.Delete(artist.artistPtr);
-            }
-
-            public override int GetHashCode()
-            {
-                return artist.GetHashCode();
+                artist = null;
             }
 
             public bool IsLoaded
@@ -35,6 +31,16 @@ namespace SpotiFire.SpotifyLib
             public string Name
             {
                 get { IsAlive(true); return artist.Name; }
+            }
+
+            public Session Session
+            {
+                get { IsAlive(true); return artist.Session; }
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                return IsAlive() ? artist.artistPtr.GetHashCode() : 0;
             }
         }
         internal static IntPtr GetPointer(IArtist artist)
@@ -115,6 +121,15 @@ namespace SpotiFire.SpotifyLib
                     return libspotify.GetString(libspotify.sp_artist_name(artistPtr), String.Empty);
             }
         }
+
+        public Session Session
+        {
+            get
+            {
+                IsAlive(true);
+                return session;
+            }
+        }
         #endregion
 
         #region Cleanup
@@ -127,9 +142,9 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        public override int GetHashCode()
+        protected override int IntPtrHashCode()
         {
-            return artistPtr.ToInt32();
+            throw new NotImplementedException();
         }
     }
 }

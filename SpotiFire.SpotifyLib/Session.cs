@@ -558,13 +558,13 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public Search Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount)
+        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount)
         {
             lock (libspotify.Mutex)
             {
                 IntPtr browsePtr = libspotify.sp_search_create(sessionPtr, query, trackOffset, trackCount, albumOffset, albumCount, artistOffset, artistCount,
                     Marshal.GetFunctionPointerForDelegate(SpotifyLib.Search.search_complete), IntPtr.Zero);
-                return browsePtr != IntPtr.Zero ? new Search(this, browsePtr) : null;
+                return browsePtr != IntPtr.Zero ? SpotifyLib.Search.Get(this, browsePtr) : null;
             }
         }
 
@@ -602,6 +602,11 @@ namespace SpotiFire.SpotifyLib
             lock (libspotify.Mutex)
                 libspotify.sp_session_preferred_bitrate(sessionPtr, bitrate);
         }
+
+        public IImage GetImageFromId(string id)
+        {
+            return Image.FromId(this, id);
+        }
         #endregion
 
         #region IDisposable Methods
@@ -623,10 +628,5 @@ namespace SpotiFire.SpotifyLib
             }
         }
         #endregion
-
-        public override int GetHashCode()
-        {
-            return sessionPtr.ToInt32();
-        }
     }
 }

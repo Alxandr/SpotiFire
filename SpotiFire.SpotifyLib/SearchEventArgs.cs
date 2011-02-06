@@ -7,16 +7,16 @@ namespace SpotiFire.SpotifyLib
 {
     public class SearchEventArgs : EventArgs
     {
-        private Search result;
+        private ISearch result;
         private object state;
 
-        internal SearchEventArgs(Search result, object state)
+        internal SearchEventArgs(ISearch result, object state)
         {
             this.result = result;
             this.state = state;
         }
 
-        public Search Result
+        public ISearch Result
         {
             get
             {

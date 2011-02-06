@@ -49,7 +49,10 @@
     <Compile Include="IAlbum.cs" />
     <Compile Include="IArray.cs" />
     <Compile Include="IArtist.cs" />
+    <Compile Include="IImage.cs" />
     <Compile Include="Image.cs" />
+    <Compile Include="ISearch.cs" />
+    <Compile Include="ISpotifyObject.cs" />
     <Compile Include="ITrack.cs" />
     <Compile Include="libspotify.cs" />
     <Compile Include="MusicDeliveryEventArgs.cs" />

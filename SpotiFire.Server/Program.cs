@@ -151,7 +151,7 @@ namespace SpotiFire.Server
                 sender.Search(searchTerm, currentIndex, 1, 0, 0, 0, 0).Complete += new SearchEventHandler(search_Complete);
         }
 
-        static void search_Complete(Search sender, EventArgs e)
+        static void search_Complete(ISearch sender, EventArgs e)
         {
             Console.WriteLine("Search complete!");
             if (sender.Tracks.Length == 0)
@@ -168,14 +168,14 @@ namespace SpotiFire.Server
                 Console.WriteLine("Artist.Name: {0}", artist.Name);
             sender.Session.PlayerLoad(trck);
             sender.Session.PlayerPlay();
-            Image img = Image.FromId(sender.Session, trck.Album.CoverId);
+            IImage img = sender.Session.GetImageFromId(trck.Album.CoverId);
             if (img.IsLoaded)
                 img_Loaded(img, new EventArgs());
             else
                 img.Loaded += new ImageEventHandler(img_Loaded);
         }
 
-        static void img_Loaded(Image sender, EventArgs e)
+        static void img_Loaded(IImage sender, EventArgs e)
         {
             try
             {

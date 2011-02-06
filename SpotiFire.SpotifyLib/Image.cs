@@ -8,9 +8,109 @@ using System.Threading;
 
 namespace SpotiFire.SpotifyLib
 {
-    public delegate void ImageEventHandler(Image sender, EventArgs e);
-    public class Image : DisposeableSpotifyObject
+    public delegate void ImageEventHandler(IImage sender, EventArgs e);
+    internal class Image : CountedDisposeableSpotifyObject, IImage
     {
+        #region Wrapper
+        private class ImageWrapper : DisposeableSpotifyObject, IImage
+        {
+            internal Image image;
+            public ImageWrapper(Image image)
+            {
+                this.image = image;
+                image.Loaded += new ImageEventHandler(image_Loaded);
+            }
+
+            void image_Loaded(IImage sender, EventArgs e)
+            {
+                if (Object.ReferenceEquals(sender, image))
+                    if (Loaded != null)
+                        Loaded(this, e);
+            }
+
+            protected override void OnDispose()
+            {
+                image.Loaded -= new ImageEventHandler(image_Loaded);
+                Image.Delete(image.imagePtr);
+                image = null;
+            }
+
+            public byte[] Data
+            {
+                get { IsAlive(true); return image.Data; }
+            }
+
+            public sp_error Error
+            {
+                get { IsAlive(true); return image.Error; }
+            }
+
+            public sp_imageformat Format
+            {
+                get { IsAlive(true); return image.Format; }
+            }
+
+            public string ImageId
+            {
+                get { IsAlive(true); return image.ImageId; }
+            }
+
+            public bool IsLoaded
+            {
+                get { IsAlive(true); return image.IsLoaded; }
+            }
+            
+            public event ImageEventHandler Loaded;
+
+            public Session Session
+            {
+                get { IsAlive(true); return image.Session; }
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                return IsAlive() ? image.imagePtr.GetHashCode() : 0;
+            }
+        }
+
+        internal static IntPtr GetPointer(IImage image)
+        {
+            if (image.GetType() == typeof(ImageWrapper))
+                return ((ImageWrapper)image).image.imagePtr;
+            throw new ArgumentException("Invalid image");
+        }
+        #endregion
+        #region Counter
+        private static Dictionary<IntPtr, Image> images = new Dictionary<IntPtr, Image>();
+        private static readonly object imagesLock = new object();
+
+        internal static IImage Get(Session session, IntPtr imagePtr)
+        {
+            Image image;
+            lock (imagesLock)
+            {
+                if (!images.ContainsKey(imagePtr))
+                {
+                    images.Add(imagePtr, new Image(session, imagePtr));
+                }
+                image = images[imagePtr];
+                image.AddRef();
+            }
+            return new ImageWrapper(image);
+        }
+
+        internal static void Delete(IntPtr imagePtr)
+        {
+            lock (imagesLock)
+            {
+                Image image = images[imagePtr];
+                int count = image.RemRef();
+                if (count == 0)
+                    images.Remove(imagePtr);
+            }
+        }
+        #endregion
+
         #region Delegates
         private delegate void image_loaded_cb(IntPtr imagePtr, IntPtr userdataPtr);
         #endregion
@@ -19,10 +119,11 @@ namespace SpotiFire.SpotifyLib
         internal IntPtr imagePtr = IntPtr.Zero;
         private Session session;
         private image_loaded_cb image_loaded;
+        private IntPtr imageLoadedPtr = IntPtr.Zero;
         #endregion
 
         #region Constructor
-        internal Image(Session session, IntPtr imagePtr)
+        private Image(Session session, IntPtr imagePtr)
         {
             if (imagePtr == IntPtr.Zero)
                 throw new ArgumentException("imagePtr can't be zero.");
@@ -32,10 +133,11 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
             this.imagePtr = imagePtr;
             this.image_loaded = new image_loaded_cb(ImageLoadedCallback);
+            this.imageLoadedPtr = Marshal.GetFunctionPointerForDelegate(this.image_loaded);
             lock (libspotify.Mutex)
             {
                 libspotify.sp_image_add_ref(imagePtr);
-                libspotify.sp_image_add_load_callback(imagePtr, Marshal.GetFunctionPointerForDelegate(image_loaded), IntPtr.Zero);
+                libspotify.sp_image_add_load_callback(imagePtr, this.imageLoadedPtr, IntPtr.Zero);
             }
         }
         #endregion
@@ -45,6 +147,7 @@ namespace SpotiFire.SpotifyLib
         {
             get
             {
+                IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_image_is_loaded(imagePtr);
             }
@@ -54,6 +157,7 @@ namespace SpotiFire.SpotifyLib
         {
             get
             {
+                IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_image_error(imagePtr);
             }
@@ -63,6 +167,7 @@ namespace SpotiFire.SpotifyLib
         {
             get
             {
+                IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_image_format(imagePtr);
             }
@@ -72,6 +177,7 @@ namespace SpotiFire.SpotifyLib
         {
             get
             {
+                IsAlive(true);
                 try
                 {
                     IntPtr lengthPtr = IntPtr.Zero;
@@ -101,8 +207,18 @@ namespace SpotiFire.SpotifyLib
         {
             get
             {
+                IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.ImageIdToString(libspotify.sp_image_image_id(imagePtr));
+            }
+        }
+
+        public Session Session
+        {
+            get
+            {
+                IsAlive(true);
+                return session;
             }
         }
         #endregion
@@ -136,16 +252,18 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
             {
-                libspotify.sp_image_remove_load_callback(imagePtr, Marshal.GetFunctionPointerForDelegate(image_loaded), IntPtr.Zero);
+                libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero);
                 libspotify.sp_image_release(imagePtr);
             }
 
+            imageLoadedPtr = IntPtr.Zero;
             imagePtr = IntPtr.Zero;
         }
         #endregion
 
         #region Static Public Methods
-        public static Image FromId(Session session, string id)
+        // TODO: Move to somewhere public.
+        public static IImage FromId(Session session, string id)
         {
             if (id == null)
                 throw new ArgumentNullException("id");
@@ -160,7 +278,7 @@ namespace SpotiFire.SpotifyLib
 
             IntPtr imagePtr = IntPtr.Zero;
             IntPtr idPtr = IntPtr.Zero;
-            Image image = null;
+            IImage image = null;
             try
             {
                 idPtr = Marshal.AllocHGlobal(idArray.Length);
@@ -169,7 +287,7 @@ namespace SpotiFire.SpotifyLib
                 lock (libspotify.Mutex)
                     imagePtr = libspotify.sp_image_create(session.sessionPtr, idPtr);
 
-                image = new Image(session, imagePtr);
+                image = Image.Get(session, imagePtr);
 
                 lock (libspotify.Mutex)
                     libspotify.sp_image_release(imagePtr);
@@ -195,9 +313,9 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        public override int GetHashCode()
+        protected override int IntPtrHashCode()
         {
-            return imagePtr.ToInt32();
+            return imagePtr.GetHashCode();
         }
     }
 }

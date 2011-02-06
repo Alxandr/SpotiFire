@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
-    public abstract class CountedDisposeableSpotifyObject : DisposeableSpotifyObject
+    internal abstract class CountedDisposeableSpotifyObject : DisposeableSpotifyObject
     {
         private volatile int _ref = 0;
         private readonly object refLock = new object();

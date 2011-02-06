@@ -145,9 +145,9 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        public override int GetHashCode()
+        protected override int IntPtrHashCode()
         {
-            return pcPtr.ToInt32();
+            return pcPtr.GetHashCode();
         }
     }
 }

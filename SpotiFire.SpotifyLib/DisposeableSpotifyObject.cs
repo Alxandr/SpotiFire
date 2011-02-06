@@ -10,6 +10,7 @@ namespace SpotiFire.SpotifyLib
         private volatile bool disposed = false;
         private readonly object disposeObject = new object();
         protected abstract void OnDispose();
+        protected abstract int IntPtrHashCode();
 
         public void Dispose()
         {
@@ -52,6 +53,11 @@ namespace SpotiFire.SpotifyLib
             if (obj == null)
                 return false;
             return this.GetHashCode() == obj.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return IntPtrHashCode();
         }
 
         static public bool operator == (DisposeableSpotifyObject obj, object obj2)

@@ -20,6 +20,7 @@ namespace SpotiFire.SpotifyLib
             protected override void OnDispose()
             {
                 Album.Delete(album.albumPtr);
+                album = null;
             }
 
             public IArtist Artist
@@ -55,6 +56,17 @@ namespace SpotiFire.SpotifyLib
             public int Year
             {
                 get { IsAlive(true); return album.Year; }
+            }
+
+            public Session Session
+            {
+                get { IsAlive(true); return album.Session; }
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                if (!IsAlive()) return 0;
+                return album.albumPtr.GetHashCode();
             }
         }
         internal static IntPtr GetPointer(IAlbum album)
@@ -189,6 +201,15 @@ namespace SpotiFire.SpotifyLib
                     return libspotify.sp_album_type(albumPtr);
             }
         }
+
+        public Session Session
+        {
+            get
+            {
+                IsAlive(true);
+                return session;
+            }
+        }
         #endregion
 
         #region Cleanup
@@ -201,9 +222,9 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        public override int GetHashCode()
+        protected override int IntPtrHashCode()
         {
-            return albumPtr.ToInt32();
+            return albumPtr.GetHashCode();
         }
     }
 }

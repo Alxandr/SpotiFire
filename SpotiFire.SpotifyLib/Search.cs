@@ -6,9 +6,129 @@ using System.Linq.Expressions;
 
 namespace SpotiFire.SpotifyLib
 {
-    public delegate void SearchEventHandler(Search sender, EventArgs e);
-    public class Search : DisposeableSpotifyObject
+    public delegate void SearchEventHandler(ISearch sender, EventArgs e);
+    internal class Search : CountedDisposeableSpotifyObject, ISearch
     {
+        #region Wrapper
+        private sealed class SearchWrapper : DisposeableSpotifyObject, ISearch
+        {
+            internal Search search;
+            public SearchWrapper(Search search)
+            {
+                this.search = search;
+                search.Complete += new SearchEventHandler(search_Complete);
+            }
+
+            void search_Complete(ISearch sender, EventArgs e)
+            {
+                if (sender == search)
+                    if (Complete != null)
+                        Complete(this, e);
+            }
+
+            protected override void OnDispose()
+            {
+                search.Complete -= new SearchEventHandler(search_Complete);
+                Search.Delete(search.searchPtr);
+                search = null;
+            }
+
+            public IArray<IAlbum> Albums
+            {
+                get { IsAlive(true); return search.Albums; }
+            }
+
+            public IArray<IArtist> Artists
+            {
+                get { IsAlive(true); return search.Artists; }
+            }
+
+            public event SearchEventHandler Complete;
+
+            public string DidYouMean
+            {
+                get { IsAlive(true); return search.DidYouMean; }
+            }
+
+            public sp_error Error
+            {
+                get { IsAlive(true); return search.Error; }
+            }
+
+            public string Query
+            {
+                get { IsAlive(true); return search.Query; }
+            }
+
+            public int TotalAlbums
+            {
+                get { IsAlive(true); return search.TotalAlbums; }
+            }
+
+            public int TotalArtists
+            {
+                get { IsAlive(true); return search.TotalArtists; }
+            }
+
+            public int TotalTracks
+            {
+                get { IsAlive(true); return search.TotalTracks; }
+            }
+
+            public IArray<ITrack> Tracks
+            {
+                get { IsAlive(true); return search.Tracks; }
+            }
+
+            public Session Session
+            {
+                get { IsAlive(true); return search.Session; }
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                return IsAlive() ? search.searchPtr.GetHashCode() : 0;
+            }
+        }
+
+        internal static IntPtr GetPointer(ISearch search)
+        {
+            if (search.GetType() == typeof(SearchWrapper))
+                return ((SearchWrapper)search).search.searchPtr;
+            throw new ArgumentException("Invalid search");
+        }
+        #endregion
+        #region Counter
+        private static Dictionary<IntPtr, Search> searchs = new Dictionary<IntPtr, Search>();
+        private static readonly object searchsLock = new object();
+
+        internal static ISearch Get(Session session, IntPtr searchPtr)
+        {
+            Search search;
+            lock (searchsLock)
+            {
+                if (!searchs.ContainsKey(searchPtr))
+                {
+                    searchs.Add(searchPtr, new Search(session, searchPtr));
+                }
+                search = searchs[searchPtr];
+                search.AddRef();
+            }
+            return new SearchWrapper(search);
+        }
+
+        internal static void Delete(IntPtr searchPtr)
+        {
+            lock (searchsLock)
+            {
+                Search search = searchs[searchPtr];
+                int count = search.RemRef();
+                if (count == 0)
+                    searchs.Remove(searchPtr);
+            }
+        }
+        #endregion
+
         #region Delegates
         internal delegate void search_complete_cb(IntPtr searchPtr, IntPtr userdataPtr);
         #endregion
@@ -26,7 +146,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Constructor and setup
-        internal Search(Session session, IntPtr searchPtr)
+        private Search(Session session, IntPtr searchPtr)
         {
             if (searchPtr == IntPtr.Zero)
                 throw new ArgumentException("searchPtr can't be zero");
@@ -206,6 +326,8 @@ namespace SpotiFire.SpotifyLib
 
         protected override void OnDispose()
         {
+            _Complete -= new search_complete_cb(Search__Complete);
+
             lock (libspotify.Mutex)
                 libspotify.sp_search_release(searchPtr);
 
@@ -238,5 +360,10 @@ namespace SpotiFire.SpotifyLib
         public event SearchEventHandler Complete;
         private static event search_complete_cb _Complete;
         #endregion
+
+        protected override int IntPtrHashCode()
+        {
+            return searchPtr.GetHashCode();
+        }
     }
 }

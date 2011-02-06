@@ -19,6 +19,7 @@ namespace SpotiFire.SpotifyLib
             protected override void OnDispose()
             {
                 Track.Delete(track.trackPtr);
+                track = null;
             }
 
             public IAlbum Album
@@ -69,6 +70,16 @@ namespace SpotiFire.SpotifyLib
             public int Popularity
             {
                 get { IsAlive(true); return track.Popularity; }
+            }
+
+            public Session Session
+            {
+                get { IsAlive(true); return track.Session; }
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                return IsAlive() ? track.trackPtr.GetHashCode() : 0;
             }
         }
         internal static IntPtr GetPointer(ITrack track)
@@ -246,6 +257,15 @@ namespace SpotiFire.SpotifyLib
                     return libspotify.sp_track_index(trackPtr);
             }
         }
+
+        public Session Session
+        {
+            get
+            {
+                IsAlive(true);
+                return session;
+            }
+        }
         #endregion
 
         #region IDisposeable
@@ -258,9 +278,9 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        public override int GetHashCode()
+        protected override int IntPtrHashCode()
         {
-            return trackPtr.ToInt32();
+            return trackPtr.GetHashCode();
         }
     }
 }
