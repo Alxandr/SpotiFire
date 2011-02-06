@@ -252,8 +252,10 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
             {
-                libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero);
-                libspotify.sp_image_release(imagePtr);
+                try { libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero); }
+                catch { }
+                try { libspotify.sp_image_release(imagePtr); }
+                catch { }
             }
 
             imageLoadedPtr = IntPtr.Zero;

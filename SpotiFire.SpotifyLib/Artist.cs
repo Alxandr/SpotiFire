@@ -136,7 +136,8 @@ namespace SpotiFire.SpotifyLib
         protected override void OnDispose()
         {
             lock (libspotify.Mutex)
-                libspotify.sp_artist_release(artistPtr);
+                try { libspotify.sp_artist_release(artistPtr); }
+                catch { }
 
             artistPtr = IntPtr.Zero;
         }

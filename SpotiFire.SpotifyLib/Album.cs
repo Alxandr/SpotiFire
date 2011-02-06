@@ -216,7 +216,8 @@ namespace SpotiFire.SpotifyLib
         protected override void OnDispose()
         {
             lock (libspotify.Mutex)
-                libspotify.sp_album_release(albumPtr);
+                try { libspotify.sp_album_release(albumPtr); }
+                catch { }
 
             albumPtr = IntPtr.Zero;
         }

@@ -137,9 +137,11 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
             {
-                libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero);
+                try { libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero); }
+                catch { }
             }
-            Marshal.FreeHGlobal(callbacksPtr);
+            try { Marshal.FreeHGlobal(callbacksPtr); }
+            catch { }
             callbacksPtr = IntPtr.Zero;
             pcPtr = IntPtr.Zero;
         }

@@ -329,7 +329,8 @@ namespace SpotiFire.SpotifyLib
             _Complete -= new search_complete_cb(Search__Complete);
 
             lock (libspotify.Mutex)
-                libspotify.sp_search_release(searchPtr);
+                try { libspotify.sp_search_release(searchPtr); }
+                catch { }
 
             searchPtr = IntPtr.Zero;
         }
