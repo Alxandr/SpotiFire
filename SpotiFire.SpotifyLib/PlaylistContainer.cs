@@ -72,6 +72,13 @@ namespace SpotiFire.SpotifyLib
             {
                 libspotify.sp_playlistcontainer_add_callbacks(pcPtr, callbacksPtr, IntPtr.Zero);
             }
+
+            session.DisposeAll += new SessionEventHandler(session_DisposeAll);
+        }
+
+        void session_DisposeAll(Session sender, SessionEventArgs e)
+        {
+            Dispose();
         }
         #endregion
 
@@ -135,11 +142,14 @@ namespace SpotiFire.SpotifyLib
         #region Cleanup
         protected override void OnDispose()
         {
-            lock (libspotify.Mutex)
-            {
-                try { libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero); }
-                catch { }
-            }
+            session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
+
+            if(!session.ProcExit)
+                lock (libspotify.Mutex)
+                {
+                    try { libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero); }
+                    catch { }
+                }
             try { Marshal.FreeHGlobal(callbacksPtr); }
             catch { }
             callbacksPtr = IntPtr.Zero;

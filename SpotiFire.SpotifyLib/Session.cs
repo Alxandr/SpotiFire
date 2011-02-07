@@ -81,11 +81,18 @@ namespace SpotiFire.SpotifyLib
                 return playlistContainer;
             }
         }
+
+        internal bool ProcExit
+        {
+            get;
+            private set;
+        }
         #endregion
 
         #region Constructor
         private Session(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
+            ProcExit = false;
             libspotify.sp_session_config config = new libspotify.sp_session_config();
 
             config.api_version = libspotify.SPOTIFY_API_VERSION;
@@ -127,6 +134,17 @@ namespace SpotiFire.SpotifyLib
                 if (config.application_key != IntPtr.Zero)
                     Marshal.FreeHGlobal(config.application_key);
             }
+
+            AppDomain.CurrentDomain.DomainUnload += new EventHandler(CurrentDomain_OnExit);
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_OnExit);
+        }
+
+        void CurrentDomain_OnExit(object sender, EventArgs e)
+        {
+            ProcExit = true;
+            this.Dispose();
+            (sender as AppDomain).DomainUnload -= new EventHandler(CurrentDomain_OnExit);
+            (sender as AppDomain).ProcessExit -= new EventHandler(CurrentDomain_OnExit);
         }
 
         static Session()
@@ -186,6 +204,8 @@ namespace SpotiFire.SpotifyLib
                     {
                         try
                         {
+                            if (this.disposed)
+                                throw new Exception();
                             libspotify.sp_session_process_events(sessionPtr, out waitTime);
                         }
                         catch
@@ -615,18 +635,26 @@ namespace SpotiFire.SpotifyLib
             if (!disposed)
             {
                 disposed = true;
+                shutdown = true;
+                if (DisposeAll != null)
+                    DisposeAll(this, null);
+                mainThreadNotification.Set();
+                eventThreadNotification.Set();
                 try
                 {
-                    if (sessionPtr != IntPtr.Zero)
+                    if (sessionPtr != IntPtr.Zero && !ProcExit)
                     {
-                        try { libspotify.sp_session_logout(sessionPtr); }
-                        catch { }
+                        if(ConnectionState == sp_connectionstate.LOGGED_IN)
+                            try { libspotify.sp_session_logout(sessionPtr); }
+                            catch { }
                         libspotify.sp_session_release(sessionPtr);
                     }
                 }
                 catch { }
             }
         }
+
+        internal event SessionEventHandler DisposeAll;
         #endregion
     }
 }

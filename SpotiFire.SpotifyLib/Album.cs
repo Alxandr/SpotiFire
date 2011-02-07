@@ -126,6 +126,13 @@ namespace SpotiFire.SpotifyLib
             this.albumPtr = albumPtr;
             lock (libspotify.Mutex)
                 libspotify.sp_album_add_ref(albumPtr);
+
+            session.DisposeAll += new SessionEventHandler(session_DisposeAll);
+        }
+
+        void session_DisposeAll(Session sender, SessionEventArgs e)
+        {
+            Dispose();
         }
         #endregion
 
@@ -215,9 +222,10 @@ namespace SpotiFire.SpotifyLib
         #region Cleanup
         protected override void OnDispose()
         {
-            lock (libspotify.Mutex)
-                try { libspotify.sp_album_release(albumPtr); }
-                catch { }
+            session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
+            if(!session.ProcExit)
+                lock (libspotify.Mutex)
+                    libspotify.sp_album_release(albumPtr);
 
             albumPtr = IntPtr.Zero;
         }

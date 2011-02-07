@@ -152,6 +152,13 @@ namespace SpotiFire.SpotifyLib
                 lock (libspotify.Mutex)
                     return Artist.Get(session, libspotify.sp_track_artist(trackPtr, index));
             });
+
+            session.DisposeAll += new SessionEventHandler(session_DisposeAll);
+        }
+
+        void session_DisposeAll(Session sender, SessionEventArgs e)
+        {
+            Dispose();
         }
         #endregion
 
@@ -271,9 +278,11 @@ namespace SpotiFire.SpotifyLib
         #region IDisposeable
         protected override void OnDispose()
         {
-            lock (libspotify.Mutex)
-                try { libspotify.sp_track_release(trackPtr); }
-                catch { }
+            session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
+
+            if (!session.ProcExit)
+                lock (libspotify.Mutex)
+                    libspotify.sp_track_release(trackPtr);
 
             trackPtr = IntPtr.Zero;
         }

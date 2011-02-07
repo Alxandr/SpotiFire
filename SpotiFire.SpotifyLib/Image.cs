@@ -139,6 +139,13 @@ namespace SpotiFire.SpotifyLib
                 libspotify.sp_image_add_ref(imagePtr);
                 libspotify.sp_image_add_load_callback(imagePtr, this.imageLoadedPtr, IntPtr.Zero);
             }
+
+            session.DisposeAll += new SessionEventHandler(session_DisposeAll);
+        }
+
+        void session_DisposeAll(Session sender, SessionEventArgs e)
+        {
+            Dispose();
         }
         #endregion
 
@@ -250,13 +257,14 @@ namespace SpotiFire.SpotifyLib
         #region Cleanup
         protected override void OnDispose()
         {
-            lock (libspotify.Mutex)
-            {
-                try { libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero); }
-                catch { }
-                try { libspotify.sp_image_release(imagePtr); }
-                catch { }
-            }
+            session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
+
+            if(!session.ProcExit)
+                lock (libspotify.Mutex)
+                {
+                    libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero);
+                    libspotify.sp_image_release(imagePtr);
+                }
 
             imageLoadedPtr = IntPtr.Zero;
             imagePtr = IntPtr.Zero;

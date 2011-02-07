@@ -84,6 +84,8 @@ namespace SpotiFire.Server
             session.Login(username.Trim(), password.Trim());
             session.SetPrefferedBitrate(sp_bitrate.BITRATE_320k);
             waiter.WaitOne();
+            session.Dispose();
+            Thread.Sleep(2000);
         }
 
         static void session_PlayTokenLost(Session sender, SessionEventArgs e)

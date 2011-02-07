@@ -194,6 +194,7 @@ namespace SpotiFire.SpotifyLib
             });
 
             _Complete += new search_complete_cb(Search__Complete);
+            session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
 
         private void Search__Complete(IntPtr searchPtr, IntPtr userdataPtr)
@@ -327,14 +328,19 @@ namespace SpotiFire.SpotifyLib
         protected override void OnDispose()
         {
             _Complete -= new search_complete_cb(Search__Complete);
+            session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
 
-            lock (libspotify.Mutex)
-                try { libspotify.sp_search_release(searchPtr); }
-                catch { }
+            if(!session.ProcExit)
+                lock (libspotify.Mutex)
+                    libspotify.sp_search_release(searchPtr);
 
             searchPtr = IntPtr.Zero;
         }
 
+        private void session_DisposeAll(Session sender, SessionEventArgs e)
+        {
+            Dispose();
+        }
         #endregion
 
         #region Private Methods
