@@ -40,11 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Album.cs" />
-    <Compile Include="Artist.cs" />
+    <Compile Include="SpotifyTypes\Album.cs" />
+    <Compile Include="SpotifyTypes\Artist.cs" />
     <Compile Include="CountedDisposeableSpotifyObject.cs" />
     <Compile Include="DelegateArray.cs" />
     <Compile Include="DelegateList.cs" />
+    <Compile Include="EventArgs\DescriptionEventArgs.cs" />
     <Compile Include="DisposeableSpotifyObject.cs" />
     <Compile Include="EventWorkerItem.cs" />
     <Compile Include="Interfaces\IAlbum.cs" />
@@ -52,7 +53,7 @@
     <Compile Include="Interfaces\IArtist.cs" />
     <Compile Include="Interfaces\IEditableArray.cs" />
     <Compile Include="Interfaces\IImage.cs" />
-    <Compile Include="Image.cs" />
+    <Compile Include="SpotifyTypes\Image.cs" />
     <Compile Include="Interfaces\IPlaylist.cs" />
     <Compile Include="Interfaces\IPlaylistContainer.cs" />
     <Compile Include="Interfaces\ISearch.cs" />
@@ -60,19 +61,25 @@
     <Compile Include="Interfaces\ITrack.cs" />
     <Compile Include="libspotify.cs" />
     <Compile Include="EventArgs\MusicDeliveryEventArgs.cs" />
-    <Compile Include="Playlist.cs" />
-    <Compile Include="PlaylistContainer.cs" />
+    <Compile Include="EventArgs\ImageEventArgs.cs" />
+    <Compile Include="SpotifyTypes\Playlist.cs" />
+    <Compile Include="SpotifyTypes\PlaylistContainer.cs" />
     <Compile Include="EventArgs\PlaylistEventArgs.cs" />
     <Compile Include="EventArgs\PlaylistMovedEventArgs.cs" />
+    <Compile Include="EventArgs\PlaylistUpdateEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Search.cs" />
+    <Compile Include="SpotifyTypes\Search.cs" />
     <Compile Include="EventArgs\SearchEventArgs.cs" />
-    <Compile Include="Session.cs" />
+    <Compile Include="SpotifyTypes\Session.cs" />
     <Compile Include="EventArgs\SessionEventArgs.cs" />
     <Compile Include="SpotifyException.cs" />
-    <Compile Include="Track.cs" />
+    <Compile Include="SpotifyTypes\Track.cs" />
     <Compile Include="EventArgs\TracksEventArgs.cs" />
     <Compile Include="EventArgs\TracksAddedEventArgs.cs" />
+    <Compile Include="EventArgs\TracksMovedEventArgs.cs" />
+    <Compile Include="EventArgs\TrackCreatedChangedEventArgs.cs" />
+    <Compile Include="EventArgs\TrackEventArgs.cs" />
+    <Compile Include="EventArgs\TrackSeenEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="libspotify.dll">

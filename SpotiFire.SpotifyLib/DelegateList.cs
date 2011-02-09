@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -15,6 +12,7 @@ namespace SpotiFire.SpotifyLib
         {
             this.addFunc = addFunc;
             this.removeFunc = removeFunc;
+            this.readonlyFunc = readonlyFunc;
         }
 
         public void Add(T item)

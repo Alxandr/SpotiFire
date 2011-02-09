@@ -10,12 +10,28 @@ namespace SpotiFire.SpotifyLib
     internal class Playlist : CountedDisposeableSpotifyObject, IPlaylist
     {
         #region Wrapper
-        private class PlaylistWrapper: DisposeableSpotifyObject, IPlaylist
+        private class PlaylistWrapper : DisposeableSpotifyObject, IPlaylist
         {
             internal Playlist playlist;
             public PlaylistWrapper(Playlist playlist)
             {
                 this.playlist = playlist;
+            }
+
+            protected override void OnDispose()
+            {
+                Playlist.Delete(playlist.playlistPtr);
+                playlist = null;
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                return IsAlive() ? playlist.IntPtrHashCode() : 0;
+            }
+
+            public Session Session
+            {
+                get { IsAlive(true); return playlist.Session; }
             }
         }
         internal static IntPtr GetPointer(IPlaylist playlist)
@@ -87,17 +103,17 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Spotify Callbacks
-        private tracks_added_cb                     tracks_added;
-        private tracks_removed_cb                   tracks_removed;
-        private tracks_moved_cd                     tracks_moved;
-        private playlist_renamed_cb                 playlist_renamed;
-        private playlist_state_changed_cb           playlist_state_changed;
-        private playlist_update_in_progress_cb      playlist_update_in_progress;
-        private playlist_metadata_updated_cb        playlist_metadata_updated;
-        private track_created_changed_cb            track_created_changed;
-        private track_seen_changed_cb               track_seen_changed;
-        private description_changed_cb              description_changed;
-        private image_changed_cb                    image_changed;
+        private tracks_added_cb tracks_added;
+        private tracks_removed_cb tracks_removed;
+        private tracks_moved_cd tracks_moved;
+        private playlist_renamed_cb playlist_renamed;
+        private playlist_state_changed_cb playlist_state_changed;
+        private playlist_update_in_progress_cb playlist_update_in_progress;
+        private playlist_metadata_updated_cb playlist_metadata_updated;
+        private track_created_changed_cb track_created_changed;
+        private track_seen_changed_cb track_seen_changed;
+        private description_changed_cb description_changed;
+        private image_changed_cb image_changed;
         #endregion
 
         #region Spotify Callback Implementations
@@ -147,6 +163,68 @@ namespace SpotiFire.SpotifyLib
                 session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(p => p.OnRenamed, this), new EventArgs()));
             }
         }
+
+        private void StateChangedCallback(IntPtr playlistPtr, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(p => p.OnStateChanged, this), new EventArgs()));
+            }
+        }
+
+        private void UdateInProgressCallback(IntPtr playlistPtr, bool complete, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<PlaylistUpdateEventArgs>(p => p.OnUpdateInProgress, this), new PlaylistUpdateEventArgs(complete)));
+            }
+        }
+
+        private void MetadataUpdatedCallback(IntPtr playlistPtr, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(p => p.OnMetadataUpdated, this), new EventArgs()));
+            }
+        }
+
+        private void TrackCreatedChangedCallback(IntPtr playlistPtr, int position, IntPtr userPtr, int when, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                ITrack track = Track.Get(session, libspotify.sp_playlist_track(playlistPtr, position));
+                //IUser user = User.Get(session, userPtr);
+                DateTime dtWhen = new DateTime(TimeSpan.FromSeconds(when).Ticks, DateTimeKind.Utc);
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<TrackCreatedChangedEventArgs>(p => p.OnTrackCreatedChanged, this), new TrackCreatedChangedEventArgs(track, dtWhen)));
+            }
+        }
+
+        private void TrackSeenChangedCallback(IntPtr playlistPtr, int position, bool seen, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                ITrack track = Track.Get(session, libspotify.sp_playlist_track(playlistPtr, position));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<TrackSeenEventArgs>(p => p.OnTrackSeenChanged, this), new TrackSeenEventArgs(track, seen)));
+            }
+        }
+
+        private void DescriptionChangedCallback(IntPtr playlistPtr, IntPtr descriptionPtr, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                string description = libspotify.GetString(descriptionPtr, String.Empty);
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<DescriptionEventArgs>(p => p.OnDescriptionChanged, this), new DescriptionEventArgs(description)));
+            }
+        }
+
+        private void ImageChangedCallback(IntPtr playlistPtr, IntPtr imageIdPtr, IntPtr userdataPtr)
+        {
+            if (playlistPtr == this.playlistPtr)
+            {
+                string imgId = libspotify.ImageIdToString(imageIdPtr);
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<ImageEventArgs>(p => p.OnImageChanged, this), new ImageEventArgs(imgId)));
+            }
+        }
         #endregion
 
         #region Event Functions
@@ -175,6 +253,36 @@ namespace SpotiFire.SpotifyLib
             if (StateChanged != null)
                 StateChanged(this, args);
         }
+        protected virtual void OnUpdateInProgress(PlaylistUpdateEventArgs args)
+        {
+            if (UpdateInProgress != null)
+                UpdateInProgress(this, args);
+        }
+        protected virtual void OnMetadataUpdated(EventArgs args)
+        {
+            if (MetadataUpdated != null)
+                MetadataUpdated(this, args);
+        }
+        protected virtual void OnTrackCreatedChanged(TrackCreatedChangedEventArgs args)
+        {
+            if (TrackCreatedChanged != null)
+                TrackCreatedChanged(this, args);
+        }
+        protected virtual void OnTrackSeenChanged(TrackSeenEventArgs args)
+        {
+            if (TrackSeenChanged != null)
+                TrackSeenChanged(this, args);
+        }
+        protected virtual void OnDescriptionChanged(DescriptionEventArgs args)
+        {
+            if (DescriptionChanged != null)
+                DescriptionChanged(this, args);
+        }
+        protected virtual void OnImageChanged(ImageEventArgs args)
+        {
+            if (ImageChanged != null)
+                ImageChanged(this, args);
+        }
         #endregion
 
         #region Events
@@ -185,8 +293,8 @@ namespace SpotiFire.SpotifyLib
         public event PlaylistEventHandler StateChanged;
         public event PlaylistEventHandler<PlaylistUpdateEventArgs> UpdateInProgress;
         public event PlaylistEventHandler MetadataUpdated;
-        public event PlaylistEventHandler<TrackEventArgs> TrackCreatedChanged;
-        public event PlaylistEventHandler<TrackEventArgs> TrackSeenChanged;
+        public event PlaylistEventHandler<TrackCreatedChangedEventArgs> TrackCreatedChanged;
+        public event PlaylistEventHandler<TrackSeenEventArgs> TrackSeenChanged;
         public event PlaylistEventHandler<DescriptionEventArgs> DescriptionChanged;
         public event PlaylistEventHandler<ImageEventArgs> ImageChanged;
         #endregion
@@ -228,11 +336,33 @@ namespace SpotiFire.SpotifyLib
         {
             return expr.Compile().Invoke(p);
         }
-        //private void ImageLoadedCallback(IntPtr imagePtr, IntPtr userdataPtr)
-        //{
-        //    if (imagePtr == this.imagePtr)
-        //        session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(i => i.OnLoaded, this), new EventArgs()));
-        //}
         #endregion
+
+        #region Properties
+        public Session Session
+        {
+            get { IsAlive(true); return session; }
+        }
+        #endregion
+
+        #region Cleanup
+        protected override void OnDispose()
+        {
+            session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
+
+            if (!session.ProcExit)
+                lock (libspotify.Mutex)
+                {
+                    libspotify.sp_playlist_release(playlistPtr);
+                }
+
+            playlistPtr = IntPtr.Zero;
+        }
+        #endregion
+
+        protected override int IntPtrHashCode()
+        {
+            return playlistPtr.GetHashCode();
+        }
     }
 }
