@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -33,7 +30,7 @@ namespace SpotiFire.SpotifyLib
 
         private bool disposed = false;
 
-        private PlaylistContainer playlistContainer = null;
+        private IPlaylistContainer playlistContainer = null;
 
         #endregion
 
@@ -74,7 +71,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public PlaylistContainer PlaylistContainer
+        public IPlaylistContainer PlaylistContainer
         {
             get
             {
@@ -216,6 +213,7 @@ namespace SpotiFire.SpotifyLib
                 }
                 while (waitTime == 0);
             }
+            Console.WriteLine("Main loop exiting.");
         }
 
         private void EventThread()
@@ -244,6 +242,7 @@ namespace SpotiFire.SpotifyLib
 
                 localList.Clear();
             }
+            Console.WriteLine("Event loop exiting");
         }
         #endregion
 
@@ -280,9 +279,8 @@ namespace SpotiFire.SpotifyLib
             if (s == null)
                 return;
 
-            // TODO: Implement Playlists.
             if (s.ConnectionState == sp_connectionstate.LOGGED_IN && error == sp_error.OK)
-                s.playlistContainer = new PlaylistContainer(s, libspotify.sp_session_playlistcontainer(sessionPtr));
+                s.playlistContainer = SpotifyLib.PlaylistContainer.Get(s, libspotify.sp_session_playlistcontainer(sessionPtr));
 
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnLoginComplete, s), new SessionEventArgs(error)));
         }

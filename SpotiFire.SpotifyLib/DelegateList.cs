@@ -5,103 +5,73 @@ using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
-    internal class DelegateList<T> : IArray<T>
+    internal class DelegateList<T> : DelegateArray<T>, IEditableArray<T>
     {
-        private Func<int> getLength;
-        private Func<int, T> getIndex;
-        public DelegateList(Func<int> getLength, Func<int, T> getIndex)
+        private Action<T> addFunc;
+        private Action<int> removeFunc;
+        private Func<bool> readonlyFunc;
+        public DelegateList(Func<int> getLength, Func<int, T> getIndex, Action<T> addFunc, Action<int> removeFunc, Func<bool> readonlyFunc)
+            : base(getLength, getIndex)
         {
-            this.getLength = getLength;
-            this.getIndex = getIndex;
+            this.addFunc = addFunc;
+            this.removeFunc = removeFunc;
         }
 
-        public int Length
+        public void Add(T item)
+        {
+            addFunc(item);
+        }
+
+        public void Clear()
+        {
+            while (Count > 0)
+                removeFunc(0);
+        }
+
+        public bool Contains(T item)
+        {
+            foreach (T itm in this)
+                if (itm.Equals(item))
+                    return true;
+            return false;
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            if (array == null)
+                throw new ArgumentNullException("array");
+            if (arrayIndex < 0)
+                throw new ArgumentOutOfRangeException("arrayIndex");
+            if (Count > array.Length - arrayIndex)
+                throw new ArgumentException("Array to small");
+
+            int i = arrayIndex;
+            foreach (T item in this)
+                array[i++] = item;
+        }
+
+        public bool IsReadOnly
         {
             get
             {
-                return getLength();
+                return readonlyFunc();
             }
         }
 
-        public T this[int index]
+        public bool Remove(T item)
         {
-            get
-            {
-                if (index >= getLength() || index < 0)
-                    throw new IndexOutOfRangeException();
+            bool found = false;
+            int i = 0, size = getLength();
+            while (!found && i < size)
+                if (!this[i].Equals(item))
+                    i++;
+                else
+                    found = true;
 
-                return getIndex(index);
-            }
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new DelegateEnumerator(getLength, getIndex);
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-
-        public class DelegateEnumerator : IEnumerator<T>
-        {
-            private Func<int> getLength;
-            private Func<int, T> getIndex;
-            private T current;
-            private int currentIndex;
-            private int length;
-            public DelegateEnumerator(Func<int> getLength, Func<int, T> getIndex)
-            {
-                this.getLength = getLength;
-                this.getIndex = getIndex;
-                Reset();
-            }
-
-            public T Current
-            {
-                get
-                {
-                    if (currentIndex == -1 || currentIndex == int.MaxValue)
-                        throw new Exception("Before first element");
-
-                    if (current == null)
-                        current = getIndex(currentIndex);
-
-                    return current;
-                }
-            }
-
-            public void Dispose()
-            {
-                getLength = null;
-                getIndex = null;
-                current = default(T);
-            }
-
-            object System.Collections.IEnumerator.Current
-            {
-                get { return this.Current; }
-            }
-
-            public bool MoveNext()
-            {
-                currentIndex++;
-                current = default(T);
-                if (currentIndex >= length)
-                {
-                    currentIndex = int.MaxValue;
-                    return false;
-                }
-                return true;
-            }
-
-            public void Reset()
-            {
-                currentIndex = -1;
-                current = default(T);
-                length = getLength();
-            }
+            if (!found)
+                return false;
+            removeFunc(i);
+            return true;
         }
     }
 }

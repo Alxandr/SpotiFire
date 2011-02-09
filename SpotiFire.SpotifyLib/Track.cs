@@ -125,7 +125,7 @@ namespace SpotiFire.SpotifyLib
         private Session session;
 
         private IAlbum album = null;
-        private DelegateList<IArtist> artists = null;
+        private DelegateArray<IArtist> artists = null;
         #endregion
 
         #region Constructor
@@ -141,7 +141,7 @@ namespace SpotiFire.SpotifyLib
             lock (libspotify.Mutex)
                 libspotify.sp_track_add_ref(trackPtr);
 
-            this.artists = new DelegateList<IArtist>(() =>
+            this.artists = new DelegateArray<IArtist>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)

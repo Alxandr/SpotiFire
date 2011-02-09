@@ -4,7 +4,7 @@ namespace SpotiFire.SpotifyLib
 {
     public interface IArray<T> : IEnumerable<T>
     {
-        int Length { get; }
+        int Count { get; }
         T this[int index] { get; }
     }
 }

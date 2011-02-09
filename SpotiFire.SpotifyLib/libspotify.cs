@@ -367,7 +367,7 @@ namespace SpotiFire.SpotifyLib
         /// </summary>
         /// <param name="sessionPtr">Session object returned from <c>sp_session_create</c>.</param>
         /// <param name="trackArrayPtr">An array of pointer to tracks.</param>
-        /// <param name="num_tracks">Length of <c>trackArray</c>.</param>
+        /// <param name="num_tracks">Count of <c>trackArray</c>.</param>
         /// <param name="star">Starred status of the track.</param>
         [DllImport("libspotify")]
         internal static extern void sp_track_set_starred(IntPtr sessionPtr, IntPtr trackArrayPtr, int num_tracks, bool star);
@@ -449,7 +449,7 @@ namespace SpotiFire.SpotifyLib
         /// <param name="artist">Name of the artist.</param>
         /// <param name="title">Song title.</param>
         /// <param name="album">Name of the album, or an empty string if not available.</param>
-        /// <param name="length">Length in MS, or -1 if not available.</param>
+        /// <param name="length">Count in MS, or -1 if not available.</param>
         /// <returns>A track.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_localtrack_create(string artist, string title, string album, int length);
@@ -967,10 +967,10 @@ namespace SpotiFire.SpotifyLib
         /// Get image for a playlist.
         /// </summary>
         /// <param name="playlistPtr">Playlist object.</param>
-        /// <param name="imageId">20 byte image id.</param>
+        /// <param name="imageId">[out] 20 byte image id.</param>
         /// <returns>True if playlist has an image, otherwise false.</returns>
         [DllImport("libspotify")]
-        internal static extern bool sp_playlist_get_image(IntPtr playlistPtr, out byte[] imageId);
+        internal static extern bool sp_playlist_get_image(IntPtr playlistPtr, IntPtr imageId);
 
         /// <summary>
         /// Check if a playlist has pending changes.
@@ -986,7 +986,7 @@ namespace SpotiFire.SpotifyLib
         /// </summary>
         /// <param name="playlistPtr">Playlist object.</param>
         /// <param name="trackArrayPtr">Array of pointer to tracks.</param>
-        /// <param name="numTracks">Length of <c>tracks</c> array.</param>
+        /// <param name="numTracks">Count of <c>tracks</c> array.</param>
         /// <param name="position">Start position in playlist where to insert the tracks.</param>
         /// <param name="sessionPtr">Your session object.</param>
         /// <returns>Error code.</returns>
@@ -999,7 +999,7 @@ namespace SpotiFire.SpotifyLib
         /// <param name="playlistPtr">Playlist object.</param>
         /// <param name="trackIndices">Array of pointer to track indices.
         /// A certain track index should be present at most once, e.g. [0, 1, 2] is valid indata, whereas [0, 1, 1] is invalid.</param>
-        /// <param name="numTracks">Length of <c>trackIndices</c> array.</param>
+        /// <param name="numTracks">Count of <c>trackIndices</c> array.</param>
         /// <returns>Error code.</returns>
         [DllImport("libspotify")]
         internal static extern sp_error sp_playlist_remove_tracks(IntPtr playlistPtr, int[] trackIndices, int numTracks);
@@ -1010,7 +1010,7 @@ namespace SpotiFire.SpotifyLib
         /// <param name="playlistPtr">Playlist object.</param>
         /// <param name="trackIndices">Array of pointer to track indices to be moved.
         /// A certain track index should be present at most once, e.g. [0, 1, 2] is valid indata, whereas [0, 1, 1] is invalid.</param>
-        /// <param name="numTracks">Length of <c>trackIndices</c> array.</param>
+        /// <param name="numTracks">Count of <c>trackIndices</c> array.</param>
         /// <param name="newPosition">New position for tracks.</param>
         /// <returns>Error code.</returns>
         [DllImport("libspotify")]

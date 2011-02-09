@@ -140,9 +140,9 @@ namespace SpotiFire.SpotifyLib
 
         internal static search_complete_cb search_complete = new search_complete_cb(_SearchCompleteCallback);
 
-        private DelegateList<ITrack> tracks;
-        private DelegateList<IAlbum> albums;
-        private DelegateList<IArtist> artists;
+        private DelegateArray<ITrack> tracks;
+        private DelegateArray<IAlbum> albums;
+        private DelegateArray<IArtist> artists;
         #endregion
 
         #region Constructor and setup
@@ -157,7 +157,7 @@ namespace SpotiFire.SpotifyLib
 
             this.searchPtr = searchPtr;
 
-            this.tracks = new DelegateList<ITrack>(() =>
+            this.tracks = new DelegateArray<ITrack>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
@@ -169,7 +169,7 @@ namespace SpotiFire.SpotifyLib
                     return Track.Get(session, libspotify.sp_search_track(searchPtr, index));
             });
 
-            this.albums = new DelegateList<IAlbum>(() =>
+            this.albums = new DelegateArray<IAlbum>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
@@ -181,7 +181,7 @@ namespace SpotiFire.SpotifyLib
                     return Album.Get(session, libspotify.sp_search_album(searchPtr, index));
             });
 
-            this.artists = new DelegateList<IArtist>(() =>
+            this.artists = new DelegateArray<IArtist>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
@@ -312,9 +312,9 @@ namespace SpotiFire.SpotifyLib
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("[Search]");
             sb.AppendLine("Error=" + Error);
-            sb.AppendLine("Tracks.Length=" + Tracks.Length);
-            sb.AppendLine("Albums.Length=" + Albums.Length);
-            //sb.AppendLine("Artists.Length=" + Artists.Length);
+            sb.AppendLine("Tracks.Count=" + Tracks.Count);
+            sb.AppendLine("Albums.Count=" + Albums.Count);
+            //sb.AppendLine("Artists.Count=" + Artists.Count);
             sb.AppendLine("Query=" + Query);
             sb.AppendLine("DidYouMean=" + DidYouMean);
             sb.AppendLine("TotalTracks=" + TotalTracks);

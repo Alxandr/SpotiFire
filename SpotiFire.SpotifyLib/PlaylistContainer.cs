@@ -7,10 +7,114 @@ using System.Linq.Expressions;
 
 namespace SpotiFire.SpotifyLib
 {
-    public delegate void PlaylistContainerHandler(PlaylistContainer pc, EventArgs args);
-    public delegate void PlaylistContainerHandler<TEventArgs>(PlaylistContainer pc, TEventArgs args) where TEventArgs : EventArgs;
-    public class PlaylistContainer : DisposeableSpotifyObject
+    public delegate void PlaylistContainerHandler(IPlaylistContainer pc, EventArgs args);
+    public delegate void PlaylistContainerHandler<TEventArgs>(IPlaylistContainer pc, TEventArgs args) where TEventArgs : EventArgs;
+    internal class PlaylistContainer : CountedDisposeableSpotifyObject, IPlaylistContainer
     {
+        #region Wrapper
+        private class PlaylistContainerWrapper : DisposeableSpotifyObject, IPlaylistContainer
+        {
+            internal PlaylistContainer pc;
+            public PlaylistContainerWrapper(PlaylistContainer pc)
+            {
+                this.pc = pc;
+                pc.Loaded += new PlaylistContainerHandler(pc_Loaded);
+                pc.PlaylistAdded += new PlaylistContainerHandler<PlaylistEventArgs>(pc_PlaylistAdded);
+                pc.PlaylistMoved += new PlaylistContainerHandler<PlaylistMovedEventArgs>(pc_PlaylistMoved);
+                pc.PlaylistRemoved += new PlaylistContainerHandler<PlaylistEventArgs>(pc_PlaylistRemoved);
+            }
+
+            void pc_PlaylistRemoved(IPlaylistContainer pc, PlaylistEventArgs args)
+            {
+                if (PlaylistRemoved != null)
+                    PlaylistRemoved(this, args);
+            }
+
+            void pc_PlaylistMoved(IPlaylistContainer pc, PlaylistMovedEventArgs args)
+            {
+                if (PlaylistMoved != null)
+                    PlaylistMoved(this, null);
+            }
+
+            void pc_PlaylistAdded(IPlaylistContainer pc, PlaylistEventArgs args)
+            {
+                if (PlaylistAdded != null)
+                    PlaylistAdded(this, args);
+            }
+
+            void pc_Loaded(IPlaylistContainer pc, EventArgs args)
+            {
+                if (Loaded != null)
+                    Loaded(this, args);
+            }
+
+            protected override void OnDispose()
+            {
+                pc.Loaded -= new PlaylistContainerHandler(pc_Loaded);
+                pc.PlaylistAdded -= new PlaylistContainerHandler<PlaylistEventArgs>(pc_PlaylistAdded);
+                pc.PlaylistMoved -= new PlaylistContainerHandler<PlaylistMovedEventArgs>(pc_PlaylistMoved);
+                pc.PlaylistRemoved -= new PlaylistContainerHandler<PlaylistEventArgs>(pc_PlaylistRemoved);
+                PlaylistContainer.Delete(pc.pcPtr);
+                pc = null;
+            }
+
+            protected override int IntPtrHashCode()
+            {
+                return IsAlive() ? pc.IntPtrHashCode() : 0;
+            }
+
+            public event PlaylistContainerHandler Loaded;
+
+            public event PlaylistContainerHandler<PlaylistEventArgs> PlaylistAdded;
+
+            public event PlaylistContainerHandler<PlaylistMovedEventArgs> PlaylistMoved;
+
+            public event PlaylistContainerHandler<PlaylistEventArgs> PlaylistRemoved;
+
+            public Session Session
+            {
+                get { IsAlive(true); return pc.Session; }
+            }
+        }
+
+        internal static IntPtr GetPointer(IPlaylistContainer pc)
+        {
+            if (pc.GetType() == typeof(PlaylistContainerWrapper))
+                return ((PlaylistContainerWrapper)pc).pc.pcPtr;
+            throw new ArgumentException("Invalid pc");
+        }
+        #endregion
+        #region Counter
+        private static Dictionary<IntPtr, PlaylistContainer> pcs = new Dictionary<IntPtr, PlaylistContainer>();
+        private static readonly object pcsLock = new object();
+
+        internal static IPlaylistContainer Get(Session session, IntPtr pcPtr)
+        {
+            PlaylistContainer pc;
+            lock (pcsLock)
+            {
+                if (!pcs.ContainsKey(pcPtr))
+                {
+                    pcs.Add(pcPtr, new PlaylistContainer(session, pcPtr));
+                }
+                pc = pcs[pcPtr];
+                pc.AddRef();
+            }
+            return new PlaylistContainerWrapper(pc);
+        }
+
+        internal static void Delete(IntPtr pcPtr)
+        {
+            lock (pcsLock)
+            {
+                PlaylistContainer pc = pcs[pcPtr];
+                int count = pc.RemRef();
+                if (count == 0)
+                    pcs.Remove(pcPtr);
+            }
+        }
+        #endregion
+
         #region Structs
         private struct sp_playlistcontainer_callbacks
         {
@@ -41,7 +145,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Constructor
-        internal PlaylistContainer(Session session, IntPtr pcPtr)
+        private PlaylistContainer(Session session, IntPtr pcPtr)
         {
             if (pcPtr == IntPtr.Zero)
                 throw new ArgumentException("pcPtr can't be zero");
@@ -79,6 +183,17 @@ namespace SpotiFire.SpotifyLib
         void session_DisposeAll(Session sender, SessionEventArgs e)
         {
             Dispose();
+        }
+        #endregion
+
+        #region Properties
+        public Session Session
+        {
+            get
+            {
+                IsAlive(true);
+                return session;
+            }
         }
         #endregion
 

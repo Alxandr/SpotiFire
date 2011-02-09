@@ -53,12 +53,6 @@ namespace SpotiFire.Server
         {
             string username, password;
 
-            Console.Write("Enter spotify username: ");
-            username = Console.ReadLine();
-            Console.Write("Enter password: ");
-            password = Console.ReadLine();
-            Console.Write("Enter search: ");
-            searchTerm = Console.ReadLine();
             AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
             string dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SpotiFire", "libspotify");
             try
@@ -81,11 +75,57 @@ namespace SpotiFire.Server
             session.StopPlayback += new SessionEventHandler(session_StopPlayback);
             session.MessageToUser += new SessionEventHandler(session_MessageToUser);
             session.PlayTokenLost += new SessionEventHandler(session_PlayTokenLost);
+
+            Console.Write("Enter spotify username: ");
+            username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            password = ReadPassword();
+
             session.Login(username.Trim(), password.Trim());
             session.SetPrefferedBitrate(sp_bitrate.BITRATE_320k);
             waiter.WaitOne();
             session.Dispose();
-            Thread.Sleep(2000);
+            session = null;
+            GC.WaitForPendingFinalizers();
+            GC.WaitForFullGCComplete();
+        }
+
+        static string ReadPassword()
+        {
+            bool enter = false;
+            StringBuilder sb = new StringBuilder();
+            while(!enter)
+            {
+                var key = Console.ReadKey();
+                var c = key.KeyChar.ToString().ToLower()[0];
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    enter = true;
+                    Console.WriteLine();
+                }
+                else if (key.Key == ConsoleKey.Backspace)
+                {
+                    sb.Remove(sb.Length - 1, 1);
+                    //Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                    Console.Write(' ');
+                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                    Console.Out.Flush();
+                }
+                else if (c >= 'a' && c <= 'z' || c >= '1' && c <= '0')
+                {
+                    sb.Append(key.KeyChar);
+                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                    Console.Write('*');
+                    Console.Out.Flush();
+                }
+                else
+                {
+                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                    Console.Write(' ');
+                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                }
+            }
+            return sb.ToString();
         }
 
         static void session_PlayTokenLost(Session sender, SessionEventArgs e)
@@ -156,7 +196,7 @@ namespace SpotiFire.Server
         static void search_Complete(ISearch sender, EventArgs e)
         {
             Console.WriteLine("Search complete!");
-            if (sender.Tracks.Length == 0)
+            if (sender.Tracks.Count == 0)
             {
                 Console.WriteLine("Did you mean \"{0}\"?", sender.DidYouMean);
                 DoSearch(sender.Session);
@@ -202,12 +242,19 @@ namespace SpotiFire.Server
 
         static void session_LoginComplete(Session sender, SessionEventArgs e)
         {
+            if (sender.ConnectionState != sp_connectionstate.LOGGED_IN)
+            {
+                session_LogoutComplete(sender, e);
+                return;
+            }
             Console.WriteLine("Login complete!");
+            Console.Write("Enter search: ");
+            searchTerm = Console.ReadLine();
             sender.Search(searchTerm, 0, 1, 0, 0, 0, 0).Complete += new SearchEventHandler(search_Complete);
             sender.PlaylistContainer.Loaded += new PlaylistContainerHandler(PlaylistContainer_Loaded);
         }
 
-        static void PlaylistContainer_Loaded(PlaylistContainer pc, EventArgs args)
+        static void PlaylistContainer_Loaded(IPlaylistContainer pc, EventArgs args)
         {
             Console.WriteLine("Playlistcontainer loaded.");
         }
