@@ -195,7 +195,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Playlist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index));
+                        return Playlist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index), libspotify.sp_playlistcontainer_playlist_folder_id(pcPtr, index));
                 },
                 (playlist) =>
                 {
@@ -285,11 +285,11 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Internal Playlist methods
-        internal sp_playlist_type GetPlaylistType(Playlist playlist)
+        internal string GetFolderName(Playlist playlist)
         {
             int index = playlists.IndexOf(playlist);
             lock (libspotify.Mutex)
-                return libspotify.sp_playlistcontainer_playlist_type(pcPtr, index);
+                return libspotify.GetString(libspotify.sp_playlistcontainer_playlist_folder_name(pcPtr, index), String.Empty);
         }
         #endregion
 

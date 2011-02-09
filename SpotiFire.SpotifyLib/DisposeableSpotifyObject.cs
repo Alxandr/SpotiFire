@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -60,16 +57,16 @@ namespace SpotiFire.SpotifyLib
             return IntPtrHashCode();
         }
 
-        static public bool operator == (DisposeableSpotifyObject obj, object obj2)
+        static public bool operator ==(DisposeableSpotifyObject obj, object obj2)
         {
-            if(!Object.ReferenceEquals(obj, obj2))
+            if (!Object.ReferenceEquals(obj, obj2))
                 return obj.Equals(obj2);
             return true;
         }
 
         static public bool operator !=(DisposeableSpotifyObject obj, object obj2)
         {
-            if(!Object.ReferenceEquals(obj, obj2))
+            if (!Object.ReferenceEquals(obj, obj2))
                 return !obj.Equals(obj2);
             return false;
         }
