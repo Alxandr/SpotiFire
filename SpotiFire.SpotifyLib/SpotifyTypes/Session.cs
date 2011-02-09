@@ -35,21 +35,21 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Delegates
-        private delegate void logged_in_delegate                (IntPtr sessionPtr, sp_error error);
-        private delegate void logged_out_delegate               (IntPtr sessionPtr);
-        private delegate void metadata_updated_delegate         (IntPtr sessionPtr);
-        private delegate void connection_error_delegate         (IntPtr sessionPtr, sp_error error);
-        private delegate void message_to_user_delegate          (IntPtr sessionPtr, string message);
-        private delegate void notify_main_thread_delegate       (IntPtr sessionPtr);
-        private delegate int  music_delivery_delegate           (IntPtr sessionPtr, IntPtr formatPtr, IntPtr framesPtr, int num_frames);
-        private delegate void play_token_lost_delegate          (IntPtr sessionPtr);
-        private delegate void log_message_delegate              (IntPtr sessionPtr, string data);
-        private delegate void end_of_track_delegate             (IntPtr sessionPtr);
-        private delegate void streaming_error_delegate          (IntPtr sessionPtr, sp_error error);
-        private delegate void userinfo_updated_delegate         (IntPtr sessionPtr);
-        private delegate void start_playback_delegate           (IntPtr sessionPtr);
-        private delegate void stop_playback_delegate            (IntPtr sessionPtr);
-        private delegate void get_audio_buffer_stats_delegate   (IntPtr sessionPtr, IntPtr statsPtr);
+        private delegate void logged_in_delegate(IntPtr sessionPtr, sp_error error);
+        private delegate void logged_out_delegate(IntPtr sessionPtr);
+        private delegate void metadata_updated_delegate(IntPtr sessionPtr);
+        private delegate void connection_error_delegate(IntPtr sessionPtr, sp_error error);
+        private delegate void message_to_user_delegate(IntPtr sessionPtr, string message);
+        private delegate void notify_main_thread_delegate(IntPtr sessionPtr);
+        private delegate int music_delivery_delegate(IntPtr sessionPtr, IntPtr formatPtr, IntPtr framesPtr, int num_frames);
+        private delegate void play_token_lost_delegate(IntPtr sessionPtr);
+        private delegate void log_message_delegate(IntPtr sessionPtr, string data);
+        private delegate void end_of_track_delegate(IntPtr sessionPtr);
+        private delegate void streaming_error_delegate(IntPtr sessionPtr, sp_error error);
+        private delegate void userinfo_updated_delegate(IntPtr sessionPtr);
+        private delegate void start_playback_delegate(IntPtr sessionPtr);
+        private delegate void stop_playback_delegate(IntPtr sessionPtr);
+        private delegate void get_audio_buffer_stats_delegate(IntPtr sessionPtr, IntPtr statsPtr);
         #endregion
 
         #region Spotify Event Handlers
@@ -169,9 +169,9 @@ namespace SpotiFire.SpotifyLib
 
         public static Session Create(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
-            lock(libspotify.Mutex)
+            lock (libspotify.Mutex)
             {
-                if(sessions.Count > 0)
+                if (sessions.Count > 0)
                     throw new InvalidOperationException("libspotify can only handle one session at the moment");
 
                 Session instance = new Session(applicationKey, cacheLocation, settingsLocation, userAgent);
@@ -588,7 +588,7 @@ namespace SpotiFire.SpotifyLib
 
         public sp_error PlayerLoad(ITrack track)
         {
-            PlayerUnload();
+            //PlayerUnload();
 
             sp_error ret;
             lock (libspotify.Mutex)
@@ -642,7 +642,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     if (sessionPtr != IntPtr.Zero && !ProcExit)
                     {
-                        if(ConnectionState == sp_connectionstate.LOGGED_IN)
+                        if (ConnectionState == sp_connectionstate.LOGGED_IN)
                             try { libspotify.sp_session_logout(sessionPtr); }
                             catch { }
                         libspotify.sp_session_release(sessionPtr);

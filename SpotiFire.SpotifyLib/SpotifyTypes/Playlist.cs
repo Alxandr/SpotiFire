@@ -41,6 +41,11 @@ namespace SpotiFire.SpotifyLib
                 return IsAlive() ? playlist.IntPtrHashCode() : 0;
             }
 
+            public IEditableArray<ITrack> Tracks
+            {
+                get { IsAlive(true); return playlist.Tracks; }
+            }
+
             public sp_playlist_type Type
             {
                 get { IsAlive(true); return playlist.Type; }
@@ -345,6 +350,8 @@ namespace SpotiFire.SpotifyLib
         private IntPtr callbacksPtr = IntPtr.Zero;
         private sp_playlist_type type;
         private IntPtr folderId = IntPtr.Zero;
+
+        private IEditableArray<ITrack> tracks;
         #endregion
 
         #region Constructor
@@ -370,6 +377,38 @@ namespace SpotiFire.SpotifyLib
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
+
+            tracks = new DelegateList<ITrack>(
+                () =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        return libspotify.sp_playlist_num_tracks(playlistPtr);
+                },
+                (index) =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        return Track.Get(session, libspotify.sp_playlist_track(playlistPtr, index));
+                },
+                (track, index) =>
+                {
+                    IntPtr[] ptrArray = new IntPtr[1];
+                    IntPtr trackArrayPtr = Marshal.AllocHGlobal(Marshal.SizeOf(ptrArray));
+                    Marshal.Copy(ptrArray, 0, trackArrayPtr, 1);
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        libspotify.sp_playlist_add_tracks(playlistPtr, trackArrayPtr, 1, index, session.sessionPtr);
+                    Marshal.FreeHGlobal(trackArrayPtr);
+                },
+                (index) =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        libspotify.sp_playlist_remove_tracks(playlistPtr, new int[] { index }, 1);
+                },
+                () => false
+            );
         }
 
         void session_DisposeAll(Session sender, SessionEventArgs e)
@@ -405,6 +444,15 @@ namespace SpotiFire.SpotifyLib
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     libspotify.sp_playlist_rename(playlistPtr, value);
+            }
+        }
+
+        public IEditableArray<ITrack> Tracks
+        {
+            get
+            {
+                IsAlive(true);
+                return tracks;
             }
         }
 

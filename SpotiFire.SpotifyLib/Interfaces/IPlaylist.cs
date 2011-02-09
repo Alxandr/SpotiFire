@@ -5,5 +5,6 @@ namespace SpotiFire.SpotifyLib
     {
         string Name { get; set; }
         sp_playlist_type Type { get; }
+        IEditableArray<ITrack> Tracks { get; }
     }
 }

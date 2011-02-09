@@ -4,10 +4,10 @@ namespace SpotiFire.SpotifyLib
 {
     internal class DelegateList<T> : DelegateArray<T>, IEditableArray<T>
     {
-        private Action<T> addFunc;
+        private Action<T, int> addFunc;
         private Action<int> removeFunc;
         private Func<bool> readonlyFunc;
-        public DelegateList(Func<int> getLength, Func<int, T> getIndex, Action<T> addFunc, Action<int> removeFunc, Func<bool> readonlyFunc)
+        public DelegateList(Func<int> getLength, Func<int, T> getIndex, Action<T, int> addFunc, Action<int> removeFunc, Func<bool> readonlyFunc)
             : base(getLength, getIndex)
         {
             this.addFunc = addFunc;
@@ -17,7 +17,7 @@ namespace SpotiFire.SpotifyLib
 
         public void Add(T item)
         {
-            addFunc(item);
+            addFunc(item, getLength());
         }
 
         public void Clear()

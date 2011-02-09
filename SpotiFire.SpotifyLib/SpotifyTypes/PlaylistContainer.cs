@@ -197,11 +197,19 @@ namespace SpotiFire.SpotifyLib
                     lock (libspotify.Mutex)
                         return Playlist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index), libspotify.sp_playlistcontainer_playlist_folder_id(pcPtr, index));
                 },
-                (playlist) =>
+                (playlist, index) =>
                 {
                     IsAlive(true);
+                    IntPtr playlistPtr;
+                    int newIndex = 0;
                     lock (libspotify.Mutex)
-                        libspotify.sp_playlistcontainer_add_new_playlist(pcPtr, playlist.Name);
+                    {
+                        playlistPtr = libspotify.sp_playlistcontainer_add_new_playlist(pcPtr, playlist.Name);
+                        newIndex = libspotify.sp_playlistcontainer_num_playlists(pcPtr);
+                    }
+                    if (playlistPtr != IntPtr.Zero)
+                        lock (libspotify.Mutex)
+                            libspotify.sp_playlistcontainer_move_playlist(pcPtr, newIndex, index);
                 },
                 (index) =>
                 {

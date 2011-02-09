@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using SpotiFire.SpotifyLib;
@@ -44,8 +45,10 @@ namespace SpotiFire.Server
 
         private static BASSPlayer player;
         private static string searchTerm;
+        private static bool playing = false;
         private static int currentIndex = 0;
         private static ManualResetEvent waiter = new ManualResetEvent(false);
+        private static IPlaylist playlist = null;
 
         static void Main(string[] args)
         {
@@ -88,6 +91,29 @@ namespace SpotiFire.Server
             GC.WaitForFullGCComplete();
         }
 
+        static void PlayNext()
+        {
+            int newIndex = ++currentIndex;
+            if (newIndex == playlist.Tracks.Count)
+            {
+                playlist.Session.Logout();
+                return;
+            }
+            ITrack track = playlist.Tracks[newIndex];
+            if (track.IsAvailable)
+            {
+                String[] artistNames = track.Artists.Select(a => a.Name).ToArray();
+                Console.WriteLine("Playing track {0} by {1}. Index is {2}.", track.Name, String.Join(", ", artistNames), newIndex);
+                playlist.Session.PlayerLoad(track);
+                playlist.Session.PlayerPlay();
+
+            }
+            else
+            {
+                PlayNext();
+            }
+        }
+
         static string ReadPassword()
         {
             bool enter = false;
@@ -103,6 +129,8 @@ namespace SpotiFire.Server
                 }
                 else if (key.Key == ConsoleKey.Backspace)
                 {
+                    if (sb.Length == 0)
+                        continue;
                     sb.Remove(sb.Length - 1, 1);
                     //Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
                     Console.Write(' ');
@@ -151,8 +179,7 @@ namespace SpotiFire.Server
         {
             Console.WriteLine("End of track.");
 
-            Thread.Sleep(510); //Empty player buffer (lags for 500ms);
-            player.Stop();
+            PlayNext();
         }
 
         static void session_MusicDeliver(Session sender, MusicDeliveryEventArgs e)
@@ -231,10 +258,18 @@ namespace SpotiFire.Server
         {
             Console.WriteLine("Playlistcontainer loaded.");
             int i = 0;
-            foreach (var playlist in pc.Playlists)
+            foreach (var pl in pc.Playlists.Select(p => new { p = p, i = i++ }).Where(p => p.p.Type == sp_playlist_type.SP_PLAYLIST_TYPE_PLAYLIST))
             {
-                Console.WriteLine("Playlists[{0}].Name: {1}, Type: {2}", i++, playlist.Name, playlist.Type);
+                var playlist = pl.p;
+                var index = pl.i;
+                Console.WriteLine("Playlists[{0}].Name: {1}, Tracks.Count: {2}", index, playlist.Name, playlist.Tracks.Count);
             }
+            Console.Write("Select playlist (index): ");
+            int plInd = int.Parse(Console.ReadLine());
+            var pls = pc.Playlists[plInd];
+            Program.playlist = pls;
+            Program.currentIndex = -1;
+            PlayNext();
         }
 
         static void session_LogMessage(Session sender, SessionEventArgs e)
