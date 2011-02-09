@@ -58,6 +58,15 @@ namespace SpotiFire.SpotifyLib
 
         public bool Remove(T item)
         {
+            int index = IndexOf(item);
+            if (index == -1)
+                return false;
+            removeFunc(index);
+            return true;
+        }
+
+        public int IndexOf(T item)
+        {
             bool found = false;
             int i = 0, size = getLength();
             while (!found && i < size)
@@ -67,9 +76,8 @@ namespace SpotiFire.SpotifyLib
                     found = true;
 
             if (!found)
-                return false;
-            removeFunc(i);
-            return true;
+                return -1;
+            return i;
         }
     }
 }

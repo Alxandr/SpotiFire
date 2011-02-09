@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -75,6 +73,11 @@ namespace SpotiFire.SpotifyLib
             {
                 get { IsAlive(true); return pc.Session; }
             }
+
+            public IEditableArray<IPlaylist> Playlists
+            {
+                get { IsAlive(true); return pc.Playlists; }
+            }
         }
 
         internal static IntPtr GetPointer(IPlaylistContainer pc)
@@ -142,6 +145,8 @@ namespace SpotiFire.SpotifyLib
         private playlist_removed_cb playlist_removed;
         private playlist_moved_cb playlist_moved;
         private container_loaded_cb container_loaded;
+
+        private IEditableArray<IPlaylist> playlists;
         #endregion
 
         #region Constructor
@@ -178,6 +183,34 @@ namespace SpotiFire.SpotifyLib
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
+
+            playlists = new DelegateList<IPlaylist>(
+                () =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        return libspotify.sp_playlistcontainer_num_playlists(pcPtr);
+                },
+                (index) =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        return Playlist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index));
+                },
+                (playlist) =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        libspotify.sp_playlistcontainer_add_new_playlist(pcPtr, playlist.Name);
+                },
+                (index) =>
+                {
+                    IsAlive(true);
+                    lock (libspotify.Mutex)
+                        libspotify.sp_playlistcontainer_remove_playlist(pcPtr, index);
+                },
+                () => false
+            );
         }
 
         void session_DisposeAll(Session sender, SessionEventArgs e)
@@ -187,6 +220,10 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
+        public IEditableArray<IPlaylist> Playlists
+        {
+            get { return playlists; }
+        }
         public Session Session
         {
             get
@@ -215,7 +252,7 @@ namespace SpotiFire.SpotifyLib
         private void PlaylistMovedCallback(IntPtr pcPtr, IntPtr playlistPtr, int position, int newPosition, IntPtr userdataPtr)
         {
             if (pcPtr == this.pcPtr)
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<PlaylistMovedEventArgs>(pc => pc.OnPlaylistMoved, this), new PlaylistEventArgs(playlistPtr, position)));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<PlaylistMovedEventArgs>(pc => pc.OnPlaylistMoved, this), new PlaylistMovedEventArgs(playlistPtr, position, newPosition)));
         }
         private void ContainerLoadedCallback(IntPtr pcPtr, IntPtr userdataPtr)
         {
@@ -247,6 +284,15 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
+        #region Internal Playlist methods
+        internal sp_playlist_type GetPlaylistType(Playlist playlist)
+        {
+            int index = playlists.IndexOf(playlist);
+            lock (libspotify.Mutex)
+                return libspotify.sp_playlistcontainer_playlist_type(pcPtr, index);
+        }
+        #endregion
+
         #region Events
         public event PlaylistContainerHandler<PlaylistEventArgs> PlaylistAdded;
         public event PlaylistContainerHandler<PlaylistEventArgs> PlaylistRemoved;
@@ -259,7 +305,7 @@ namespace SpotiFire.SpotifyLib
         {
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
 
-            if(!session.ProcExit)
+            if (!session.ProcExit)
                 lock (libspotify.Mutex)
                 {
                     try { libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero); }

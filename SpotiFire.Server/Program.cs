@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Threading;
 using SpotiFire.SpotifyLib;
 using d = System.Drawing;
@@ -94,7 +92,7 @@ namespace SpotiFire.Server
         {
             bool enter = false;
             StringBuilder sb = new StringBuilder();
-            while(!enter)
+            while (!enter)
             {
                 var key = Console.ReadKey();
                 var c = key.KeyChar.ToString().ToLower()[0];
@@ -155,15 +153,13 @@ namespace SpotiFire.Server
 
             Thread.Sleep(510); //Empty player buffer (lags for 500ms);
             player.Stop();
-
-            DoSearch(sender);
         }
 
         static void session_MusicDeliver(Session sender, MusicDeliveryEventArgs e)
         {
             if (e.Samples.Length > 0)
             {
-                if(player == null)
+                if (player == null)
                     player = new BASSPlayer();
 
                 e.ConsumedFrames = player.EnqueueSamples(e.Channels, e.Rate, e.Samples, e.Frames);
@@ -174,32 +170,12 @@ namespace SpotiFire.Server
             }
         }
 
-        static void DoSearch(Session sender)
-        {
-            string prevSearch = searchTerm;
-            Console.WriteLine("New search term? (enter \"quit\" to exit, \"next\" to play next song on previous result).");
-            Console.Write("Search: ");
-            searchTerm = Console.ReadLine().Trim();
-            if (searchTerm != "next")
-                currentIndex = 0;
-            else
-            {
-                currentIndex++;
-                searchTerm = prevSearch;
-            }
-            if (searchTerm == "quit")
-                sender.Logout();
-            else
-                sender.Search(searchTerm, currentIndex, 1, 0, 0, 0, 0).Complete += new SearchEventHandler(search_Complete);
-        }
-
         static void search_Complete(ISearch sender, EventArgs e)
         {
             Console.WriteLine("Search complete!");
             if (sender.Tracks.Count == 0)
             {
                 Console.WriteLine("Did you mean \"{0}\"?", sender.DidYouMean);
-                DoSearch(sender.Session);
                 return;
             }
             Console.WriteLine(sender.ToString());
@@ -248,15 +224,17 @@ namespace SpotiFire.Server
                 return;
             }
             Console.WriteLine("Login complete!");
-            Console.Write("Enter search: ");
-            searchTerm = Console.ReadLine();
-            sender.Search(searchTerm, 0, 1, 0, 0, 0, 0).Complete += new SearchEventHandler(search_Complete);
             sender.PlaylistContainer.Loaded += new PlaylistContainerHandler(PlaylistContainer_Loaded);
         }
 
         static void PlaylistContainer_Loaded(IPlaylistContainer pc, EventArgs args)
         {
             Console.WriteLine("Playlistcontainer loaded.");
+            int i = 0;
+            foreach (var playlist in pc.Playlists)
+            {
+                Console.WriteLine("Playlists[{0}].Name: {1}, Type: {2}", i++, playlist.Name, playlist.Type);
+            }
         }
 
         static void session_LogMessage(Session sender, SessionEventArgs e)

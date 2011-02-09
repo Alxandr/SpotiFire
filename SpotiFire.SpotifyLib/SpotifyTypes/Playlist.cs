@@ -7,8 +7,21 @@ namespace SpotiFire.SpotifyLib
 {
     public delegate void PlaylistEventHandler(IPlaylist playlist, EventArgs args);
     public delegate void PlaylistEventHandler<TEventArgs>(IPlaylist playlist, TEventArgs args) where TEventArgs : EventArgs;
+
+
+
     internal class Playlist : CountedDisposeableSpotifyObject, IPlaylist
     {
+        #region KeyGen
+        private class PlaylistMaintainer : Tuple<IntPtr, sp_playlist_type>
+        {
+            public PlaylistMaintainer(IntPtr ptr, sp_playlist_type type)
+                : base(ptr, type)
+            {
+
+            }
+        }
+        #endregion
         #region Wrapper
         private class PlaylistWrapper : DisposeableSpotifyObject, IPlaylist
         {
@@ -20,13 +33,24 @@ namespace SpotiFire.SpotifyLib
 
             protected override void OnDispose()
             {
-                Playlist.Delete(playlist.playlistPtr);
+                Playlist.Delete(playlist.playlistPtr, playlist.type);
                 playlist = null;
             }
 
             protected override int IntPtrHashCode()
             {
                 return IsAlive() ? playlist.IntPtrHashCode() : 0;
+            }
+
+            public sp_playlist_type Type
+            {
+                get { IsAlive(true); return playlist.Type; }
+            }
+
+            public string Name
+            {
+                get { IsAlive(true); return playlist.Name; }
+                set { IsAlive(true); playlist.Name = value; }
             }
 
             public Session Session
@@ -42,32 +66,34 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
         #region Counter
-        private static Dictionary<IntPtr, Playlist> playlists = new Dictionary<IntPtr, Playlist>();
+        private static Dictionary<PlaylistMaintainer, Playlist> playlists = new Dictionary<PlaylistMaintainer, Playlist>();
         private static readonly object playlistsLock = new object();
 
-        internal static IPlaylist Get(Session session, IntPtr playlistPtr)
+        internal static IPlaylist Get(Session session, PlaylistContainer container, IntPtr playlistPtr, sp_playlist_type type)
         {
             Playlist playlist;
+            PlaylistMaintainer pm = new PlaylistMaintainer(playlistPtr, type);
             lock (playlistsLock)
             {
-                if (!playlists.ContainsKey(playlistPtr))
+                if (!playlists.ContainsKey(pm))
                 {
-                    playlists.Add(playlistPtr, new Playlist(session, playlistPtr));
+                    playlists.Add(pm, new Playlist(session, container, playlistPtr, type));
                 }
-                playlist = playlists[playlistPtr];
+                playlist = playlists[pm];
                 playlist.AddRef();
             }
             return new PlaylistWrapper(playlist);
         }
 
-        internal static void Delete(IntPtr playlistPtr)
+        internal static void Delete(IntPtr playlistPtr, sp_playlist_type type)
         {
+            PlaylistMaintainer pm = new PlaylistMaintainer(playlistPtr, type);
             lock (playlistsLock)
             {
-                Playlist playlist = playlists[playlistPtr];
+                Playlist playlist = playlists[pm];
                 int count = playlist.RemRef();
                 if (count == 0)
-                    playlists.Remove(playlistPtr);
+                    playlists.Remove(pm);
             }
         }
         #endregion
@@ -302,20 +328,27 @@ namespace SpotiFire.SpotifyLib
         #region Declarations
         internal IntPtr playlistPtr = IntPtr.Zero;
         private Session session;
+        private PlaylistContainer container;
         private sp_playlist_callbacks callbacks;
         private IntPtr callbacksPtr = IntPtr.Zero;
+        private sp_playlist_type type;
         #endregion
 
         #region Constructor
-        private Playlist(Session session, IntPtr playlistPtr)
+        private Playlist(Session session, PlaylistContainer container, IntPtr playlistPtr, sp_playlist_type type)
         {
             if (playlistPtr == IntPtr.Zero)
                 throw new ArgumentException("playlistPtr can't be zero.");
 
             if (session == null)
                 throw new ArgumentNullException("Session can't be null.");
+
+            if (container == null)
+                throw new ArgumentNullException("Container can't be null.");
             this.session = session;
+            this.container = container;
             this.playlistPtr = playlistPtr;
+            this.type = type;
             lock (libspotify.Mutex)
             {
                 libspotify.sp_playlist_add_ref(playlistPtr);
@@ -339,6 +372,33 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
+        public string Name
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.GetString(libspotify.sp_playlist_name(playlistPtr), String.Empty);
+            }
+            set
+            {
+                if (value.Length > 255)
+                    throw new ArgumentException("value can't be longer than 255 chars.");
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    libspotify.sp_playlist_rename(playlistPtr, value);
+            }
+        }
+
+        public sp_playlist_type Type
+        {
+            get
+            {
+                IsAlive(true);
+                return type;
+            }
+        }
+
         public Session Session
         {
             get { IsAlive(true); return session; }
