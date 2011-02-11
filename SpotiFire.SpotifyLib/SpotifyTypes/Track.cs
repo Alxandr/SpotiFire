@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
     internal class Track : CountedDisposeableSpotifyObject, ITrack
     {
         #region Wrapper
-        private class TrackWrapper : DisposeableSpotifyObject, ITrack
+        protected class TrackWrapper : DisposeableSpotifyObject, ITrack
         {
             internal Track track;
             internal TrackWrapper(Track track)
@@ -84,7 +82,7 @@ namespace SpotiFire.SpotifyLib
         }
         internal static IntPtr GetPointer(ITrack track)
         {
-            if (track.GetType() == typeof(TrackWrapper))
+            if (track is TrackWrapper)
                 return ((TrackWrapper)track).track.trackPtr;
             throw new ArgumentException("Invalid track");
         }
@@ -129,7 +127,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Constructor
-        private  Track(Session session, IntPtr trackPtr)
+        internal protected Track(Session session, IntPtr trackPtr)
         {
             if (trackPtr == IntPtr.Zero)
                 throw new ArgumentException("albumPtr can't be zero.");

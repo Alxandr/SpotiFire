@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace SpotiFire.SpotifyLib
 {
     public class TracksAddedEventArgs : TracksEventArgs
@@ -12,6 +8,11 @@ namespace SpotiFire.SpotifyLib
             : base(trackIndices)
         {
             this.tracks = tracks;
+        }
+
+        public ITrack[] Tracks
+        {
+            get { return tracks; }
         }
     }
 }

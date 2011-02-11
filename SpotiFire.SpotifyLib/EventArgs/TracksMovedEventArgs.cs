@@ -9,5 +9,10 @@ namespace SpotiFire.SpotifyLib
         {
             this.newPosition = newPosition;
         }
+
+        public int NewPosition
+        {
+            get { return newPosition; }
+        }
     }
 }

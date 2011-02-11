@@ -85,6 +85,7 @@ namespace SpotiFire.Server
             waiter.WaitOne();
             session.Dispose();
             session = null;
+            GC.KeepAlive(playlist);
             GC.WaitForPendingFinalizers();
             GC.WaitForFullGCComplete();
         }

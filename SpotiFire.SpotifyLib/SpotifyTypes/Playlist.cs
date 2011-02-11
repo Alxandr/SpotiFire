@@ -121,7 +121,7 @@ namespace SpotiFire.SpotifyLib
                 return IsAlive() ? playlist.IntPtrHashCode() : 0;
             }
 
-            public IEditableArray<ITrack> Tracks
+            public IEditableArray<IPlaylistTrack> Tracks
             {
                 get { IsAlive(true); return playlist.Tracks; }
             }
@@ -163,6 +163,29 @@ namespace SpotiFire.SpotifyLib
             public string ImageId
             {
                 get { IsAlive(true); return playlist.ImageId; }
+            }
+
+
+            public bool IsColaberativ
+            {
+                get { IsAlive(true); return playlist.IsColaberativ; }
+                set { IsAlive(true); playlist.IsColaberativ = value; }
+            }
+
+            public void AutoLinkTracks(bool autoLink)
+            {
+                IsAlive(true);
+                playlist.AutoLinkTracks(autoLink);
+            }
+
+            public string Description
+            {
+                get { IsAlive(true); return playlist.Description; }
+            }
+
+            public bool PendingChanges
+            {
+                get { IsAlive(true); return playlist.PendingChanges; }
             }
         }
         internal static IntPtr GetPointer(IPlaylist playlist)
@@ -361,16 +384,19 @@ namespace SpotiFire.SpotifyLib
         #region Event Functions
         protected virtual void OnTracksAdded(TracksAddedEventArgs args)
         {
+            PlaylistTrack.Update(this, aditions: args.TrackIndices);
             if (TracksAdded != null)
                 TracksAdded(this, args);
         }
         protected virtual void OnTracksRemoved(TracksEventArgs args)
         {
+            PlaylistTrack.Update(this, removals: args.TrackIndices);
             if (TracksRemoved != null)
                 TracksRemoved(this, args);
         }
         protected virtual void OnTracksMoved(TracksMovedEventArgs args)
         {
+            PlaylistTrack.Update(this, moves: args.TrackIndices, movedTo: args.NewPosition);
             if (TracksMoved != null)
                 TracksMoved(this, args);
         }
@@ -436,7 +462,7 @@ namespace SpotiFire.SpotifyLib
         private IntPtr callbacksPtr = IntPtr.Zero;
         private bool registerCallbacks;
 
-        private IEditableArray<ITrack> tracks;
+        private IEditableArray<IPlaylistTrack> tracks;
         #endregion
 
         #region Constructor
@@ -493,7 +519,7 @@ namespace SpotiFire.SpotifyLib
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
 
-            tracks = new DelegateList<ITrack>(
+            tracks = new DelegateList<IPlaylistTrack>(
                 () =>
                 {
                     IsAlive(true);
@@ -504,7 +530,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Track.Get(session, libspotify.sp_playlist_track(playlistPtr, index));
+                        return PlaylistTrack.Get(session, this, libspotify.sp_playlist_track(playlistPtr, index), index);
                 },
                 (track, index) =>
                 {
@@ -524,6 +550,7 @@ namespace SpotiFire.SpotifyLib
                 },
                 () => false
             );
+            PlaylistTrack.RegisterPlaylist(this);
         }
 
         void session_DisposeAll(ISession sender, SessionEventArgs e)
@@ -536,6 +563,29 @@ namespace SpotiFire.SpotifyLib
         private static Delegate CreateDelegate<T>(Expression<Func<Playlist, Action<T>>> expr, Playlist p) where T : EventArgs
         {
             return expr.Compile().Invoke(p);
+        }
+        #endregion
+
+        #region Internal Track Methods
+        internal DateTime GetTrackCreationTime(PlaylistTrack track)
+        {
+            lock (libspotify.Mutex)
+                return new DateTime(TimeSpan.FromSeconds(libspotify.sp_playlist_track_create_time(playlistPtr, track.position)).Ticks);
+        }
+
+        internal bool GetTrackSeen(PlaylistTrack track)
+        {
+            lock (libspotify.Mutex)
+                return libspotify.sp_playlist_track_seen(playlistPtr, track.position);
+        }
+        #endregion
+
+        #region Public Functions
+        public void AutoLinkTracks(bool autoLink)
+        {
+            IsAlive(true);
+            lock (libspotify.Mutex)
+                libspotify.sp_playlist_set_autolink_tracks(playlistPtr, autoLink);
         }
         #endregion
 
@@ -558,7 +608,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public IEditableArray<ITrack> Tracks
+        public IEditableArray<IPlaylistTrack> Tracks
         {
             get
             {
@@ -594,6 +644,42 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
+        public bool IsColaberativ
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_playlist_is_collaborative(playlistPtr);
+            }
+            set
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    libspotify.sp_playlist_set_collaborative(playlistPtr, value);
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.GetString(libspotify.sp_playlist_get_description(playlistPtr), String.Empty);
+            }
+        }
+
+        public bool PendingChanges
+        {
+            get
+            {
+                IsAlive(true);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_playlist_has_pending_changes(playlistPtr);
+            }
+        }
+
         public ISession Session
         {
             get { IsAlive(true); return session; }
@@ -604,14 +690,14 @@ namespace SpotiFire.SpotifyLib
         protected override void OnDispose()
         {
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
-
+            PlaylistTrack.UnregisterPlaylist(this);
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
                 {
                     if (registerCallbacks)
                     {
-                        libspotify.sp_playlist_remove_callbacks(playlistPtr, callbacksPtr, IntPtr.Zero);
-                        Marshal.FreeHGlobal(callbacksPtr);
+                        try { libspotify.sp_playlist_remove_callbacks(playlistPtr, callbacksPtr, IntPtr.Zero); }
+                        finally { Marshal.FreeHGlobal(callbacksPtr); }
                     }
                     libspotify.sp_playlist_release(playlistPtr);
                 }

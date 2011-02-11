@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -11,6 +8,11 @@ namespace SpotiFire.SpotifyLib
         public TracksEventArgs(int[] trackIndices)
         {
             this.trackIndices = trackIndices;
+        }
+
+        public int[] TrackIndices
+        {
+            get { return trackIndices; }
         }
     }
 }

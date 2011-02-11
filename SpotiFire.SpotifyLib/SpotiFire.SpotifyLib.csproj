@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\IContainerPlaylist.cs" />
+    <Compile Include="Interfaces\IPlaylistTrack.cs" />
+    <Compile Include="SpotifyTypes\PlaylistTrack.cs" />
     <Compile Include="Spotify.cs" />
     <Compile Include="SpotifyTypes\Album.cs" />
     <Compile Include="SpotifyTypes\Artist.cs" />
