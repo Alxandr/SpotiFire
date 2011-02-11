@@ -33,7 +33,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return artist.Name; }
             }
 
-            public Session Session
+            public ISession Session
             {
                 get { IsAlive(true); return artist.Session; }
             }
@@ -102,7 +102,7 @@ namespace SpotiFire.SpotifyLib
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
 
-        void session_DisposeAll(Session sender, SessionEventArgs e)
+        void session_DisposeAll(ISession sender, SessionEventArgs e)
         {
             Dispose();
         }
@@ -129,7 +129,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public Session Session
+        public ISession Session
         {
             get
             {

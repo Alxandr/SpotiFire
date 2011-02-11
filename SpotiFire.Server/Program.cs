@@ -44,8 +44,6 @@ namespace SpotiFire.Server
         #endregion
 
         private static BASSPlayer player;
-        private static string searchTerm;
-        private static bool playing = false;
         private static int currentIndex = 0;
         private static ManualResetEvent waiter = new ManualResetEvent(false);
         private static IPlaylist playlist = null;
@@ -66,7 +64,7 @@ namespace SpotiFire.Server
                 Console.WriteLine(ex.ToString());
             }
 
-            Session session = Session.Create(key, dataPath, dataPath, "SpotiFire");
+            ISession session = Spotify.CreateSession(key, dataPath, dataPath, "SpotiFire");
             session.Exception += new SessionEventHandler(session_Exception);
             session.LogMessage += new SessionEventHandler(session_LogMessage);
             session.LoginComplete += new SessionEventHandler(session_LoginComplete);
@@ -154,35 +152,35 @@ namespace SpotiFire.Server
             return sb.ToString();
         }
 
-        static void session_PlayTokenLost(Session sender, SessionEventArgs e)
+        static void session_PlayTokenLost(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine("PlayToken lost");
         }
 
-        static void session_MessageToUser(Session sender, SessionEventArgs e)
+        static void session_MessageToUser(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine("To you: " + e.Message);
         }
 
-        static void session_StopPlayback(Session sender, SessionEventArgs e)
+        static void session_StopPlayback(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine("Playback stoped");
         }
 
-        static void session_LogoutComplete(Session sender, SessionEventArgs e)
+        static void session_LogoutComplete(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine("Logout complete.");
             waiter.Set();
         }
 
-        static void session_EndOfTrack(Session sender, SessionEventArgs e)
+        static void session_EndOfTrack(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine("End of track.");
 
             PlayNext();
         }
 
-        static void session_MusicDeliver(Session sender, MusicDeliveryEventArgs e)
+        static void session_MusicDeliver(ISession sender, MusicDeliveryEventArgs e)
         {
             if (e.Samples.Length > 0)
             {
@@ -213,7 +211,7 @@ namespace SpotiFire.Server
                 Console.WriteLine("Artist.Name: {0}", artist.Name);
             sender.Session.PlayerLoad(trck);
             sender.Session.PlayerPlay();
-            IImage img = sender.Session.GetImageFromId(trck.Album.CoverId);
+            IImage img = Spotify.GetImageFromId(sender.Session, trck.Album.CoverId);
             if (img.IsLoaded)
                 img_Loaded(img, new EventArgs());
             else
@@ -243,7 +241,7 @@ namespace SpotiFire.Server
             catch { }
         }
 
-        static void session_LoginComplete(Session sender, SessionEventArgs e)
+        static void session_LoginComplete(ISession sender, SessionEventArgs e)
         {
             if (sender.ConnectionState != sp_connectionstate.LOGGED_IN)
             {
@@ -253,16 +251,30 @@ namespace SpotiFire.Server
             Console.WriteLine("Login complete!");
             sender.PlaylistContainer.Loaded += new PlaylistContainerHandler(PlaylistContainer_Loaded);
         }
-
+        static string typeString(sp_playlist_type type)
+        {
+            switch (type)
+            {
+                case sp_playlist_type.SP_PLAYLIST_TYPE_PLAYLIST:
+                    return "Playlist";
+                case sp_playlist_type.SP_PLAYLIST_TYPE_START_FOLDER:
+                    return "Folder start";
+                case sp_playlist_type.SP_PLAYLIST_TYPE_END_FOLDER:
+                    return "Folder end";
+                case sp_playlist_type.SP_PLAYLIST_TYPE_PLACEHOLDER:
+                    return "Placeholder";
+            }
+            return null;
+        }
         static void PlaylistContainer_Loaded(IPlaylistContainer pc, EventArgs args)
         {
             Console.WriteLine("Playlistcontainer loaded.");
             int i = 0;
-            foreach (var pl in pc.Playlists.Select(p => new { p = p, i = i++ }).Where(p => p.p.Type == sp_playlist_type.SP_PLAYLIST_TYPE_PLAYLIST))
+            foreach (var pl in pc.Playlists.Select(p => new { p = p, i = i++ }))
             {
                 var playlist = pl.p;
                 var index = pl.i;
-                Console.WriteLine("Playlists[{0}].Name: {1}, Tracks.Count: {2}", index, playlist.Name, playlist.Tracks.Count);
+                Console.WriteLine("Playlists[{0}].Name: {1}, Tracks.Count: {2}, Type: {3}", index, playlist.Name, playlist.Tracks.Count, typeString(playlist.Type));
             }
             Console.Write("Select playlist (index): ");
             int plInd = int.Parse(Console.ReadLine());
@@ -272,12 +284,12 @@ namespace SpotiFire.Server
             PlayNext();
         }
 
-        static void session_LogMessage(Session sender, SessionEventArgs e)
+        static void session_LogMessage(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine(e.Message);
         }
 
-        static void session_Exception(Session sender, SessionEventArgs e)
+        static void session_Exception(ISession sender, SessionEventArgs e)
         {
             Console.WriteLine("New Exception: " + e.ToString());
         }

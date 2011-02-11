@@ -12,27 +12,107 @@ namespace SpotiFire.SpotifyLib
 
     internal class Playlist : CountedDisposeableSpotifyObject, IPlaylist
     {
-        #region KeyGen
-        private class PlaylistMaintainer : Tuple<IntPtr, sp_playlist_type, IntPtr>
-        {
-            public PlaylistMaintainer(IntPtr ptr, sp_playlist_type type, IntPtr id)
-                : base(ptr, type, id)
-            {
-            }
-        }
-        #endregion
         #region Wrapper
-        private class PlaylistWrapper : DisposeableSpotifyObject, IPlaylist
+        internal protected class PlaylistWrapper : DisposeableSpotifyObject, IPlaylist
         {
             internal Playlist playlist;
             public PlaylistWrapper(Playlist playlist)
             {
                 this.playlist = playlist;
+                playlist.TracksAdded += new PlaylistEventHandler<TracksAddedEventArgs>(playlist_TracksAdded);
+                playlist.TracksRemoved += new PlaylistEventHandler<TracksEventArgs>(playlist_TracksRemoved);
+                playlist.TracksMoved += new PlaylistEventHandler<TracksMovedEventArgs>(playlist_TracksMoved);
+                playlist.Renamed += new PlaylistEventHandler(playlist_Renamed);
+                playlist.StateChanged += new PlaylistEventHandler(playlist_StateChanged);
+                playlist.UpdateInProgress += new PlaylistEventHandler<PlaylistUpdateEventArgs>(playlist_UpdateInProgress);
+                playlist.MetadataUpdated += new PlaylistEventHandler(playlist_MetadataUpdated);
+                playlist.TrackCreatedChanged += new PlaylistEventHandler<TrackCreatedChangedEventArgs>(playlist_TrackCreatedChanged);
+                playlist.TrackSeenChanged += new PlaylistEventHandler<TrackSeenEventArgs>(playlist_TrackSeenChanged);
+                playlist.DescriptionChanged += new PlaylistEventHandler<DescriptionEventArgs>(playlist_DescriptionChanged);
+                playlist.ImageChanged += new PlaylistEventHandler<ImageEventArgs>(playlist_ImageChanged);
+            }
+
+            void playlist_ImageChanged(IPlaylist playlist, ImageEventArgs args)
+            {
+                if (ImageChanged != null)
+                    ImageChanged(this, args);
+            }
+
+            void playlist_DescriptionChanged(IPlaylist playlist, DescriptionEventArgs args)
+            {
+                if (DescriptionChanged != null)
+                    DescriptionChanged(this, args);
+            }
+
+            void playlist_TrackSeenChanged(IPlaylist playlist, TrackSeenEventArgs args)
+            {
+                if (TrackSeenChanged != null)
+                    TrackSeenChanged(this, args);
+            }
+
+            void playlist_TrackCreatedChanged(IPlaylist playlist, TrackCreatedChangedEventArgs args)
+            {
+                if (TrackCreatedChanged != null)
+                    TrackCreatedChanged(this, args);
+            }
+
+            void playlist_MetadataUpdated(IPlaylist playlist, EventArgs args)
+            {
+                if (MetadataUpdated != null)
+                    MetadataUpdated(this, args);
+            }
+
+            void playlist_UpdateInProgress(IPlaylist playlist, PlaylistUpdateEventArgs args)
+            {
+                if (UpdateInProgress != null)
+                    UpdateInProgress(this, args);
+            }
+
+            void playlist_StateChanged(IPlaylist playlist, EventArgs args)
+            {
+                if (StateChanged != null)
+                    StateChanged(this, args);
+            }
+
+            void playlist_Renamed(IPlaylist playlist, EventArgs args)
+            {
+                if (Renamed != null)
+                    Renamed(this, args);
+            }
+
+            void playlist_TracksMoved(IPlaylist playlist, TracksMovedEventArgs args)
+            {
+                if (TracksMoved != null)
+                    TracksMoved(this, args);
+            }
+
+            void playlist_TracksRemoved(IPlaylist playlist, TracksEventArgs args)
+            {
+                if (TracksRemoved != null)
+                    TracksRemoved(this, args);
+            }
+
+            void playlist_TracksAdded(IPlaylist playlist, TracksAddedEventArgs args)
+            {
+                if (TracksAdded != null)
+                    TracksAdded(this, args);
             }
 
             protected override void OnDispose()
             {
-                Playlist.Delete(playlist.playlistPtr, playlist.type, playlist.folderId);
+                playlist.TracksAdded -= new PlaylistEventHandler<TracksAddedEventArgs>(playlist_TracksAdded);
+                playlist.TracksRemoved -= new PlaylistEventHandler<TracksEventArgs>(playlist_TracksRemoved);
+                playlist.TracksMoved -= new PlaylistEventHandler<TracksMovedEventArgs>(playlist_TracksMoved);
+                playlist.Renamed -= new PlaylistEventHandler(playlist_Renamed);
+                playlist.StateChanged -= new PlaylistEventHandler(playlist_StateChanged);
+                playlist.UpdateInProgress -= new PlaylistEventHandler<PlaylistUpdateEventArgs>(playlist_UpdateInProgress);
+                playlist.MetadataUpdated -= new PlaylistEventHandler(playlist_MetadataUpdated);
+                playlist.TrackCreatedChanged -= new PlaylistEventHandler<TrackCreatedChangedEventArgs>(playlist_TrackCreatedChanged);
+                playlist.TrackSeenChanged -= new PlaylistEventHandler<TrackSeenEventArgs>(playlist_TrackSeenChanged);
+                playlist.DescriptionChanged -= new PlaylistEventHandler<DescriptionEventArgs>(playlist_DescriptionChanged);
+                playlist.ImageChanged -= new PlaylistEventHandler<ImageEventArgs>(playlist_ImageChanged);
+                if (this.GetType() == typeof(PlaylistWrapper))
+                    Playlist.Delete(playlist.playlistPtr);
                 playlist = null;
             }
 
@@ -46,33 +126,43 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return playlist.Tracks; }
             }
 
-            public sp_playlist_type Type
-            {
-                get { IsAlive(true); return playlist.Type; }
-            }
-
             public string Name
             {
                 get { IsAlive(true); return playlist.Name; }
                 set { IsAlive(true); playlist.Name = value; }
             }
 
-            public Session Session
+            public ISession Session
             {
                 get { IsAlive(true); return playlist.Session; }
             }
 
-            public override bool Equals(object obj)
+            public event PlaylistEventHandler<TracksAddedEventArgs> TracksAdded;
+
+            public event PlaylistEventHandler<TracksEventArgs> TracksRemoved;
+
+            public event PlaylistEventHandler<TracksMovedEventArgs> TracksMoved;
+
+            public event PlaylistEventHandler Renamed;
+
+            public event PlaylistEventHandler StateChanged;
+
+            public event PlaylistEventHandler<PlaylistUpdateEventArgs> UpdateInProgress;
+
+            public event PlaylistEventHandler MetadataUpdated;
+
+            public event PlaylistEventHandler<TrackCreatedChangedEventArgs> TrackCreatedChanged;
+
+            public event PlaylistEventHandler<TrackSeenEventArgs> TrackSeenChanged;
+
+            public event PlaylistEventHandler<DescriptionEventArgs> DescriptionChanged;
+
+            public event PlaylistEventHandler<ImageEventArgs> ImageChanged;
+
+
+            public string ImageId
             {
-                PlaylistWrapper pw = obj as PlaylistWrapper;
-                if (pw == null)
-                {
-                    Playlist p = obj as Playlist;
-                    if (p == null)
-                        return false;
-                    return p == this.playlist;
-                }
-                return pw.playlist == this.playlist;
+                get { IsAlive(true); return playlist.ImageId; }
             }
         }
         internal static IntPtr GetPointer(IPlaylist playlist)
@@ -83,34 +173,32 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
         #region Counter
-        private static Dictionary<PlaylistMaintainer, Playlist> playlists = new Dictionary<PlaylistMaintainer, Playlist>();
+        private static Dictionary<IntPtr, Playlist> playlists = new Dictionary<IntPtr, Playlist>();
         private static readonly object playlistsLock = new object();
 
-        internal static IPlaylist Get(Session session, PlaylistContainer container, IntPtr playlistPtr, sp_playlist_type type, IntPtr id)
+        internal static IPlaylist Get(Session session, IntPtr playlistPtr)
         {
             Playlist playlist;
-            PlaylistMaintainer pm = new PlaylistMaintainer(playlistPtr, type, id);
             lock (playlistsLock)
             {
-                if (!playlists.ContainsKey(pm))
+                if (!playlists.ContainsKey(playlistPtr))
                 {
-                    playlists.Add(pm, new Playlist(session, container, playlistPtr, type, id));
+                    playlists.Add(playlistPtr, new Playlist(session, playlistPtr));
                 }
-                playlist = playlists[pm];
+                playlist = playlists[playlistPtr];
                 playlist.AddRef();
             }
             return new PlaylistWrapper(playlist);
         }
 
-        internal static void Delete(IntPtr playlistPtr, sp_playlist_type type, IntPtr id)
+        internal static void Delete(IntPtr playlistPtr)
         {
-            PlaylistMaintainer pm = new PlaylistMaintainer(playlistPtr, type, id);
             lock (playlistsLock)
             {
-                Playlist playlist = playlists[pm];
+                Playlist playlist = playlists[playlistPtr];
                 int count = playlist.RemRef();
                 if (count == 0)
-                    playlists.Remove(pm);
+                    playlists.Remove(playlistPtr);
             }
         }
         #endregion
@@ -215,7 +303,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        private void UdateInProgressCallback(IntPtr playlistPtr, bool complete, IntPtr userdataPtr)
+        private void UpdateInProgressCallback(IntPtr playlistPtr, bool complete, IntPtr userdataPtr)
         {
             if (playlistPtr == this.playlistPtr)
             {
@@ -345,17 +433,14 @@ namespace SpotiFire.SpotifyLib
         #region Declarations
         internal IntPtr playlistPtr = IntPtr.Zero;
         private Session session;
-        private PlaylistContainer container;
-        private sp_playlist_callbacks callbacks;
         private IntPtr callbacksPtr = IntPtr.Zero;
-        private sp_playlist_type type;
-        private IntPtr folderId = IntPtr.Zero;
+        private bool registerCallbacks;
 
         private IEditableArray<ITrack> tracks;
         #endregion
 
         #region Constructor
-        private Playlist(Session session, PlaylistContainer container, IntPtr playlistPtr, sp_playlist_type type, IntPtr folderId)
+        protected Playlist(Session session, IntPtr playlistPtr, bool registerCallbacks = true)
         {
             if (playlistPtr == IntPtr.Zero)
                 throw new ArgumentException("playlistPtr can't be zero.");
@@ -363,17 +448,47 @@ namespace SpotiFire.SpotifyLib
             if (session == null)
                 throw new ArgumentNullException("Session can't be null.");
 
-            if (container == null)
-                throw new ArgumentNullException("Container can't be null.");
             this.session = session;
-            this.container = container;
             this.playlistPtr = playlistPtr;
-            this.type = type;
-            this.folderId = folderId;
+            this.registerCallbacks = registerCallbacks;
+
+            if (registerCallbacks)
+            {
+                tracks_added = new tracks_added_cb(TracksAddedCallback);
+                tracks_removed = new tracks_removed_cb(TracksRemovedCallback);
+                tracks_moved = new tracks_moved_cd(TracksMovedCallback);
+                playlist_renamed = new playlist_renamed_cb(RenamedCallback);
+                playlist_state_changed = new playlist_state_changed_cb(StateChangedCallback);
+                playlist_update_in_progress = new playlist_update_in_progress_cb(UpdateInProgressCallback);
+                playlist_metadata_updated = new playlist_metadata_updated_cb(MetadataUpdatedCallback);
+                track_created_changed = new track_created_changed_cb(TrackCreatedChangedCallback);
+                track_seen_changed = new track_seen_changed_cb(TrackSeenChangedCallback);
+                description_changed = new description_changed_cb(DescriptionChangedCallback);
+                image_changed = new image_changed_cb(ImageChangedCallback);
+                sp_playlist_callbacks callbacks = new sp_playlist_callbacks
+                {
+                    tracks_added = Marshal.GetFunctionPointerForDelegate(tracks_added),
+                    tracks_removed = Marshal.GetFunctionPointerForDelegate(tracks_removed),
+                    tracks_moved = Marshal.GetFunctionPointerForDelegate(tracks_moved),
+                    playlist_renamed = Marshal.GetFunctionPointerForDelegate(playlist_renamed),
+                    playlist_state_changed = Marshal.GetFunctionPointerForDelegate(playlist_state_changed),
+                    playlist_update_in_progress = Marshal.GetFunctionPointerForDelegate(playlist_update_in_progress),
+                    playlist_metadata_updated = Marshal.GetFunctionPointerForDelegate(playlist_metadata_updated),
+                    track_created_changed = Marshal.GetFunctionPointerForDelegate(track_created_changed),
+                    track_seen_changed = Marshal.GetFunctionPointerForDelegate(track_seen_changed),
+                    description_changed = Marshal.GetFunctionPointerForDelegate(description_changed),
+                    image_changed = Marshal.GetFunctionPointerForDelegate(image_changed)
+                };
+
+                callbacksPtr = Marshal.AllocHGlobal(Marshal.SizeOf(callbacks));
+                Marshal.StructureToPtr(callbacks, callbacksPtr, true);
+            }
+
             lock (libspotify.Mutex)
             {
                 libspotify.sp_playlist_add_ref(playlistPtr);
-                // TODO: Implement listeners
+                if (registerCallbacks)
+                    libspotify.sp_playlist_add_callbacks(playlistPtr, callbacksPtr, IntPtr.Zero);
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
@@ -411,7 +526,7 @@ namespace SpotiFire.SpotifyLib
             );
         }
 
-        void session_DisposeAll(Session sender, SessionEventArgs e)
+        void session_DisposeAll(ISession sender, SessionEventArgs e)
         {
             Dispose();
         }
@@ -425,17 +540,13 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public string Name
+        public virtual string Name
         {
             get
             {
                 IsAlive(true);
-                if (type == sp_playlist_type.SP_PLAYLIST_TYPE_PLAYLIST)
-                    lock (libspotify.Mutex)
-                        return libspotify.GetString(libspotify.sp_playlist_name(playlistPtr), String.Empty);
-                else if (type != sp_playlist_type.SP_PLAYLIST_TYPE_PLACEHOLDER)
-                    return container.GetFolderName(this);
-                throw new InvalidOperationException();
+                lock (libspotify.Mutex)
+                    return libspotify.GetString(libspotify.sp_playlist_name(playlistPtr), String.Empty);
             }
             set
             {
@@ -456,16 +567,34 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public sp_playlist_type Type
+        public string ImageId
         {
             get
             {
                 IsAlive(true);
-                return type;
+                IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(byte)) * 20);
+                bool ans = false;
+                lock (libspotify.Mutex)
+                    ans = libspotify.sp_playlist_get_image(playlistPtr, ptr);
+                try
+                {
+                    if (ans)
+                    {
+                        return libspotify.ImageIdToString(ptr);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(ptr);
+                }
             }
         }
 
-        public Session Session
+        public ISession Session
         {
             get { IsAlive(true); return session; }
         }
@@ -479,28 +608,22 @@ namespace SpotiFire.SpotifyLib
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
                 {
+                    if (registerCallbacks)
+                    {
+                        libspotify.sp_playlist_remove_callbacks(playlistPtr, callbacksPtr, IntPtr.Zero);
+                        Marshal.FreeHGlobal(callbacksPtr);
+                    }
                     libspotify.sp_playlist_release(playlistPtr);
                 }
 
             playlistPtr = IntPtr.Zero;
+            callbacksPtr = IntPtr.Zero;
         }
         #endregion
 
         protected override int IntPtrHashCode()
         {
             return playlistPtr.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (Object.ReferenceEquals(obj, null))
-                return false;
-            if (obj.GetType() == typeof(Playlist))
-            {
-                Playlist p = (Playlist)obj;
-                return p.playlistPtr == this.playlistPtr && p.type == this.type && p.folderId == this.folderId;
-            }
-            return false;
         }
     }
 }

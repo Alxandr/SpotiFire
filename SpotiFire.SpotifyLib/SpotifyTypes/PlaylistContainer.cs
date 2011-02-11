@@ -69,12 +69,12 @@ namespace SpotiFire.SpotifyLib
 
             public event PlaylistContainerHandler<PlaylistEventArgs> PlaylistRemoved;
 
-            public Session Session
+            public ISession Session
             {
                 get { IsAlive(true); return pc.Session; }
             }
 
-            public IEditableArray<IPlaylist> Playlists
+            public IEditableArray<IContainerPlaylist> Playlists
             {
                 get { IsAlive(true); return pc.Playlists; }
             }
@@ -146,7 +146,7 @@ namespace SpotiFire.SpotifyLib
         private playlist_moved_cb playlist_moved;
         private container_loaded_cb container_loaded;
 
-        private IEditableArray<IPlaylist> playlists;
+        private IEditableArray<IContainerPlaylist> playlists;
         #endregion
 
         #region Constructor
@@ -184,7 +184,7 @@ namespace SpotiFire.SpotifyLib
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
 
-            playlists = new DelegateList<IPlaylist>(
+            playlists = new DelegateList<IContainerPlaylist>(
                 () =>
                 {
                     IsAlive(true);
@@ -195,7 +195,8 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Playlist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index), libspotify.sp_playlistcontainer_playlist_folder_id(pcPtr, index));
+                        return ContainerPlaylist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index),
+                            libspotify.sp_playlistcontainer_playlist_folder_id(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index));
                 },
                 (playlist, index) =>
                 {
@@ -221,18 +222,18 @@ namespace SpotiFire.SpotifyLib
             );
         }
 
-        void session_DisposeAll(Session sender, SessionEventArgs e)
+        void session_DisposeAll(ISession sender, SessionEventArgs e)
         {
             Dispose();
         }
         #endregion
 
         #region Properties
-        public IEditableArray<IPlaylist> Playlists
+        public IEditableArray<IContainerPlaylist> Playlists
         {
             get { return playlists; }
         }
-        public Session Session
+        public ISession Session
         {
             get
             {
@@ -293,7 +294,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Internal Playlist methods
-        internal string GetFolderName(Playlist playlist)
+        internal string GetFolderName(ContainerPlaylist playlist)
         {
             int index = playlists.IndexOf(playlist);
             lock (libspotify.Mutex)
@@ -330,5 +331,7 @@ namespace SpotiFire.SpotifyLib
         {
             return pcPtr.GetHashCode();
         }
+
+
     }
 }

@@ -6,11 +6,11 @@ using System.Threading;
 
 namespace SpotiFire.SpotifyLib
 {
-    public delegate void SessionEventHandler(Session sender, SessionEventArgs e);
-    public delegate void MusicDeliveryEventHandler(Session sender, MusicDeliveryEventArgs e);
+    public delegate void SessionEventHandler(ISession sender, SessionEventArgs e);
+    public delegate void MusicDeliveryEventHandler(ISession sender, MusicDeliveryEventArgs e);
 
 
-    public class Session : IDisposable
+    internal class Session : ISession
     {
         #region Static declarations
         private static Dictionary<IntPtr, Session> sessions = new Dictionary<IntPtr, Session>();
@@ -167,7 +167,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public static Session Create(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
+        internal static Session Create(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
             lock (libspotify.Mutex)
             {
@@ -291,11 +291,11 @@ namespace SpotiFire.SpotifyLib
             if (s == null)
                 return;
 
-            //if (s.PlaylistContainer != null)
-            //{
-            //    s.playlistContainer.Dispose();
-            //    s.playlistContainer = null;
-            //}
+            if (s.PlaylistContainer != null)
+            {
+                s.playlistContainer.Dispose();
+                s.playlistContainer = null;
+            }
 
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnLogoutComplete, s), new SessionEventArgs()));
         }
@@ -619,11 +619,6 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
                 libspotify.sp_session_preferred_bitrate(sessionPtr, bitrate);
-        }
-
-        public IImage GetImageFromId(string id)
-        {
-            return Image.FromId(this, id);
         }
         #endregion
 

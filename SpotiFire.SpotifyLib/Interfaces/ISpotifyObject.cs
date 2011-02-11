@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
-    public interface ISpotifyObject
+    public interface ISpotifyObject : IDisposable
     {
-        Session Session { get; }
+        ISession Session { get; }
     }
 }

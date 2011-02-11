@@ -80,7 +80,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return search.Tracks; }
             }
 
-            public Session Session
+            public ISession Session
             {
                 get { IsAlive(true); return search.Session; }
             }
@@ -215,7 +215,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public Session Session { get { return session; } }
+        public ISession Session { get { IsAlive(true); return session; } }
 
         public sp_error Error
         {
@@ -337,7 +337,7 @@ namespace SpotiFire.SpotifyLib
             searchPtr = IntPtr.Zero;
         }
 
-        private void session_DisposeAll(Session sender, SessionEventArgs e)
+        private void session_DisposeAll(ISession sender, SessionEventArgs e)
         {
             Dispose();
         }

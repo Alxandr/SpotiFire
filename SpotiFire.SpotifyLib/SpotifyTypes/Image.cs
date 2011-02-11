@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Linq.Expressions;
-using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -59,10 +56,10 @@ namespace SpotiFire.SpotifyLib
             {
                 get { IsAlive(true); return image.IsLoaded; }
             }
-            
+
             public event ImageEventHandler Loaded;
 
-            public Session Session
+            public ISession Session
             {
                 get { IsAlive(true); return image.Session; }
             }
@@ -143,7 +140,7 @@ namespace SpotiFire.SpotifyLib
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
 
-        void session_DisposeAll(Session sender, SessionEventArgs e)
+        void session_DisposeAll(ISession sender, SessionEventArgs e)
         {
             Dispose();
         }
@@ -220,7 +217,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public Session Session
+        public ISession Session
         {
             get
             {
@@ -259,7 +256,7 @@ namespace SpotiFire.SpotifyLib
         {
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
 
-            if(!session.ProcExit)
+            if (!session.ProcExit)
                 lock (libspotify.Mutex)
                 {
                     libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero);
@@ -273,10 +270,13 @@ namespace SpotiFire.SpotifyLib
 
         #region Static Public Methods
         // TODO: Move to somewhere public.
-        public static IImage FromId(Session session, string id)
+        internal static IImage FromId(ISession session, string id)
         {
             if (id == null)
                 throw new ArgumentNullException("id");
+
+            if (session.GetType() != typeof(Session))
+                throw new ArgumentException("Session must be a spotify-session.");
 
             if (id.Length != 40)
                 throw new ArgumentException("invalid id", "id");
@@ -295,9 +295,9 @@ namespace SpotiFire.SpotifyLib
                 Marshal.Copy(idArray, 0, idPtr, idArray.Length);
 
                 lock (libspotify.Mutex)
-                    imagePtr = libspotify.sp_image_create(session.sessionPtr, idPtr);
+                    imagePtr = libspotify.sp_image_create(((Session)session).sessionPtr, idPtr);
 
-                image = Image.Get(session, imagePtr);
+                image = Image.Get((Session)session, imagePtr);
 
                 lock (libspotify.Mutex)
                     libspotify.sp_image_release(imagePtr);
@@ -306,7 +306,7 @@ namespace SpotiFire.SpotifyLib
             }
             catch
             {
-                if(imagePtr != IntPtr.Zero)
+                if (imagePtr != IntPtr.Zero)
                     try
                     {
                         lock (libspotify.Mutex)
