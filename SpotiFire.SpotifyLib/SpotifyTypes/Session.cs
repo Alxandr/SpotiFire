@@ -263,12 +263,24 @@ namespace SpotiFire.SpotifyLib
 
         internal void EnqueueEventWorkItem(EventWorkItem eventWorkerItem)
         {
-            lock (eventQueue)
-            {
-                eventQueue.Enqueue(eventWorkerItem);
-            }
+            //x lock (eventQueue)
+            //x {
+            //x     eventQueue.Enqueue(eventWorkerItem);
+            //x }
+            //x 
+            //x eventThreadNotification.Set();
 
-            eventThreadNotification.Set();
+            ThreadPool.QueueUserWorkItem((state) =>
+            {
+                try
+                {
+                    eventWorkerItem.Execute();
+                }
+                catch (Exception ex)
+                {
+                    OnException(new SessionEventArgs(ex.ToString()));
+                }
+            });
         }
         #endregion
 

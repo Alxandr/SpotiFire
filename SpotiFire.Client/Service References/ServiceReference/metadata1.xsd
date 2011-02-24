@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="http://schemas.datacontract.org/2004/07/SpotiFire.Server" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd0" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="Track">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Album" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Artists" nillable="true" type="q1:ArrayOfstring" />
+      <xs:element minOccurs="0" name="IsAvailable" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Length" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Popularity" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Track" nillable="true" type="tns:Track" />
+  <xs:simpleType name="PlaylistType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Playlist" />
+      <xs:enumeration value="FolderStart" />
+      <xs:enumeration value="FolderEnd" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="PlaylistType" nillable="true" type="tns:PlaylistType" />
+  <xs:complexType name="Playlist">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" type="ser:guid" />
+      <xs:element minOccurs="0" name="ImageId" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsColaberativ" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Type" type="tns:PlaylistType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Playlist" nillable="true" type="tns:Playlist" />
+  <xs:complexType name="ArrayOfPlaylist">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Playlist" nillable="true" type="tns:Playlist" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlaylist" nillable="true" type="tns:ArrayOfPlaylist" />
+  <xs:complexType name="ArrayOfTrack">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Track" nillable="true" type="tns:Track" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTrack" nillable="true" type="tns:ArrayOfTrack" />
+</xs:schema>

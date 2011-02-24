@@ -78,6 +78,11 @@ namespace SpotiFire.SpotifyLib
             {
                 get { IsAlive(true); return pc.Playlists; }
             }
+
+            public bool IsLoaded
+            {
+                get { IsAlive(true); return pc.IsLoaded; }
+            }
         }
 
         internal static IntPtr GetPointer(IPlaylistContainer pc)
@@ -147,6 +152,7 @@ namespace SpotiFire.SpotifyLib
         private container_loaded_cb container_loaded;
 
         private IEditableArray<IContainerPlaylist> playlists;
+        private bool loaded;
         #endregion
 
         #region Constructor
@@ -241,6 +247,15 @@ namespace SpotiFire.SpotifyLib
                 return session;
             }
         }
+
+        public bool IsLoaded
+        {
+            get
+            {
+                IsAlive(true);
+                return loaded;
+            }
+        }
         #endregion
 
         #region Private Methods
@@ -288,6 +303,7 @@ namespace SpotiFire.SpotifyLib
         }
         protected virtual void OnLoaded(EventArgs args)
         {
+            loaded = true;
             if (Loaded != null)
                 Loaded(this, args);
         }

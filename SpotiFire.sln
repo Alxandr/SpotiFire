@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotiFire.Server", "SpotiFi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotiFire.SpotifyLib", "SpotiFire.SpotifyLib\SpotiFire.SpotifyLib.csproj", "{CBF5614B-AF79-4228-8265-7DC2BAF9A626}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotiFire.Client", "SpotiFire.Client\SpotiFire.Client.csproj", "{FEDDFB3D-1650-461F-895D-BA9D7C13948D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{CBF5614B-AF79-4228-8265-7DC2BAF9A626}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CBF5614B-AF79-4228-8265-7DC2BAF9A626}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CBF5614B-AF79-4228-8265-7DC2BAF9A626}.Release|x86.ActiveCfg = Release|Any CPU
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Debug|x86.ActiveCfg = Debug|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Debug|x86.Build.0 = Debug|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Release|Any CPU.ActiveCfg = Release|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Release|x86.ActiveCfg = Release|x86
+		{FEDDFB3D-1650-461F-895D-BA9D7C13948D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
