@@ -18,6 +18,7 @@ namespace SpotiFire.Server
 
         private string password;
         private ISession spotify;
+        private LiveQueue<ITrack> playQueue;
         private Queue<ClientAction> messageQueue;
         private Thread messageThread;
         private AutoResetEvent messageLock;
@@ -34,12 +35,25 @@ namespace SpotiFire.Server
             this.spotify.LoginComplete += new SessionEventHandler(spotify_LoginComplete);
             this.spotify.LogoutComplete += new SessionEventHandler(spotify_LogoutComplete);
             this.spotify.MusicDeliver += new MusicDeliveryEventHandler(spotify_MusicDeliver);
+            this.spotify.EndOfTrack += new SessionEventHandler(spotify_EndOfTrack);
+
+            this.playQueue = new LiveQueue<ITrack>();
 
             this.messageQueue = new Queue<ClientAction>();
             this.messageLock = new AutoResetEvent(false);
             this.messageThread = new Thread(new ThreadStart(MessageThread));
             this.messageThread.IsBackground = true;
             this.messageThread.Start();
+        }
+
+        void spotify_EndOfTrack(ISession sender, SessionEventArgs e)
+        {
+            if (playQueue.Count > 0)
+            {
+                ITrack track = playQueue.Dequeue();
+                spotify.PlayerLoad(track);
+                spotify.PlayerPlay();
+            }
         }
 
         void spotify_MusicDeliver(ISession sender, MusicDeliveryEventArgs e)
@@ -158,6 +172,8 @@ namespace SpotiFire.Server
         {
             Playlist playlist = Playlist.GetById(playlistId);
             spotify.PlayerLoad(playlist.playlist.Tracks[position]);
+            playQueue.Feed = playlist.playlist.Tracks.Cast<ITrack>();
+            playQueue.Index = position;
             spotify.PlayerPlay();
         }
 

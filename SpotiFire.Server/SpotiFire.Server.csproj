@@ -52,6 +52,7 @@
     <Compile Include="BASSPlayer.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientAction.cs" />
+    <Compile Include="LiveQueue.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="SpotifireServer.cs" />
     <Compile Include="Track.cs" />

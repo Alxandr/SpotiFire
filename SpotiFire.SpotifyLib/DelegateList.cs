@@ -79,5 +79,17 @@ namespace SpotiFire.SpotifyLib
                 return -1;
             return i;
         }
+
+        public override IArray<TResult> Cast<TResult>()
+        {
+            return new DelegateList<TResult>(getLength, (index) =>
+            {
+                object obj = getIndex(index);
+                return (TResult)obj;
+            }, (value, index) =>
+            {
+                throw new InvalidOperationException();
+            }, removeFunc, readonlyFunc);
+        }
     }
 }

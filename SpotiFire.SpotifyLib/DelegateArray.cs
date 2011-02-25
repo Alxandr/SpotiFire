@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -42,6 +40,14 @@ namespace SpotiFire.SpotifyLib
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public virtual IArray<TResult> Cast<TResult>()
+        {
+            return new DelegateArray<TResult>(getLength, (index) =>
+            {
+                return (TResult)Convert.ChangeType(getIndex(index), typeof(TResult));
+            });
         }
 
         public class DelegateEnumerator : IEnumerator<T>
