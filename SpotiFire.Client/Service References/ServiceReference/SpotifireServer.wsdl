@@ -36,10 +36,9 @@
   </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
-      <xsd:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd3" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd2" namespace="http://tempuri.org/" />
       <xsd:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd0" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd1" namespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server" />
-      <xsd:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="Spotify_Authenticate_InputMessage">
@@ -50,6 +49,9 @@
   </wsdl:message>
   <wsdl:message name="Spotify_Login_InputMessage">
     <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_Login_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
   </wsdl:message>
   <wsdl:message name="Spotify_Pong_InputMessage">
     <wsdl:part name="parameters" element="tns:Pong" />
@@ -69,17 +71,17 @@
   <wsdl:message name="Spotify_PlayPlaylistTrack_InputMessage">
     <wsdl:part name="parameters" element="tns:PlayPlaylistTrack" />
   </wsdl:message>
-  <wsdl:message name="Spotify_LoginComplete_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:LoginComplete" />
+  <wsdl:message name="Spotify_SetRandom_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetRandom" />
   </wsdl:message>
-  <wsdl:message name="Spotify_LoginFailed_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:LoginFailed" />
-  </wsdl:message>
-  <wsdl:message name="Spotify_RequireLogin_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:RequireLogin" />
+  <wsdl:message name="Spotify_SetRepeat_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetRepeat" />
   </wsdl:message>
   <wsdl:message name="Spotify_Ping_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:Ping" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_PlaybackStarted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:PlaybackStarted" />
   </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="Spotify">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Authenticate">
@@ -88,6 +90,7 @@
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="Login">
       <wsdl:input wsaw:Action="http://tempuri.org/Spotify/Login" message="tns:Spotify_Login_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/LoginResponse" message="tns:Spotify_Login_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="Pong">
       <wsdl:input wsaw:Action="http://tempuri.org/Spotify/Pong" message="tns:Spotify_Pong_InputMessage" />
@@ -103,17 +106,17 @@
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlayPlaylistTrack">
       <wsdl:input wsaw:Action="http://tempuri.org/Spotify/PlayPlaylistTrack" message="tns:Spotify_PlayPlaylistTrack_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="LoginComplete">
-      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/LoginComplete" message="tns:Spotify_LoginComplete_OutputCallbackMessage" />
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SetRandom">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/SetRandom" message="tns:Spotify_SetRandom_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="LoginFailed">
-      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/LoginFailed" message="tns:Spotify_LoginFailed_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="RequireLogin">
-      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/RequireLogin" message="tns:Spotify_RequireLogin_OutputCallbackMessage" />
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SetRepeat">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/SetRepeat" message="tns:Spotify_SetRepeat_InputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="Ping">
       <wsdl:output wsaw:Action="http://tempuri.org/Spotify/Ping" message="tns:Spotify_Ping_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlaybackStarted">
+      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/PlaybackStarted" message="tns:Spotify_PlaybackStarted_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpContextBinding_Spotify" type="tns:Spotify">
@@ -133,6 +136,9 @@
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="Pong">
       <soap12:operation soapAction="http://tempuri.org/Spotify/Pong" style="document" />
@@ -164,26 +170,26 @@
         <soap12:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
-    <wsdl:operation name="LoginComplete">
-      <soap12:operation soapAction="http://tempuri.org/Spotify/LoginComplete" style="document" />
-      <wsdl:output>
+    <wsdl:operation name="SetRandom">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/SetRandom" style="document" />
+      <wsdl:input>
         <soap12:body use="literal" />
-      </wsdl:output>
+      </wsdl:input>
     </wsdl:operation>
-    <wsdl:operation name="LoginFailed">
-      <soap12:operation soapAction="http://tempuri.org/Spotify/LoginFailed" style="document" />
-      <wsdl:output>
+    <wsdl:operation name="SetRepeat">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/SetRepeat" style="document" />
+      <wsdl:input>
         <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="RequireLogin">
-      <soap12:operation soapAction="http://tempuri.org/Spotify/RequireLogin" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
+      </wsdl:input>
     </wsdl:operation>
     <wsdl:operation name="Ping">
       <soap12:operation soapAction="http://tempuri.org/Spotify/Ping" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PlaybackStarted">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/PlaybackStarted" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

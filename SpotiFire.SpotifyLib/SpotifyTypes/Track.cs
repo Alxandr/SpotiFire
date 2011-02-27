@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -35,7 +37,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return track.Disc; }
             }
 
-            public int Duration
+            public TimeSpan Duration
             {
                 get { IsAlive(true); return track.Duration; }
             }
@@ -68,6 +70,12 @@ namespace SpotiFire.SpotifyLib
             public int Popularity
             {
                 get { IsAlive(true); return track.Popularity; }
+            }
+
+            public bool IsStarred
+            {
+                get { IsAlive(true); return track.IsStarred; }
+                set { IsAlive(true); track.IsStarred = value; }
             }
 
             public ISession Session
@@ -130,7 +138,7 @@ namespace SpotiFire.SpotifyLib
         internal protected Track(Session session, IntPtr trackPtr)
         {
             if (trackPtr == IntPtr.Zero)
-                throw new ArgumentException("albumPtr can't be zero.");
+                throw new ArgumentException("trackPtr can't be zero.");
 
             if (session == null)
                 throw new ArgumentNullException("Session can't be null.");
@@ -223,13 +231,13 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public int Duration
+        public TimeSpan Duration
         {
             get
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_duration(trackPtr);
+                    return TimeSpan.FromMilliseconds(libspotify.sp_track_duration(trackPtr));
             }
         }
 
@@ -240,6 +248,35 @@ namespace SpotiFire.SpotifyLib
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_track_popularity(trackPtr);
+            }
+        }
+
+        public bool IsStarred
+        {
+            get
+            {
+                IsAlive(true);
+                //x lock (libspotify.Mutex)
+                //x     return libspotify.sp_track_is_starred(session.sessionPtr, trackPtr);
+
+                return session.Starred.Tracks.Any(t => Track.GetPointer(t) == this.trackPtr);
+            }
+            set
+            {
+                IsAlive(true);
+                IntPtr arrayPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
+                IntPtr[] ptrArray = new IntPtr[] { trackPtr };
+                try
+                {
+                    Marshal.Copy(ptrArray, 0, arrayPtr, 1);
+                    lock (libspotify.Mutex)
+                        libspotify.sp_track_set_starred(session.sessionPtr, arrayPtr, 1, value);
+                }
+                finally
+                {
+                    try { Marshal.FreeHGlobal(arrayPtr); }
+                    catch { }
+                }
             }
         }
 

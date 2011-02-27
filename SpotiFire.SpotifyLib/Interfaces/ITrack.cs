@@ -6,11 +6,12 @@ namespace SpotiFire.SpotifyLib
         IAlbum Album { get; }
         IArray<IArtist> Artists { get; }
         int Disc { get; }
-        int Duration { get; }
+        TimeSpan Duration { get; }
         sp_error Error { get; }
         int Index { get; }
         bool IsAvailable { get; }
         bool IsLoaded { get; }
+        bool IsStarred { get; set; }
         string Name { get; }
         int Popularity { get; }
     }

@@ -96,7 +96,9 @@ namespace SpotiFire.SpotifyLib
             config.cache_location = cacheLocation;
             config.settings_location = settingsLocation;
             config.user_agent = userAgent;
-            config.tiny_settings = false;
+            config.compress_playlists = false;
+            config.dont_save_metadata_for_playlists = false;
+            config.initially_unload_playlists = false;
 
             int size = Marshal.SizeOf(callbacks);
             config.callbacks = Marshal.AllocHGlobal(size);
@@ -438,7 +440,7 @@ namespace SpotiFire.SpotifyLib
 
         private static void GetAudioBufferStatsCallback(IntPtr sessionPtr, IntPtr statsPtr)
         {
-            //throw new NotImplementedException("GetAudioBufferStatsCallback");
+            //x throw new NotImplementedException("GetAudioBufferStatsCallback");
         }
         #endregion
 
@@ -463,7 +465,7 @@ namespace SpotiFire.SpotifyLib
 
         protected virtual void OnLogoutComplete(SessionEventArgs args)
         {
-            this.shutdown = true;
+            //this.shutdown = true;
             if (this.LogoutComplete != null)
                 this.LogoutComplete(this, args);
         }
@@ -631,6 +633,15 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
                 libspotify.sp_session_preferred_bitrate(sessionPtr, bitrate);
+        }
+
+        public IPlaylist Starred
+        {
+            get
+            {
+                lock (libspotify.Mutex)
+                    return Playlist.Get(this, libspotify.sp_session_starred_create(sessionPtr));
+            }
         }
         #endregion
 

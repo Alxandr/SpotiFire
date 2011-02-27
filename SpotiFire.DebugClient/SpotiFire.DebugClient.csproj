@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2B2703EC-1740-47FD-B527-E507AF0E5BDA}</ProjectGuid>
+    <ProjectGuid>{343496BE-7FFF-4E26-984D-4CFBCA9A0698}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpotiFire.Server</RootNamespace>
-    <AssemblyName>SpotiFire.Server</AssemblyName>
+    <RootNamespace>SpotiFire.DebugClient</RootNamespace>
+    <AssemblyName>SpotiFire.DebugClient</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -34,14 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bass.Net">
-      <HintPath>..\..\..\..\libspotify-sharp\libspotify-sharp-demo\Bass.Net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,33 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Artist.cs" />
-    <Compile Include="BASSPlayer.cs" />
-    <Compile Include="Client.cs" />
-    <Compile Include="ClientAction.cs" />
-    <Compile Include="LiveQueue.cs" />
-    <Compile Include="Playlist.cs" />
-    <Compile Include="SpotifireServer.cs" />
-    <Compile Include="Track.cs" />
-    <Compile Include="AuthenticationStatus.cs" />
-    <Compile Include="Wcf Interfaces\ISpotifireClient.cs" />
-    <Compile Include="Wcf Interfaces\ISpotifireServer.cs" />
+    <Compile Include="libspotify.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SpotiFire.SpotifyLib\SpotiFire.SpotifyLib.csproj">
-      <Project>{CBF5614B-AF79-4228-8265-7DC2BAF9A626}</Project>
-      <Name>SpotiFire.SpotifyLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="bass.dll">
+    <Content Include="libspotify.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ServerImplementation\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

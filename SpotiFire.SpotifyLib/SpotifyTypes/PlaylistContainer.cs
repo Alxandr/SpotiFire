@@ -313,8 +313,28 @@ namespace SpotiFire.SpotifyLib
         internal string GetFolderName(ContainerPlaylist playlist)
         {
             int index = playlists.IndexOf(playlist);
-            lock (libspotify.Mutex)
-                return libspotify.GetString(libspotify.sp_playlistcontainer_playlist_folder_name(pcPtr, index), String.Empty);
+            int bufferSize = libspotify.STRINGBUFFER_SIZE;
+            IntPtr bufferPtr = IntPtr.Zero;
+            try
+            {
+                bufferPtr = Marshal.AllocHGlobal(bufferSize);
+                sp_error error;
+                lock (libspotify.Mutex)
+                    error = libspotify.sp_playlistcontainer_playlist_folder_name(pcPtr, index, bufferPtr, bufferSize);
+
+                if (error == sp_error.OK)
+                {
+                    return libspotify.GetString(bufferPtr, String.Empty);
+                }
+                else
+                    return String.Empty;
+            }
+            finally
+            {
+                if (bufferPtr != IntPtr.Zero)
+                    try { Marshal.FreeHGlobal(bufferPtr); }
+                    catch { }
+            }
         }
         #endregion
 

@@ -18,38 +18,31 @@ namespace SpotiFire.SpotiClient
             : base()
         {
             client = new ServiceReference.SpotifyClient(new InstanceContext(this));
-            bool ok = false;
-            try { ok = client.Authenticate("tester"); }
+            AuthenticationStatus ok = AuthenticationStatus.Bad;
+            MainWindow = new MainWindow(this);
+            try { ok = client.Authenticate(""); }
             catch { throw; }
-            if (!ok)
+            if (ok == AuthenticationStatus.Bad)
                 Shutdown();
-            else
-                MainWindow = new MainWindow(this);
-        }
-
-        public void LoginComplete()
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
+            else if (ok == AuthenticationStatus.RequireLogin)
             {
-                MainWindow.Show();
-            }));
+                bool loggedIn = false;
+                while (!loggedIn)
+                {
+                    SpotifyLogin login = new SpotifyLogin();
+                    login.ShowDialog();
+                    if (login.Username.Text != "")
+                        loggedIn = client.Login(login.Username.Text, login.Password.Password);
+                }
+            }
+            MainWindow = new MainWindow(this);
+            MainWindow.Show();
+            MainWindow.Closed += new EventHandler(MainWindow_Closed);
         }
 
-        public void LoginFailed()
+        void MainWindow_Closed(object sender, EventArgs e)
         {
-            RequireLogin();
-        }
-
-        public void RequireLogin()
-        {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                SpotifyLogin login = new SpotifyLogin();
-                login.ShowDialog();
-                string username = login.Username.Text;
-                if (!string.IsNullOrWhiteSpace(username))
-                    client.Login(login.Username.Text, login.Password.Password);
-            }));
+            this.Shutdown();
         }
 
         public void Ping()
@@ -110,5 +103,23 @@ namespace SpotiFire.SpotiClient
         {
             client.PlayPlaylistTrack(guid, index);
         }
+
+        internal void SetRandom(bool p)
+        {
+            client.SetRandom(p);
+        }
+
+        internal void SetRepeat(bool p)
+        {
+            client.SetRepeat(p);
+        }
+
+        public void PlaybackStarted(Track track, Guid containerId, int index)
+        {
+            if (OnPlaybackStart != null)
+                OnPlaybackStart(this, new PlaybackEventArgs(track, containerId, index));
+        }
+
+        public event EventHandler<PlaybackEventArgs> OnPlaybackStart;
     }
 }

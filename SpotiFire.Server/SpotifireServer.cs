@@ -22,6 +22,9 @@ namespace SpotiFire.Server
         private Queue<ClientAction> messageQueue;
         private Thread messageThread;
         private AutoResetEvent messageLock;
+        private AutoResetEvent loginComplete = new AutoResetEvent(false);
+        private readonly object canLoginLock = new object();
+        private Playlist playlist = null;
         public SpotifireServer(string password = null)
         {
             if (Instance != null)
@@ -36,6 +39,7 @@ namespace SpotiFire.Server
             this.spotify.LogoutComplete += new SessionEventHandler(spotify_LogoutComplete);
             this.spotify.MusicDeliver += new MusicDeliveryEventHandler(spotify_MusicDeliver);
             this.spotify.EndOfTrack += new SessionEventHandler(spotify_EndOfTrack);
+            //this.spotify.StartPlayback += new SessionEventHandler(spotify_StartPlayback);
 
             this.playQueue = new LiveQueue<ITrack>();
 
@@ -46,6 +50,23 @@ namespace SpotiFire.Server
             this.messageThread.Start();
         }
 
+        void spotify_StartPlayback(ISession sender, EventArgs e)
+        {
+            ITrack track = playQueue.Current;
+            IPlaylistTrack pt = track as IPlaylistTrack;
+            if (pt != null)
+            {
+                int index = playlist.playlist.Tracks.IndexOf(pt);
+                if (index != -1)
+                {
+                    MessageClients(c => c.PlaybackStarted(new Track(track), playlist.Id, index));
+                    return;
+                }
+            }
+
+            MessageClients(c => c.PlaybackStarted(new Track(track), Guid.Empty, 0));
+        }
+
         void spotify_EndOfTrack(ISession sender, SessionEventArgs e)
         {
             if (playQueue.Count > 0)
@@ -53,6 +74,7 @@ namespace SpotiFire.Server
                 ITrack track = playQueue.Dequeue();
                 spotify.PlayerLoad(track);
                 spotify.PlayerPlay();
+                spotify_StartPlayback(spotify, new EventArgs());
             }
         }
 
@@ -73,16 +95,12 @@ namespace SpotiFire.Server
 
         void spotify_LogoutComplete(ISession sender, SessionEventArgs e)
         {
-            //x throw new NotImplementedException();
-            //? Hvordan bør dette implementeres?
+            // Message about logout.
         }
 
         void spotify_LoginComplete(ISession sender, SessionEventArgs e)
         {
-            if (spotify.ConnectionState == sp_connectionstate.LOGGED_IN)
-                MessageClients(client => client.LoginComplete());
-            else
-                MessageClients(client => client.LoginFailed());
+            loginComplete.Set();
         }
 
         internal void MessageClients(Action<ISpotifireClient> message, Client client = null)
@@ -124,26 +142,37 @@ namespace SpotiFire.Server
             spotify.Dispose();
         }
 
-        public bool Authenticate(string password)
+        public AuthenticationStatus Authenticate(string password)
         {
             if (this.password != null && password != this.password)
             {
-                return false;
+                return AuthenticationStatus.Bad;
             }
 
             Client c = Client.Current;
             c.Authenticated = true;
 
             if (spotify.ConnectionState == sp_connectionstate.LOGGED_OUT)
-                c.Connection.RequireLogin();
+                return AuthenticationStatus.RequireLogin;
 
-            return true;
+            return AuthenticationStatus.Ok;
         }
 
-        public void Login(string username, string password)
+        public bool Login(string username, string password)
         {
-            if (spotify.ConnectionState == sp_connectionstate.LOGGED_OUT)
-                spotify.Login(username, password);
+            lock (canLoginLock)
+            {
+                if (spotify.ConnectionState == sp_connectionstate.LOGGED_OUT)
+                {
+                    spotify.Login(username, password);
+                    loginComplete.WaitOne();
+                    return spotify.ConnectionState == sp_connectionstate.LOGGED_IN;
+                }
+                else
+                {
+                    return true;
+                }
+            }
         }
 
         public void Pong()
@@ -171,11 +200,30 @@ namespace SpotiFire.Server
         public void PlayPlaylistTrack(Guid playlistId, int position)
         {
             Playlist playlist = Playlist.GetById(playlistId);
-            spotify.PlayerLoad(playlist.playlist.Tracks[position]);
+            this.playlist = playlist;
+            if (position != -1)
+                spotify.PlayerLoad(playlist.playlist.Tracks[position]);
             playQueue.Feed = playlist.playlist.Tracks.Cast<ITrack>();
-            playQueue.Index = position;
+            if (position == -1)
+                spotify.PlayerLoad(playQueue.Dequeue());
+            if (position != -1)
+                playQueue.Index = position;
+            if (position != -1)
+                playQueue.Current = playlist.playlist.Tracks[position];
             spotify.PlayerPlay();
+            spotify_StartPlayback(spotify, new EventArgs());
         }
 
+
+
+        public void SetRandom(bool random)
+        {
+            playQueue.Random = random;
+        }
+
+        public void SetRepeat(bool repeat)
+        {
+            playQueue.Repeat = repeat;
+        }
     }
 }

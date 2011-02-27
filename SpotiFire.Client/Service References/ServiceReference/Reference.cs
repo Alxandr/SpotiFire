@@ -13,6 +13,20 @@ namespace SpotiFire.SpotiClient.ServiceReference {
     using System;
     
     
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AuthenticationStatus", Namespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server")]
+    public enum AuthenticationStatus : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Ok = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Bad = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        RequireLogin = 2,
+    }
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Playlist", Namespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server")]
@@ -165,13 +179,16 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         private string AlbumField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string[] ArtistsField;
+        private SpotiFire.SpotiClient.ServiceReference.Artist[] ArtistsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsAvailableField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int LengthField;
+        private bool IsStarredField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.TimeSpan LengthField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string NameField;
@@ -203,7 +220,7 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string[] Artists {
+        public SpotiFire.SpotiClient.ServiceReference.Artist[] Artists {
             get {
                 return this.ArtistsField;
             }
@@ -229,7 +246,20 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int Length {
+        public bool IsStarred {
+            get {
+                return this.IsStarredField;
+            }
+            set {
+                if ((this.IsStarredField.Equals(value) != true)) {
+                    this.IsStarredField = value;
+                    this.RaisePropertyChanged("IsStarred");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.TimeSpan Length {
             get {
                 return this.LengthField;
             }
@@ -277,15 +307,76 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Artist", Namespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server")]
+    [System.SerializableAttribute()]
+    public partial class Artist : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string LinkField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Link {
+            get {
+                return this.LinkField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LinkField, value) != true)) {
+                    this.LinkField = value;
+                    this.RaisePropertyChanged("Link");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference.Spotify", CallbackContract=typeof(SpotiFire.SpotiClient.ServiceReference.SpotifyCallback), SessionMode=System.ServiceModel.SessionMode.Required)]
     public interface Spotify {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/Spotify/Authenticate", ReplyAction="http://tempuri.org/Spotify/AuthenticateResponse")]
-        bool Authenticate(string password);
+        SpotiFire.SpotiClient.ServiceReference.AuthenticationStatus Authenticate(string password);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/Login")]
-        void Login(string username, string password);
+        [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="http://tempuri.org/Spotify/Login", ReplyAction="http://tempuri.org/Spotify/LoginResponse")]
+        bool Login(string username, string password);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/Pong")]
         void Pong();
@@ -298,22 +389,22 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/PlayPlaylistTrack")]
         void PlayPlaylistTrack(System.Guid playlistId, int position);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SetRandom")]
+        void SetRandom(bool random);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SetRepeat")]
+        void SetRepeat(bool repeat);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface SpotifyCallback {
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/LoginComplete")]
-        void LoginComplete();
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/LoginFailed")]
-        void LoginFailed();
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/RequireLogin")]
-        void RequireLogin();
-        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/Ping")]
         void Ping();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/PlaybackStarted")]
+        void PlaybackStarted(SpotiFire.SpotiClient.ServiceReference.Track track, System.Guid containerId, int index);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -344,12 +435,12 @@ namespace SpotiFire.SpotiClient.ServiceReference {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public bool Authenticate(string password) {
+        public SpotiFire.SpotiClient.ServiceReference.AuthenticationStatus Authenticate(string password) {
             return base.Channel.Authenticate(password);
         }
         
-        public void Login(string username, string password) {
-            base.Channel.Login(username, password);
+        public bool Login(string username, string password) {
+            return base.Channel.Login(username, password);
         }
         
         public void Pong() {
@@ -366,6 +457,14 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         
         public void PlayPlaylistTrack(System.Guid playlistId, int position) {
             base.Channel.PlayPlaylistTrack(playlistId, position);
+        }
+        
+        public void SetRandom(bool random) {
+            base.Channel.SetRandom(random);
+        }
+        
+        public void SetRepeat(bool repeat) {
+            base.Channel.SetRepeat(repeat);
         }
     }
 }

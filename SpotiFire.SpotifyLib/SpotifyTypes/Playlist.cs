@@ -241,6 +241,8 @@ namespace SpotiFire.SpotifyLib
             internal IntPtr track_seen_changed;
             internal IntPtr description_changed;
             internal IntPtr image_changed;
+            internal IntPtr track_message_changed; //TODO: Implement
+            internal IntPtr subscribers_changed; // TODO: Implement
         }
         #endregion
         private delegate void tracks_added_cb(IntPtr playlistPtr, IntPtr tracksPtr, int num_tracks, int position, IntPtr userdataPtr);

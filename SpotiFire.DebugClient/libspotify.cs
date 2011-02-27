@@ -9,7 +9,6 @@ namespace SpotiFire.SpotifyLib
 
         #region Constraints
         public const int SPOTIFY_API_VERSION = 7;
-        public const int STRINGBUFFER_SIZE = 256;
         #endregion
 
         #region Helpers
@@ -75,6 +74,20 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
+        internal static bool GetNativeBool(IntPtr intPtr)
+        {
+            try
+            {
+                unsafe
+                {
+                    return *((bool*)intPtr.ToPointer());
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
         #endregion
 
         #region Error Handeling
@@ -298,87 +311,6 @@ namespace SpotiFire.SpotifyLib
         internal static extern IntPtr sp_session_friend(IntPtr sessionPtr, int index);
         #endregion
 
-        #region Links (Spotify URIs)
-        /// <summary>
-        /// Creates a link object from an artist.
-        /// </summary>
-        /// <remarks>You need to release the link when you are done with it.</remarks>
-        /// <param name="artistPtr">The artist.</param>
-        /// <returns>A link object representing the artist.</returns>
-        [DllImport("libspotify")]
-        internal static extern IntPtr sp_link_create_from_artist(IntPtr artistPtr);
-
-        /// <summary>
-        /// Create a string representation of the given Spotify link.
-        /// </summary>
-        /// <param name="linkPtr">The Spotify link whose string representation you are interested in.</param>
-        /// <param name="bufferPtr">The buffer to hold the string representation of link.</param>
-        /// <param name="buffer_size">The max size of the buffer that will hold the string representation.
-        /// The resulting string is guaranteed to always be null terminated if buffer_size &gt; 0.</param>
-        /// <returns>The number of characters in the string representation of the link.
-        /// If this value is greater or equal than buffer_size, output was truncated.</returns>
-        [DllImport("libspotify")]
-        internal static extern int sp_link_as_string(IntPtr linkPtr, IntPtr bufferPtr, int buffer_size);
-
-        /// <summary>
-        /// Gets the link type of the specified link.
-        /// </summary>
-        /// <param name="linkPtr">The link.</param>
-        /// <returns>The link type of the specified link - see the sp_linktype enum for possible values.</returns>
-        [DllImport("libspotify")]
-        internal static extern sp_linktype sp_link_type(IntPtr linkPtr);
-
-        /// <summary>
-        /// The track representation for the given link.
-        /// </summary>
-        /// <param name="linkPtr">The Spotify link whose track you are interested in.</param>
-        /// <returns>The track representation of the given track link.
-        /// If the link is not of track type then NULL is returned.</returns>
-        [DllImport("libspotify")]
-        internal static extern IntPtr sp_link_as_track(IntPtr linkPtr);
-
-        /// <summary>
-        /// The track and offset into track representation for the given link.
-        /// </summary>
-        /// <param name="linkPtr">The Spotify link whose track you are interested in.</param>
-        /// <param name="offsetPtr">The offset into track (in seconds). If the link does not contain an offset this will be set to 0.</param>
-        /// <returns>The track representation of the given track link If the link is not of track type then NULL is returned.</returns>
-        [DllImport("libspotify")]
-        internal static extern IntPtr sp_link_as_track_and_offset(IntPtr linkPtr, out int offsetPtr);
-
-        /// <summary>
-        /// The album representation for the given link.
-        /// </summary>
-        /// <param name="linkPtr">The Spotify link whose album you are interested in.</param>
-        /// <returns>The album representation of the given album link.
-        /// If the link is not of album type then NULL is returned.</returns>
-        [DllImport("libspotify")]
-        internal static extern IntPtr sp_link_as_album(IntPtr linkPtr);
-
-        /// <summary>
-        /// The artist representation for the given link.
-        /// </summary>
-        /// <param name="linkPtr">The Spotify link whose artist you are interested in.</param>
-        /// <returns>The artist representation of the given link.
-        /// If the link is not of artist type then NULL is returned.</returns>
-        [DllImport("libspotify")]
-        internal static extern IntPtr sp_link_as_artist(IntPtr linkPtr);
-
-        /// <summary>
-        /// Adds a reference to the specified link.
-        /// </summary>
-        /// <param name="linkPtr">The link.</param>
-        [DllImport("libspotify")]
-        internal static extern void sp_link_add_ref(IntPtr linkPtr);
-
-        /// <summary>
-        /// Releases the specified link.
-        /// </summary>
-        /// <param name="linkPtr">The link.</param>
-        [DllImport("libspotify")]
-        internal static extern void sp_link_release(IntPtr linkPtr);
-        #endregion
-
         #region Tracks subsytem
         /// <summary>
         /// Get load status for the specified track. If the track is not loaded yet, all other functions operating on the track return default values.
@@ -442,7 +374,7 @@ namespace SpotiFire.SpotifyLib
         /// </remarks>
         /// <returns>True if track is a starred file, otherwise false.</returns>
         [DllImport("libspotify")]
-        internal static extern bool sp_track_is_starred(IntPtr sessionPtr, IntPtr trackPtr);
+        internal static extern IntPtr sp_track_is_starred(IntPtr sessionPtr, IntPtr trackPtr);
 
 
         /// <summary>
@@ -1102,11 +1034,11 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Load an already existing playlist without adding it to a playlistcontainer.
         /// </summary>
-        /// <param name="playlistPtr">Session object.</param>
+        /// <param name="playlistPtr">Playlist object.</param>
         /// <param name="linkPtr">Link object referring to a playlist.</param>
         /// <returns>A playlist. The reference is owned by the caller and should be released with sp_playlist_release().</returns>
         [DllImport("libspotify")]
-        internal static extern IntPtr sp_playlist_create(IntPtr sessionPtr, IntPtr linkPtr);
+        internal static extern IntPtr sp_playlist_create(IntPtr playlistPtr, IntPtr linkPtr);
 
         /// <summary>
         /// Increase the reference count of a playlist.
@@ -1168,15 +1100,12 @@ namespace SpotiFire.SpotifyLib
         [DllImport("libspotify")]
         internal static extern sp_playlist_type sp_playlistcontainer_playlist_type(IntPtr pcPtr, int index);
 
-
         /// <summary>
-        /// Gets the name of the playlist folder.
+        /// Return the folder name at index.
         /// </summary>
         /// <param name="pcPtr">Playlist container.</param>
-        /// <param name="index">The playlist index.</param>
-        /// <param name="buffer">Pointer to name-buffer.</param>
-        /// <param name="bufferSize">Size of the buffer.</param>
-        /// <returns></returns>
+        /// <param name="index">Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1].</param>
+        /// <returns>The folder name.</returns>
         [DllImport("libspotify")]
         internal static extern sp_error sp_playlistcontainer_playlist_folder_name(IntPtr pcPtr, int index, IntPtr buffer, int bufferSize);
 
@@ -1247,9 +1176,7 @@ namespace SpotiFire.SpotifyLib
             internal string user_agent;
             internal IntPtr callbacks;
             internal IntPtr userdata;
-            internal bool compress_playlists;
-            internal bool dont_save_metadata_for_playlists;
-            internal bool initially_unload_playlists;
+            internal bool tiny_settings;
         }
 
         internal struct sp_session_callbacks
@@ -1276,12 +1203,6 @@ namespace SpotiFire.SpotifyLib
             internal int sample_type;
             internal int sample_rate;
             internal int channels;
-        }
-
-        internal struct sp_audio_buffer_stats
-        {
-            int samples;
-            int stutter;
         }
         #endregion
     }

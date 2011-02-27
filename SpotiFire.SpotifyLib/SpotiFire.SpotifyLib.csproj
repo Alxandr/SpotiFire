@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -42,6 +43,10 @@
   <ItemGroup>
     <Compile Include="Interfaces\IContainerPlaylist.cs" />
     <Compile Include="Interfaces\IPlaylistTrack.cs" />
+    <Compile Include="Interfaces\ILink.cs" />
+    <Compile Include="LinkExtensions.cs" />
+    <Compile Include="Interfaces\ITrackAndOffset.cs" />
+    <Compile Include="SpotifyTypes\Link.cs" />
     <Compile Include="SpotifyTypes\PlaylistTrack.cs" />
     <Compile Include="Spotify.cs" />
     <Compile Include="SpotifyTypes\Album.cs" />

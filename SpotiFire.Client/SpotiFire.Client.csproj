@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="PlaybackEventArgs.cs" />
     <Compile Include="PlaylistTreeItem.cs" />
     <Compile Include="Service References\ServiceReference\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -66,6 +67,7 @@
     <Compile Include="SpotifyLogin.xaml.cs">
       <DependentUpon>SpotifyLogin.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ValueConverters\StarredValueConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -116,8 +118,8 @@
     <None Include="Service References\ServiceReference\metadata2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\ServiceReference\metadata3.xsd">
-      <SubType>Designer</SubType>
+    <None Include="Service References\ServiceReference\SpotiFire.SpotiClient.ServiceReference.AuthenticationStatus.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\ServiceReference\SpotiFire.SpotiClient.ServiceReference.Playlist.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -148,9 +150,14 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\ico_track_starred.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\spotify-core-logo-128x128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ico_track_unstarred.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

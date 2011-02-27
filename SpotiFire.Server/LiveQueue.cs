@@ -13,9 +13,10 @@ namespace SpotiFire.Server
     {
         [NonSerialized]
         private IArray<T> feed = null;
-        private int index = 0;
+        private int index = -1;
         private bool randomOrder = false;
         private bool repeat = false;
+        private T current;
 
         private Queue<T> backlog = new Queue<T>();
         private Queue<T> queue = new Queue<T>();
@@ -43,18 +44,32 @@ namespace SpotiFire.Server
             }
         }
 
+        public T Current
+        {
+            get
+            {
+                return current;
+            }
+            set
+            {
+                current = value;
+            }
+        }
+
         public int Index
         {
             set
             {
                 index = value;
                 RebuildList(true, true);
+                index = -1;
             }
         }
 
         public LiveQueue(IArray<T> feed = null)
         {
             Feed = feed;
+            current = default(T);
         }
 
         private void RebuildList(bool removeQueue, bool removeCustomQueue)
@@ -68,7 +83,10 @@ namespace SpotiFire.Server
             }
 
             if (removeCustomQueue)
+            {
                 customQueue.Clear();
+                current = default(T);
+            }
 
             if (feed == null)
                 return;
@@ -81,7 +99,8 @@ namespace SpotiFire.Server
                     FeedArray(remaining, 0, feed.Count);
                     if (first)
                     {
-                        remaining.Remove(index);
+                        if (remaining.Contains(index))
+                            remaining.Remove(index);
                         first = false;
                     }
                     while (remaining.Count > 0 && queue.Count < queueLength)
@@ -179,7 +198,9 @@ namespace SpotiFire.Server
                 ret = customQueue.Dequeue();
             else
                 ret = queue.Dequeue();
-            backlog.Enqueue(ret);
+            if (!object.Equals(default(T), current))
+                backlog.Enqueue(current);
+            current = ret;
             FeedItems();
             return ret;
         }
@@ -194,6 +215,10 @@ namespace SpotiFire.Server
             if (i < backlog.Count)
                 return backlog.ToArray()[i];
             i -= backlog.Count;
+
+            if (i == 0)
+                return current;
+            i--;
 
             if (i < customQueue.Count)
                 return customQueue.ToArray()[i];
@@ -317,6 +342,32 @@ namespace SpotiFire.Server
                 currentEnum.Dispose();
                 currentArr = -1;
                 currentEnum = default(Queue<T>.Enumerator);
+            }
+        }
+
+        public bool Random
+        {
+            get
+            {
+                return randomOrder;
+            }
+            set
+            {
+                randomOrder = value;
+                RebuildList(true, false);
+            }
+        }
+
+        public bool Repeat
+        {
+            get
+            {
+                return repeat;
+            }
+            set
+            {
+                repeat = value;
+                RebuildList(true, false);
             }
         }
     }

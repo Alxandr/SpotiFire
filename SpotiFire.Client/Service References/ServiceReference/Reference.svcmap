@@ -24,7 +24,6 @@
     <MetadataFile FileName="metadata.xsd" MetadataType="Schema" ID="acef8c18-179e-4a94-90cf-212a63c1afd9" SourceId="1" SourceUrl="http://localhost:8081/spotifire/metadata?xsd=xsd0" />
     <MetadataFile FileName="metadata1.xsd" MetadataType="Schema" ID="d3dab9bc-07f1-45be-a60f-2f87ac31e295" SourceId="1" SourceUrl="http://localhost:8081/spotifire/metadata?xsd=xsd1" />
     <MetadataFile FileName="metadata2.xsd" MetadataType="Schema" ID="5ed92486-972d-42c2-ac9d-9c39810ab37e" SourceId="1" SourceUrl="http://localhost:8081/spotifire/metadata?xsd=xsd2" />
-    <MetadataFile FileName="metadata3.xsd" MetadataType="Schema" ID="f01c16c9-795b-44f4-82ff-58a20f6a494e" SourceId="1" SourceUrl="http://localhost:8081/spotifire/metadata?xsd=xsd3" />
     <MetadataFile FileName="SpotifireServer.wsdl" MetadataType="Wsdl" ID="491467e7-ae45-4a85-a114-831fb5f20b3c" SourceId="1" SourceUrl="http://localhost:8081/spotifire/metadata?wsdl" />
     <MetadataFile FileName="metadata.disco" MetadataType="Disco" ID="8d004147-6ca7-4af2-a087-4e8a16f1c4af" SourceId="1" SourceUrl="http://localhost:8081/spotifire/metadata?disco" />
   </Metadata>

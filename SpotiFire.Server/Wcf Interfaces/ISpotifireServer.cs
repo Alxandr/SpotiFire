@@ -8,13 +8,15 @@ namespace SpotiFire.Server
     [ServiceKnownType(typeof(PlaylistType))]
     [ServiceKnownType(typeof(Playlist))]
     [ServiceKnownType(typeof(Track))]
+    [ServiceKnownType(typeof(Artist))]
+    [ServiceKnownType(typeof(AuthenticationStatus))]
     public interface ISpotifireServer
     {
         [OperationContract(IsOneWay = false, IsInitiating = true)]
-        bool Authenticate(string password);
+        AuthenticationStatus Authenticate(string password);
 
-        [OperationContract(IsOneWay = true, IsInitiating = false)]
-        void Login(string username, string password);
+        [OperationContract(IsOneWay = false, IsInitiating = false)]
+        bool Login(string username, string password);
 
         [OperationContract(IsOneWay = true, IsInitiating = false)]
         void Pong();
@@ -27,5 +29,11 @@ namespace SpotiFire.Server
 
         [OperationContract(IsOneWay = true, IsInitiating = false)]
         void PlayPlaylistTrack(Guid playlistId, int position);
+
+        [OperationContract(IsOneWay = true, IsInitiating = false)]
+        void SetRandom(bool random);
+
+        [OperationContract(IsOneWay = true, IsInitiating = false)]
+        void SetRepeat(bool repeat);
     }
 }
