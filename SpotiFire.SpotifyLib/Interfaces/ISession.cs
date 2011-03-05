@@ -20,6 +20,7 @@ namespace SpotiFire.SpotifyLib
         sp_error PlayerPlay();
         void PlayerUnload();
         IPlaylistContainer PlaylistContainer { get; }
+        IPlaylist Starred { get; }
         event SessionEventHandler PlayTokenLost;
         ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount);
         void SetPrefferedBitrate(sp_bitrate bitrate);

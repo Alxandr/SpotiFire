@@ -16,10 +16,12 @@ namespace SpotiFire.Server
         internal void Execute()
         {
             if (client != null)
-                action(client);
+                try { action(client); }
+                catch { /* TODO: Flag client for deletion */}
             else
                 foreach (var c in Client.All)
-                    action(c);
+                    try { action(c); }
+                    catch { /* TODO: Flag client for deletion */ }
         }
     }
 }

@@ -67,7 +67,14 @@
     <Compile Include="SpotifyLogin.xaml.cs">
       <DependentUpon>SpotifyLogin.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ValueConverters\ThumbIndicatorConverter.cs" />
     <Compile Include="ValueConverters\StarredValueConverter.cs" />
+    <Compile Include="ValueConverters\VolumeBarsConverter.cs" />
+    <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\PlaylistViewModel.cs" />
+    <Compile Include="ViewModels\SpotifyViewModel.cs" />
+    <Compile Include="ViewModels\PlaylistTreeItemViewModel.cs" />
+    <Compile Include="ViewModels\TrackViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -124,6 +131,9 @@
     <None Include="Service References\ServiceReference\SpotiFire.SpotiClient.ServiceReference.Playlist.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\ServiceReference\SpotiFire.SpotiClient.ServiceReference.SpotifyStatus.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\ServiceReference\SpotiFire.SpotiClient.ServiceReference.Track.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -159,6 +169,29 @@
   <ItemGroup>
     <Resource Include="Images\ico_track_unstarred.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\next_button.png" />
+    <Resource Include="Images\next_button_disabled.png" />
+    <Resource Include="Images\next_button_pressed.png" />
+    <Resource Include="Images\pause_button.png" />
+    <Resource Include="Images\pause_button_disabled.png" />
+    <Resource Include="Images\pause_button_pressed.png" />
+    <Resource Include="Images\playlist_icon.png" />
+    <Resource Include="Images\playlist_icon_selected.png" />
+    <Resource Include="Images\play_button.png" />
+    <Resource Include="Images\play_button_disabled.png" />
+    <Resource Include="Images\play_button_pressed.png" />
+    <Resource Include="Images\previous_button.png" />
+    <Resource Include="Images\previous_button_disabled.png" />
+    <Resource Include="Images\previous_button_pressed.png" />
+    <Resource Include="Images\repeat_button_active.png" />
+    <Resource Include="Images\repeat_button_inactive.png" />
+    <Resource Include="Images\repeat_button_pressed.png" />
+    <Resource Include="Images\shuffle_button_active.png" />
+    <Resource Include="Images\shuffle_button_inactive.png" />
+    <Resource Include="Images\shuffle_button_pressed.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

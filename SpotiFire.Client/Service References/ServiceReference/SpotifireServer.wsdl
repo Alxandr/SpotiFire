@@ -71,17 +71,38 @@
   <wsdl:message name="Spotify_PlayPlaylistTrack_InputMessage">
     <wsdl:part name="parameters" element="tns:PlayPlaylistTrack" />
   </wsdl:message>
-  <wsdl:message name="Spotify_SetRandom_InputMessage">
-    <wsdl:part name="parameters" element="tns:SetRandom" />
+  <wsdl:message name="Spotify_SetShuffle_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetShuffle" />
   </wsdl:message>
   <wsdl:message name="Spotify_SetRepeat_InputMessage">
     <wsdl:part name="parameters" element="tns:SetRepeat" />
   </wsdl:message>
+  <wsdl:message name="Spotify_GetStatus_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatus" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_GetStatus_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatusResponse" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_Exit_InputMessage">
+    <wsdl:part name="parameters" element="tns:Exit" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_SetVolume_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetVolume" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_PlayPause_InputMessage">
+    <wsdl:part name="parameters" element="tns:PlayPause" />
+  </wsdl:message>
   <wsdl:message name="Spotify_Ping_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:Ping" />
   </wsdl:message>
+  <wsdl:message name="Spotify_SongStarted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:SongStarted" />
+  </wsdl:message>
   <wsdl:message name="Spotify_PlaybackStarted_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:PlaybackStarted" />
+  </wsdl:message>
+  <wsdl:message name="Spotify_PlaybackEnded_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:PlaybackEnded" />
   </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="Spotify">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Authenticate">
@@ -106,17 +127,36 @@
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlayPlaylistTrack">
       <wsdl:input wsaw:Action="http://tempuri.org/Spotify/PlayPlaylistTrack" message="tns:Spotify_PlayPlaylistTrack_InputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SetRandom">
-      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/SetRandom" message="tns:Spotify_SetRandom_InputMessage" />
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SetShuffle">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/SetShuffle" message="tns:Spotify_SetShuffle_InputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SetRepeat">
       <wsdl:input wsaw:Action="http://tempuri.org/Spotify/SetRepeat" message="tns:Spotify_SetRepeat_InputMessage" />
     </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="GetStatus">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/GetStatus" message="tns:Spotify_GetStatus_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/GetStatusResponse" message="tns:Spotify_GetStatus_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="true" name="Exit">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/Exit" message="tns:Spotify_Exit_InputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SetVolume">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/SetVolume" message="tns:Spotify_SetVolume_InputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlayPause">
+      <wsdl:input wsaw:Action="http://tempuri.org/Spotify/PlayPause" message="tns:Spotify_PlayPause_InputMessage" />
+    </wsdl:operation>
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="Ping">
       <wsdl:output wsaw:Action="http://tempuri.org/Spotify/Ping" message="tns:Spotify_Ping_OutputCallbackMessage" />
     </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="SongStarted">
+      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/SongStarted" message="tns:Spotify_SongStarted_OutputCallbackMessage" />
+    </wsdl:operation>
     <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlaybackStarted">
       <wsdl:output wsaw:Action="http://tempuri.org/Spotify/PlaybackStarted" message="tns:Spotify_PlaybackStarted_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlaybackEnded">
+      <wsdl:output wsaw:Action="http://tempuri.org/Spotify/PlaybackEnded" message="tns:Spotify_PlaybackEnded_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpContextBinding_Spotify" type="tns:Spotify">
@@ -170,8 +210,8 @@
         <soap12:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
-    <wsdl:operation name="SetRandom">
-      <soap12:operation soapAction="http://tempuri.org/Spotify/SetRandom" style="document" />
+    <wsdl:operation name="SetShuffle">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/SetShuffle" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -182,14 +222,53 @@
         <soap12:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
+    <wsdl:operation name="GetStatus">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/GetStatus" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Exit">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/Exit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="SetVolume">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/SetVolume" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="PlayPause">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/PlayPause" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+    </wsdl:operation>
     <wsdl:operation name="Ping">
       <soap12:operation soapAction="http://tempuri.org/Spotify/Ping" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="SongStarted">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/SongStarted" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="PlaybackStarted">
       <soap12:operation soapAction="http://tempuri.org/Spotify/PlaybackStarted" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PlaybackEnded">
+      <soap12:operation soapAction="http://tempuri.org/Spotify/PlaybackEnded" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

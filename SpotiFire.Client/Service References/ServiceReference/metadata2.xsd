@@ -70,7 +70,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SetRandom">
+  <xs:element name="SetShuffle">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="random" type="xs:boolean" />
@@ -84,18 +84,57 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetStatus">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetStatusResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/SpotiFire.Server" minOccurs="0" name="GetStatusResult" nillable="true" type="q6:SpotifyStatus" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Exit">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetVolume">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="volume" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PlayPause">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Ping">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="PlaybackStarted">
+  <xs:element name="SongStarted">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/SpotiFire.Server" minOccurs="0" name="track" nillable="true" type="q6:Track" />
-        <xs:element xmlns:q7="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="containerId" type="q7:guid" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/SpotiFire.Server" minOccurs="0" name="track" nillable="true" type="q7:Track" />
+        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="containerId" type="q8:guid" />
         <xs:element minOccurs="0" name="index" type="xs:int" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PlaybackStarted">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PlaybackEnded">
+    <xs:complexType>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
 </xs:schema>

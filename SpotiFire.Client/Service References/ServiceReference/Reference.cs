@@ -368,6 +368,179 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SpotifyStatus", Namespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server")]
+    [System.SerializableAttribute()]
+    public partial class SpotifyStatus : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool CanGoBackField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool CanGoNextField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool CanStartPlaybackField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private SpotiFire.SpotiClient.ServiceReference.Track CurrentTrackField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsPlayingField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.TimeSpan LengthPlayedField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool RepeatField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool ShuffleField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int VolumeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool CanGoBack {
+            get {
+                return this.CanGoBackField;
+            }
+            set {
+                if ((this.CanGoBackField.Equals(value) != true)) {
+                    this.CanGoBackField = value;
+                    this.RaisePropertyChanged("CanGoBack");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool CanGoNext {
+            get {
+                return this.CanGoNextField;
+            }
+            set {
+                if ((this.CanGoNextField.Equals(value) != true)) {
+                    this.CanGoNextField = value;
+                    this.RaisePropertyChanged("CanGoNext");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool CanStartPlayback {
+            get {
+                return this.CanStartPlaybackField;
+            }
+            set {
+                if ((this.CanStartPlaybackField.Equals(value) != true)) {
+                    this.CanStartPlaybackField = value;
+                    this.RaisePropertyChanged("CanStartPlayback");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public SpotiFire.SpotiClient.ServiceReference.Track CurrentTrack {
+            get {
+                return this.CurrentTrackField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CurrentTrackField, value) != true)) {
+                    this.CurrentTrackField = value;
+                    this.RaisePropertyChanged("CurrentTrack");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsPlaying {
+            get {
+                return this.IsPlayingField;
+            }
+            set {
+                if ((this.IsPlayingField.Equals(value) != true)) {
+                    this.IsPlayingField = value;
+                    this.RaisePropertyChanged("IsPlaying");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.TimeSpan LengthPlayed {
+            get {
+                return this.LengthPlayedField;
+            }
+            set {
+                if ((this.LengthPlayedField.Equals(value) != true)) {
+                    this.LengthPlayedField = value;
+                    this.RaisePropertyChanged("LengthPlayed");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Repeat {
+            get {
+                return this.RepeatField;
+            }
+            set {
+                if ((this.RepeatField.Equals(value) != true)) {
+                    this.RepeatField = value;
+                    this.RaisePropertyChanged("Repeat");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Shuffle {
+            get {
+                return this.ShuffleField;
+            }
+            set {
+                if ((this.ShuffleField.Equals(value) != true)) {
+                    this.ShuffleField = value;
+                    this.RaisePropertyChanged("Shuffle");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int Volume {
+            get {
+                return this.VolumeField;
+            }
+            set {
+                if ((this.VolumeField.Equals(value) != true)) {
+                    this.VolumeField = value;
+                    this.RaisePropertyChanged("Volume");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference.Spotify", CallbackContract=typeof(SpotiFire.SpotiClient.ServiceReference.SpotifyCallback), SessionMode=System.ServiceModel.SessionMode.Required)]
     public interface Spotify {
@@ -390,11 +563,23 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/PlayPlaylistTrack")]
         void PlayPlaylistTrack(System.Guid playlistId, int position);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SetRandom")]
-        void SetRandom(bool random);
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SetShuffle")]
+        void SetShuffle(bool random);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SetRepeat")]
         void SetRepeat(bool repeat);
+        
+        [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="http://tempuri.org/Spotify/GetStatus", ReplyAction="http://tempuri.org/Spotify/GetStatusResponse")]
+        SpotiFire.SpotiClient.ServiceReference.SpotifyStatus GetStatus();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsTerminating=true, IsInitiating=false, Action="http://tempuri.org/Spotify/Exit")]
+        void Exit();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SetVolume")]
+        void SetVolume(int volume);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/PlayPause")]
+        void PlayPause();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -403,8 +588,14 @@ namespace SpotiFire.SpotiClient.ServiceReference {
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/Ping")]
         void Ping();
         
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/SongStarted")]
+        void SongStarted(SpotiFire.SpotiClient.ServiceReference.Track track, System.Guid containerId, int index);
+        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/PlaybackStarted")]
-        void PlaybackStarted(SpotiFire.SpotiClient.ServiceReference.Track track, System.Guid containerId, int index);
+        void PlaybackStarted();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, IsInitiating=false, Action="http://tempuri.org/Spotify/PlaybackEnded")]
+        void PlaybackEnded();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -459,12 +650,28 @@ namespace SpotiFire.SpotiClient.ServiceReference {
             base.Channel.PlayPlaylistTrack(playlistId, position);
         }
         
-        public void SetRandom(bool random) {
-            base.Channel.SetRandom(random);
+        public void SetShuffle(bool random) {
+            base.Channel.SetShuffle(random);
         }
         
         public void SetRepeat(bool repeat) {
             base.Channel.SetRepeat(repeat);
+        }
+        
+        public SpotiFire.SpotiClient.ServiceReference.SpotifyStatus GetStatus() {
+            return base.Channel.GetStatus();
+        }
+        
+        public void Exit() {
+            base.Channel.Exit();
+        }
+        
+        public void SetVolume(int volume) {
+            base.Channel.SetVolume(volume);
+        }
+        
+        public void PlayPause() {
+            base.Channel.PlayPause();
         }
     }
 }

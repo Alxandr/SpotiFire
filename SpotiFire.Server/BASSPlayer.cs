@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Un4seen.Bass;
 
 namespace SpotiFire.Server
@@ -43,6 +40,18 @@ namespace SpotiFire.Server
         {
             // In real world usage you must remember to free the BASS stream if not reusing it!
             basbuffer.Clear();
+        }
+
+        public float Volume
+        {
+            get
+            {
+                return Bass.BASS_GetVolume();
+            }
+            set
+            {
+                Bass.BASS_SetVolume(value);
+            }
         }
     }
 }

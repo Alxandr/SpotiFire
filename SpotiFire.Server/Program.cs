@@ -94,8 +94,7 @@ namespace SpotiFire.Server
                 host.Open();
 
                 Console.WriteLine("The service is ready at {0}", baseAddress);
-                Console.WriteLine("Press <Enter> to stop the service.");
-                Console.ReadLine();
+                server.Run();
 
                 // Close the ServiceHost.
                 host.Close();

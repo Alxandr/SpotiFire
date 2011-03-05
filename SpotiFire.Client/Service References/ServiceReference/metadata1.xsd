@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="http://schemas.datacontract.org/2004/07/SpotiFire.Server" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/SpotiFire.Server" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8081/spotifire/metadata?xsd=xsd0" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-  <xs:simpleType name="PlaylistType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Playlist" />
-      <xs:enumeration value="FolderStart" />
-      <xs:enumeration value="FolderEnd" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="PlaylistType" nillable="true" type="tns:PlaylistType" />
   <xs:simpleType name="AuthenticationStatus">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Ok" />
@@ -17,6 +9,20 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="AuthenticationStatus" nillable="true" type="tns:AuthenticationStatus" />
+  <xs:complexType name="SpotifyStatus">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CanGoBack" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanGoNext" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanStartPlayback" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CurrentTrack" nillable="true" type="tns:Track" />
+      <xs:element minOccurs="0" name="IsPlaying" type="xs:boolean" />
+      <xs:element minOccurs="0" name="LengthPlayed" type="ser:duration" />
+      <xs:element minOccurs="0" name="Repeat" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Shuffle" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Volume" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SpotifyStatus" nillable="true" type="tns:SpotifyStatus" />
   <xs:complexType name="Track">
     <xs:sequence>
       <xs:element minOccurs="0" name="Album" nillable="true" type="xs:string" />
@@ -42,6 +48,14 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Artist" nillable="true" type="tns:Artist" />
+  <xs:simpleType name="PlaylistType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Playlist" />
+      <xs:enumeration value="FolderStart" />
+      <xs:enumeration value="FolderEnd" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="PlaylistType" nillable="true" type="tns:PlaylistType" />
   <xs:complexType name="Playlist">
     <xs:sequence>
       <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />

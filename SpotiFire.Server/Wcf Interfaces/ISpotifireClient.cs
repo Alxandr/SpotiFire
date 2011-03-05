@@ -9,6 +9,12 @@ namespace SpotiFire.Server
         void Ping();
 
         [OperationContract(IsOneWay = true, IsInitiating = false)]
-        void PlaybackStarted(Track track, Guid containerId, int index);
+        void SongStarted(Track track, Guid containerId, int index);
+
+        [OperationContract(IsOneWay = true, IsInitiating = false)]
+        void PlaybackStarted();
+
+        [OperationContract(IsOneWay = true, IsInitiating = false)]
+        void PlaybackEnded();
     }
 }

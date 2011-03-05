@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Dispatcher;
 using System.Threading;
 using SpotiFire.SpotifyLib;
+using c = System.ServiceModel.Channels;
 namespace SpotiFire.Server
 {
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.Single, IncludeExceptionDetailInFaults = true)]
-    class SpotifireServer : ISpotifireServer
+    class SpotifireServer : ISpotifireServer, IErrorHandler
     {
         public static SpotifireServer Instance { get; private set; }
         private BASSPlayer player = null;
@@ -25,6 +27,13 @@ namespace SpotiFire.Server
         private AutoResetEvent loginComplete = new AutoResetEvent(false);
         private readonly object canLoginLock = new object();
         private Playlist playlist = null;
+        private ManualResetEvent waitHandle = new ManualResetEvent(false);
+
+        private DateTime trackStartTime = DateTime.Now;
+        private DateTime trackPauseTime = DateTime.MinValue;
+
+        private bool playing = false;
+
         public SpotifireServer(string password = null)
         {
             if (Instance != null)
@@ -39,7 +48,9 @@ namespace SpotiFire.Server
             this.spotify.LogoutComplete += new SessionEventHandler(spotify_LogoutComplete);
             this.spotify.MusicDeliver += new MusicDeliveryEventHandler(spotify_MusicDeliver);
             this.spotify.EndOfTrack += new SessionEventHandler(spotify_EndOfTrack);
-            //this.spotify.StartPlayback += new SessionEventHandler(spotify_StartPlayback);
+
+            this.spotify.StartPlayback += new SessionEventHandler(spotify_StartPlayback);
+            this.spotify.StopPlayback += new SessionEventHandler(spotify_StopPlayback);
 
             this.playQueue = new LiveQueue<ITrack>();
 
@@ -48,10 +59,39 @@ namespace SpotiFire.Server
             this.messageThread = new Thread(new ThreadStart(MessageThread));
             this.messageThread.IsBackground = true;
             this.messageThread.Start();
+
+            player = new BASSPlayer();
         }
 
-        void spotify_StartPlayback(ISession sender, EventArgs e)
+        void spotify_StopPlayback(ISession sender, SessionEventArgs e)
         {
+            if (trackPauseTime == DateTime.MinValue)
+            {
+                trackPauseTime = DateTime.Now;
+                playing = false;
+                MessageClients(c => c.PlaybackEnded());
+            }
+        }
+
+        void spotify_StartPlayback(ISession sender, SessionEventArgs e)
+        {
+            if (trackPauseTime != DateTime.MinValue)
+            {
+                trackStartTime = trackStartTime + DateTime.Now.Subtract(trackPauseTime);
+                trackPauseTime = DateTime.MinValue;
+                playing = true;
+                MessageClients(c => c.PlaybackStarted());
+            }
+        }
+
+        public void Run()
+        {
+            waitHandle.WaitOne();
+        }
+
+        void spotify_SongStarted(ISession sender, EventArgs e)
+        {
+            playing = true;
             ITrack track = playQueue.Current;
             IPlaylistTrack pt = track as IPlaylistTrack;
             if (pt != null)
@@ -59,12 +99,12 @@ namespace SpotiFire.Server
                 int index = playlist.playlist.Tracks.IndexOf(pt);
                 if (index != -1)
                 {
-                    MessageClients(c => c.PlaybackStarted(new Track(track), playlist.Id, index));
+                    MessageClients(c => c.SongStarted(new Track(track), playlist.Id, index));
                     return;
                 }
             }
 
-            MessageClients(c => c.PlaybackStarted(new Track(track), Guid.Empty, 0));
+            MessageClients(c => c.SongStarted(new Track(track), Guid.Empty, 0));
         }
 
         void spotify_EndOfTrack(ISession sender, SessionEventArgs e)
@@ -74,7 +114,11 @@ namespace SpotiFire.Server
                 ITrack track = playQueue.Dequeue();
                 spotify.PlayerLoad(track);
                 spotify.PlayerPlay();
-                spotify_StartPlayback(spotify, new EventArgs());
+                spotify_SongStarted(spotify, new EventArgs());
+            }
+            else
+            {
+                playQueue.Dequeue(true);
             }
         }
 
@@ -82,9 +126,6 @@ namespace SpotiFire.Server
         {
             if (e.Samples.Length > 0)
             {
-                if (player == null)
-                    player = new BASSPlayer();
-
                 e.ConsumedFrames = player.EnqueueSamples(e.Channels, e.Rate, e.Samples, e.Frames);
             }
             else
@@ -130,7 +171,7 @@ namespace SpotiFire.Server
                 while (queue.Count > 0)
                 {
                     var message = queue.Dequeue();
-                    try { message.Execute(); }
+                    try { message.Execute(); } // Should be fail-safe, but don't want thread to exit just in case.
                     catch { }
                 }
             }
@@ -181,17 +222,19 @@ namespace SpotiFire.Server
         }
 
 
-        public Playlist[] GetPlaylists()
+        public IEnumerable<Playlist> GetPlaylists()
         {
             while (!spotify.PlaylistContainer.IsLoaded)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(.5));
             }
 
-            return spotify.PlaylistContainer.Playlists.Select(pl => Playlist.Get(pl)).ToArray();
+            yield return Playlist.Get(spotify.Starred);
+            foreach (var p in spotify.PlaylistContainer.Playlists)
+                yield return Playlist.Get(p);
         }
 
-        public Track[] GetPlaylistTracks(Guid id)
+        public IEnumerable<Track> GetPlaylistTracks(Guid id)
         {
             Playlist playlist = Playlist.GetById(id);
             return playlist.playlist.Tracks.Select(t => new Track(t)).ToArray();
@@ -211,19 +254,71 @@ namespace SpotiFire.Server
             if (position != -1)
                 playQueue.Current = playlist.playlist.Tracks[position];
             spotify.PlayerPlay();
-            spotify_StartPlayback(spotify, new EventArgs());
+            spotify_SongStarted(spotify, new EventArgs());
         }
 
 
 
-        public void SetRandom(bool random)
+        public void SetShuffle(bool shuffle)
         {
-            playQueue.Random = random;
+            playQueue.Shuffle = shuffle;
         }
 
         public void SetRepeat(bool repeat)
         {
             playQueue.Repeat = repeat;
+        }
+
+        public void Exit()
+        {
+            waitHandle.Set();
+        }
+
+        public void SetVolume(int volume)
+        {
+            volume = Math.Max(Math.Max(volume, 0), 100);
+            player.Volume = (volume / 100);
+        }
+
+        public int GetVolume()
+        {
+            return (int)(player.Volume * 100);
+        }
+
+        public void PlayPause()
+        {
+            playing = !playing;
+            if (!playing)
+                spotify.PlayerPause();
+            else
+                spotify.PlayerPlay();
+        }
+
+        public bool HandleError(Exception error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ProvideFault(Exception error, c.MessageVersion version, ref c.Message fault)
+        {
+            if (error is FaultException)
+                return;
+        }
+
+        public SpotifyStatus GetStatus()
+        {
+            return new SpotifyStatus
+            {
+                IsPlaying = playing,
+                CanGoBack = false,
+                CanGoNext = false,
+                CanStartPlayback = playQueue.Current != null,
+                CurrentTrack = playQueue.Current != null ? new Track(playQueue.Current) : null,
+                LengthPlayed = playQueue.Current != null ? (playing ? DateTime.Now.Subtract(trackStartTime) : trackPauseTime.Subtract(trackStartTime)) : TimeSpan.Zero,
+                Repeat = playQueue.Repeat,
+                Shuffle = playQueue.Shuffle,
+                Volume = GetVolume()
+            };
         }
     }
 }

@@ -345,7 +345,7 @@ namespace SpotiFire.Server
             }
         }
 
-        public bool Random
+        public bool Shuffle
         {
             get
             {
@@ -369,6 +369,19 @@ namespace SpotiFire.Server
                 repeat = value;
                 RebuildList(true, false);
             }
+        }
+
+        public T Dequeue(bool p)
+        {
+            if (p == false || Count > 0)
+                return Dequeue();
+
+
+            T ret = current;
+            backlog.Enqueue(current);
+            current = default(T);
+            FeedItems();
+            return ret;
         }
     }
 }
