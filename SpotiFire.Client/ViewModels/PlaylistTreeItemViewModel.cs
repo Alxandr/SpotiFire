@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SpotiFire.SpotiClient.ViewModels
 {
@@ -7,6 +8,7 @@ namespace SpotiFire.SpotiClient.ViewModels
     {
         #region Data
         private PlaylistTreeItemViewModel parent;
+        private bool isSelected;
         #endregion
 
         #region Static helpers
@@ -27,6 +29,25 @@ namespace SpotiFire.SpotiClient.ViewModels
                 return parent;
             }
         }
+
+        public bool IsSelected
+        {
+            get
+            {
+                return isSelected;
+            }
+            set
+            {
+                if (value != isSelected)
+                {
+                    isSelected = value;
+                    OnPropertyChanged(() => IsSelected);
+                }
+            }
+        }
+
+        public abstract string[] IconPaths { get; }
+        public abstract bool IsExpanded { get; set; }
         #endregion
 
         #region Constructors
@@ -40,10 +61,37 @@ namespace SpotiFire.SpotiClient.ViewModels
         #region Implementations
         public class Playlist : PlaylistTreeItemViewModel
         {
+            #region IconData
+            private static readonly string[] iconPaths = new string[] {
+                "Images/playlist_icon.png",
+                "Images/playlist_icon_selected.png"
+            };
+            #endregion
+
             #region Constructors
             public Playlist(ServiceReference.Playlist pl)
                 : base(pl)
             { }
+            #endregion
+
+            #region Properties
+            public override string[] IconPaths
+            {
+                get { return iconPaths; }
+            }
+
+            public override bool IsExpanded
+            {
+                get
+                {
+                    return false;
+                }
+                set
+                {
+                    if (value)
+                        throw new InvalidOperationException();
+                }
+            }
             #endregion
 
             #region ToStrings
@@ -56,8 +104,16 @@ namespace SpotiFire.SpotiClient.ViewModels
 
         public class PlaylistFolder : PlaylistTreeItemViewModel
         {
+            #region IconData
+            private static readonly string[] iconPaths = new string[] {
+                "Images/playlist_folder_icon.png",
+                "Images/playlist_folder_icon_selected.png"
+            };
+            #endregion
+
             #region Data
-            private ReadOnlyCollection<PlaylistTreeItemViewModel> children;
+            private BindingList<PlaylistTreeItemViewModel> children;
+            private bool isExpanded;
             #endregion
 
             #region Constructors
@@ -65,7 +121,7 @@ namespace SpotiFire.SpotiClient.ViewModels
                 : base(pl)
             {
                 if (children == null)
-                    this.children = new ReadOnlyCollection<PlaylistTreeItemViewModel>(new List<PlaylistTreeItemViewModel>());
+                    this.children = new BindingList<PlaylistTreeItemViewModel>();
                 else
                 {
                     var list = new List<PlaylistTreeItemViewModel>();
@@ -74,25 +130,43 @@ namespace SpotiFire.SpotiClient.ViewModels
                         list.Add(p);
                         parent = this;
                     }
-                    this.children = new ReadOnlyCollection<PlaylistTreeItemViewModel>(list);
+                    this.children = new BindingList<PlaylistTreeItemViewModel>(list);
                 }
+
+                this.children.ListChanged += (s, e) => OnPropertyChanged(() => Children);
             }
             #endregion
 
             #region Properties
-            public PlaylistTreeItemViewModel Parent
+            public override string[] IconPaths
             {
-                get
-                {
-                    return parent;
-                }
+                get { return iconPaths; }
             }
 
-            public ReadOnlyCollection<PlaylistTreeItemViewModel> Children
+            public BindingList<PlaylistTreeItemViewModel> Children
             {
                 get
                 {
                     return children;
+                }
+            }
+
+            public override bool IsExpanded
+            {
+                get
+                {
+                    return isExpanded;
+                }
+                set
+                {
+                    if (value != isExpanded)
+                    {
+                        isExpanded = value;
+                        OnPropertyChanged(() => IsExpanded);
+
+                        if (isExpanded && Parent != null)
+                            Parent.IsExpanded = true;
+                    }
                 }
             }
             #endregion
@@ -100,7 +174,7 @@ namespace SpotiFire.SpotiClient.ViewModels
             #region ToStrings
             public override string ToString()
             {
-                return string.Format("{PlaylistFolder Name={0}, Count={1}}", Name, Children.Count);
+                return "PlaylistFolder " + Name + " (" + Children.Count + ")";
             }
             #endregion
         }

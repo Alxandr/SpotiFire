@@ -67,10 +67,15 @@
     <Compile Include="SpotifyLogin.xaml.cs">
       <DependentUpon>SpotifyLogin.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SpotifyPlaylistView.xaml.cs">
+      <DependentUpon>SpotifyPlaylistView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ValueConverters\TreeViewMarginConverter.cs" />
     <Compile Include="ValueConverters\ThumbIndicatorConverter.cs" />
     <Compile Include="ValueConverters\StarredValueConverter.cs" />
     <Compile Include="ValueConverters\VolumeBarsConverter.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\ISpotifyViewViewModel.cs" />
     <Compile Include="ViewModels\PlaylistViewModel.cs" />
     <Compile Include="ViewModels\SpotifyViewModel.cs" />
     <Compile Include="ViewModels\PlaylistTreeItemViewModel.cs" />
@@ -90,6 +95,14 @@
     <Page Include="SpotifyLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SpotifyPlaylistTree.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SpotifyPlaylistView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +203,18 @@
     <Resource Include="Images\shuffle_button_active.png" />
     <Resource Include="Images\shuffle_button_inactive.png" />
     <Resource Include="Images\shuffle_button_pressed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\playlist_folder_icon.png" />
+    <Resource Include="Images\playlist_folder_icon_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\arrow_down.png" />
+    <Resource Include="Images\arrow_right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\arrow_down_selected.png" />
+    <Resource Include="Images\arrow_right_selected.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

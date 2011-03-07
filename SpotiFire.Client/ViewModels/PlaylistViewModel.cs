@@ -1,12 +1,22 @@
 ﻿
 using System;
+using System.Windows;
 namespace SpotiFire.SpotiClient.ViewModels
 {
-    public class PlaylistViewModel : BaseViewModel
+    public class PlaylistViewModel : BaseViewModel, ISpotifyViewViewModel
     {
         #region Data
         private Guid id;
         private string name;
+        #endregion
+
+        #region View
+        public FrameworkElement GetView()
+        {
+            var view = new SpotifyPlaylistView();
+            view.DataContext = this;
+            return view;
+        }
         #endregion
 
         #region Constructors

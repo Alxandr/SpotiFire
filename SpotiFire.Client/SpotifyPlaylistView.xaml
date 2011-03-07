@@ -1,0 +1,144 @@
+﻿<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:SpotiFire_SpotiClient_ValueConverters="clr-namespace:SpotiFire.SpotiClient.ValueConverters"
+	mc:Ignorable="d"
+	x:Class="SpotiFire.SpotiClient.SpotifyPlaylistView"
+	x:Name="UserControl"
+	d:DesignWidth="584" d:DesignHeight="345" UseLayoutRounding="True">
+
+	<UserControl.Resources>
+		<Style x:Key="TrackListRowStyle" TargetType="{x:Type ListViewItem}">
+			<Setter Property="Background" Value="#313131" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="Foreground" Value="#DDDDDD" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ListViewItem}">
+						<Grid x:Name="background" Margin="0">
+							<Grid.Style>
+								<Style TargetType="{x:Type Grid}">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}, Mode=FindAncestor}}" Value="True">
+											<Setter Property="Background" Value="#A9D9FE" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}, Mode=FindAncestor}}" Value="False">
+											<Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}, Mode=FindAncestor}}" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Style>
+							<GridViewRowPresenter x:Name="ItemContent" Focusable="False"/>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Style.Triggers>
+				<Trigger Property="ItemsControl.AlternationIndex" Value="1">
+					<Setter Property="FontFamily" Value="FangSong" />
+					<Setter Property="Background" Value="#373737" />
+				</Trigger>
+				<DataTrigger Binding="{Binding IsAvailable}" Value="False">
+					<Setter Property="Foreground" Value="LightGray" />
+					<Setter Property="IsEnabled" Value="False" />
+				</DataTrigger>
+				<Trigger Property="IsSelected" Value="True">
+					<Setter Property="Foreground" Value="#000F1C" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+		<SpotiFire_SpotiClient_ValueConverters:StarredValueConverter x:Key="StarredConverter" />
+		<Style x:Key="ArtistLink" TargetType="{x:Type Hyperlink}">
+			<Setter Property="TextDecorations" Value="None" />
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="TextDecorations" Value="Underline" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+	</UserControl.Resources>
+
+	<Grid x:Name="LayoutRoot">
+		<ListView x:Name="SpotifySongs" BorderThickness="0" Background="#313131">
+			<ListView.Resources>
+				<Style TargetType="{x:Type GridViewColumnHeader}">
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
+								<Border BorderThickness="1,1,0,0" BorderBrush="#A4A4A4">
+									<Border BorderThickness="0,0,1,1" BorderBrush="#646464" Height="17">
+										<Border.Background>
+											<LinearGradientBrush EndPoint="0.504,1.5" StartPoint="0.504,0.03">
+												<GradientStop Color="#A8A8A8" Offset="0"/>
+												<GradientStop Color="#868686" Offset="0.567"/>
+											</LinearGradientBrush>
+										</Border.Background>
+										<TextBlock Text="{TemplateBinding Content}" FontWeight="Bold" Padding="5,0,0,0">
+											<TextBlock.Effect>
+												<DropShadowEffect
+													ShadowDepth="1"
+													Direction="330"
+													Color="#DDDDDD"
+													Opacity="0.5"
+													BlurRadius="1"
+                                                        />
+											</TextBlock.Effect>
+										</TextBlock>
+									</Border>
+								</Border>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</ListView.Resources>
+			<ListView.ItemContainerStyle>
+				<StaticResource ResourceKey="TrackListRowStyle"/>
+			</ListView.ItemContainerStyle>
+			<ListView.View>
+				<GridView AllowsColumnReorder="False">
+					<GridViewColumn Width="25" Header="">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Image Source="{Binding IsStarred, Converter={StaticResource ResourceKey=StarredConverter}}" Height="13" Width="13" Margin="0" />
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+					<GridViewColumn Width="150" Header="Track" DisplayMemberBinding="{Binding Name}"/>
+					<GridViewColumn Width="150" Header="Artist">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<ListView ItemsSource="{Binding Artists}" BorderThickness="0" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent">
+									<ListView.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Horizontal" CanHorizontallyScroll="False" CanVerticallyScroll="False" ClipToBounds="True"
+												Background="Transparent"/>
+										</ItemsPanelTemplate>
+									</ListView.ItemsPanel>
+									<ListView.ItemTemplate>
+										<DataTemplate>
+											<TextBlock><Hyperlink NavigateUri="{Binding Link}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorLevel=2, AncestorType={x:Type ListViewItem}}}"
+													Background="Transparent" Style="{StaticResource ResourceKey=ArtistLink}"><InlineUIContainer>
+														<TextBlock Text="{Binding Name}" />
+													</InlineUIContainer></Hyperlink></TextBlock>
+										</DataTemplate>
+									</ListView.ItemTemplate>
+								</ListView>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+					<GridViewColumn Width="50" Header="Time">
+						<GridViewColumn.DisplayMemberBinding>
+							<Binding Path="Length">
+								<Binding.StringFormat>mm\:ss</Binding.StringFormat>
+							</Binding>
+						</GridViewColumn.DisplayMemberBinding>
+					</GridViewColumn>
+					<GridViewColumn Width="150" Header="Album" DisplayMemberBinding="{Binding Album}"/>
+				</GridView>
+			</ListView.View>
+		</ListView>
+	</Grid>
+</UserControl>

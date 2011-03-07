@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using SpotiFire.SpotiClient.ServiceReference;
 
@@ -32,7 +32,10 @@ namespace SpotiFire.SpotiClient.ViewModels
         private int volume;
 
         // Playlist-tree
-        private ReadOnlyCollection<PlaylistTreeItemViewModel> playlists;
+        BindingList<PlaylistTreeItemViewModel> playlists;
+
+        // Viewobject
+        private ISpotifyViewViewModel currentView;
         #endregion
 
         #region Constructors
@@ -48,7 +51,41 @@ namespace SpotiFire.SpotiClient.ViewModels
 
             volume = 100;
 
-            playlists = null;
+            playlists = new BindingList<PlaylistTreeItemViewModel>();
+            playlists.ListChanged += new ListChangedEventHandler(playlists_ListChanged);
+        }
+        #endregion
+
+        #region Event listeners
+        #region Helper
+        private IEnumerable<PlaylistTreeItemViewModel> FlattenPlaylistTree(IEnumerable<PlaylistTreeItemViewModel> playlists = null)
+        {
+            if (playlists == null)
+                playlists = this.playlists;
+            Queue<PlaylistTreeItemViewModel.PlaylistFolder> folders = new Queue<PlaylistTreeItemViewModel.PlaylistFolder>();
+            foreach (var p in playlists)
+            {
+                yield return p;
+                if (p is PlaylistTreeItemViewModel.PlaylistFolder)
+                    folders.Enqueue((PlaylistTreeItemViewModel.PlaylistFolder)p);
+            }
+
+            while (folders.Count > 0)
+                foreach (var p in FlattenPlaylistTree(folders.Dequeue().Children))
+                    yield return p;
+
+            yield break;
+        }
+        #endregion
+
+        void playlists_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            if (e.ListChangedType == ListChangedType.ItemChanged && !(currentView is PlaylistTreeItemViewModel && ((PlaylistTreeItemViewModel)currentView).IsSelected))
+            {
+                var newView = FlattenPlaylistTree().Where(p => p.IsSelected && !(p is PlaylistTreeItemViewModel.PlaylistFolder)).FirstOrDefault();
+                if (newView != null)
+                    CurrentView = newView;
+            }
         }
         #endregion
 
@@ -107,7 +144,8 @@ namespace SpotiFire.SpotiClient.ViewModels
 
         private void ApplyPlaylists(ServiceReference.Playlist[] playlist)
         {
-            Playlists = new ReadOnlyCollection<PlaylistTreeItemViewModel>(MakePlaylistTree(playlist).ToArray());
+            foreach (var p in MakePlaylistTree(playlist))
+                playlists.Add(p);
         }
 
         private void ApplyStatus(ServiceReference.SpotifyStatus spotifyStatus)
@@ -237,18 +275,26 @@ namespace SpotiFire.SpotiClient.ViewModels
             }
         }
 
-        public ReadOnlyCollection<PlaylistTreeItemViewModel> Playlists
+        public BindingList<PlaylistTreeItemViewModel> Playlists
         {
             get
             {
                 return playlists;
             }
-            private set
+        }
+
+        public ISpotifyViewViewModel CurrentView
+        {
+            get
             {
-                if (!Object.ReferenceEquals(playlists, value))
+                return currentView;
+            }
+            set
+            {
+                if (!Object.ReferenceEquals(currentView, value))
                 {
-                    playlists = value;
-                    OnPropertyChanged(() => Playlists);
+                    currentView = value;
+                    OnPropertyChanged(() => CurrentView);
                 }
             }
         }

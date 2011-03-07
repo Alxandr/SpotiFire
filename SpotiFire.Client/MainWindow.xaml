@@ -1,15 +1,17 @@
-﻿<Window x:Class="SpotiFire.SpotiClient.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:s="clr-namespace:System;assembly=mscorlib"
         xmlns:vc="clr-namespace:SpotiFire.SpotiClient.ValueConverters"
+        xmlns:vm="clr-namespace:SpotiFire.SpotiClient.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:SpotiFire.SpotiClient" mc:Ignorable="d" x:Class="SpotiFire.SpotiClient.MainWindow"
         Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" UseLayoutRounding="True"
         >
     <Window.Resources>
+    	<XmlDataProvider x:Key="playlistsDataSource" Source="C:\Users\Alxandr\Documents\Visual Studio 2010\Projects\SpotiFire\TestDesignData\playlists.xml" d:IsDataSource="True"/>
         <vc:StarredValueConverter x:Key="StarredConverter" />
         <vc:VolumeBarsConverter x:Key="VolumeBarsConverter" />
-        <Style x:Key="ArtistLink" TargetType="Hyperlink">
-            <EventSetter Event="Click" Handler="Artist_Click" />
+        <Style x:Key="ArtistLink" TargetType="{x:Type Hyperlink}">
             <Setter Property="TextDecorations" Value="None" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -17,76 +19,35 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="TrackListRowStyle" TargetType="{x:Type ListViewItem}">
-            <Setter Property="Background" Value="#313131" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="Foreground" Value="#DDDDDD" />
+        
+        <Style TargetType="{x:Type Slider}">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-                        <Grid x:Name="background" Margin="0">
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="True">
-                                            <Setter Property="Background" Value="#A9D9FE" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" Value="False">
-                                            <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListViewItem}}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <GridViewRowPresenter x:Name="ItemContent" Focusable="False"></GridViewRowPresenter>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <EventSetter Event="MouseDoubleClick" Handler="SpotifySongs_MouseDoubleClick" />
-            <Style.Triggers>
-                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                    <Setter Property="FontFamily" Value="FangSong" />
-                    <Setter Property="Background" Value="#373737" />
-                </Trigger>
-                <DataTrigger Binding="{Binding Path=IsAvailable}" Value="False">
-                    <Setter Property="Foreground" Value="LightGray" />
-                    <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Foreground" Value="#000F1C" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style TargetType="Slider">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Slider">
+                    <ControlTemplate TargetType="{x:Type Slider}">
                         <ControlTemplate.Resources>
                             <vc:ThumbIndicatorConverter x:Key="ThumbIndicatorConverter" />
                         </ControlTemplate.Resources>
                         <Grid>
                             <Border BorderBrush="#121212" Height="10" CornerRadius="5" BorderThickness="1,1,1,0">
                                 <Border BorderBrush="#232323" BorderThickness="0,0,0,1" CornerRadius="5" Background="#2E2E2E">
-                                    <Border Background="#404040" CornerRadius="5" HorizontalAlignment="Left" Name="PART_Indicator">
+                                    <Border Background="#404040" CornerRadius="5" HorizontalAlignment="Left" x:Name="PART_Indicator">
                                         <Border.Width>
                                             <MultiBinding Converter="{StaticResource ResourceKey=ThumbIndicatorConverter}">
-                                                <Binding Path="Value" RelativeSource="{RelativeSource AncestorType=Slider}" />
-                                                <Binding Path="Minimum" RelativeSource="{RelativeSource AncestorType=Slider}" />
-                                                <Binding Path="Maximum" RelativeSource="{RelativeSource AncestorType=Slider}" />
+                                                <Binding Path="Value" RelativeSource="{RelativeSource AncestorType={x:Type Slider}}" />
+                                                <Binding Path="Minimum" RelativeSource="{RelativeSource AncestorType={x:Type Slider}}" />
+                                                <Binding Path="Maximum" RelativeSource="{RelativeSource AncestorType={x:Type Slider}}" />
                                                 <Binding Path="ActualWidth" ElementName="PART_Track" />
-                                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource AncestorType=Slider}" />
+                                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource AncestorType={x:Type Slider}}" />
                                             </MultiBinding>
                                         </Border.Width>
                                     </Border>
                                 </Border>
                             </Border>
-                            <Track Name="PART_Track">
+                            <Track x:Name="PART_Track">
                                 <Track.Thumb>
-                                    <Thumb Name="PART_Thumb">
+                                    <Thumb x:Name="PART_Thumb">
                                         <Thumb.Template>
-                                            <ControlTemplate TargetType="Thumb">
-                                                <!--<Ellipse Width="10" Height="10" Fill="#FFFFFF"></Ellipse>-->
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
                                                 <Border BorderBrush="#0A0A0A" BorderThickness="1" CornerRadius="5" Height="10" Width="10" Background="#FFFFFF" />
                                             </ControlTemplate>
                                         </Thumb.Template>
@@ -110,6 +71,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="20" />
                 <RowDefinition />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="50" />
             </Grid.RowDefinitions>
 
@@ -131,24 +93,24 @@
                 </Grid.ColumnDefinitions>
                 <Menu Background="Transparent">
                     <MenuItem Header="_File">
-                        <MenuItem Header="_New Playlist"></MenuItem>
-                        <MenuItem Header="New _Playlist Folder"></MenuItem>
+                        <MenuItem Header="_New Playlist"/>
+                        <MenuItem Header="New _Playlist Folder"/>
                         <Separator />
-                        <MenuItem Header="_Log Out"></MenuItem>
+                        <MenuItem Header="_Log Out"/>
                         <Separator />
-                        <MenuItem x:Name="ExitMenuButton" Header="_Exit" Click="ExitMenuButton_Click"></MenuItem>
+                        <MenuItem x:Name="ExitMenuButton" Header="_Exit"/>
                     </MenuItem>
-                    <MenuItem Header="_Edit"></MenuItem>
-                    <MenuItem Header="_View"></MenuItem>
-                    <MenuItem Header="_Playback"></MenuItem>
-                    <MenuItem Header="_Help"></MenuItem>
+                    <MenuItem Header="_Edit"/>
+                    <MenuItem Header="_View"/>
+                    <MenuItem Header="_Playback"/>
+                    <MenuItem Header="_Help"/>
                 </Menu>
 
                 <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal">
-                    <Button Content="Back"></Button>
-                    <Button Content="Forward"></Button>
-                    <TextBox Width="200" Margin="10,0,0,0"></TextBox>
-                    <Button Content="Search"></Button>
+                    <Button Content="Back"/>
+                    <Button Content="Forward"/>
+                    <TextBox Width="200" Margin="10,0,0,0"/>
+                    <Button Content="Search"/>
                 </StackPanel>
 
                 <Border Grid.Row="2" Grid.ColumnSpan="2" Height="2" BorderThickness="0,0,0,1" BorderBrush="#404040" Background="#A5A5A5" />
@@ -189,111 +151,58 @@
                 </Grid.Background>
             </Grid>
         
-            <TreeView Grid.Row="2" BorderThickness="0" x:Name="SpotifyTree" SelectedItemChanged="SpotifyTree_SelectedItemChanged" Background="#474747"
-                      ItemsSource="{Binding Playlists}">
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <EventSetter Event="MouseDoubleClick" Handler="SpotifyTree_ItemDoubleClicked" />
-                        <Setter Property="Background" Value="Transparent" />
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                        <TextBlock Foreground="#EEEEEE">
-                            <TextBlock.Effect>
-                                <DropShadowEffect
-                                    ShadowDepth="1"
-                                    Direction="330"
-                                    Color="Black"
-                                    Opacity="0.5"
-                                    BlurRadius="1" />
-                            </TextBlock.Effect>
-                            <TextBlock Text="{Binding Name}" />
-                        </TextBlock>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+            	<TreeView Grid.Row="2" BorderThickness="0" x:Name="SpotifyTree" Background="#474747"
+            		ItemsSource="{Binding Playlists}" Padding="5">
+            		<TreeView.Resources>
+                        <ResourceDictionary>
+                            <ResourceDictionary.MergedDictionaries>
+                                <ResourceDictionary Source="SpotifyPlaylistTree.xaml" />
+                            </ResourceDictionary.MergedDictionaries>
+                        </ResourceDictionary>
+                    </TreeView.Resources>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <TextBlock Padding="2"><TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Foreground" Value="#EEEEEE" />
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <DropShadowEffect
+                                                    ShadowDepth="1"
+                                                    Direction="330"
+                                                    Color="Black"
+                                                    Opacity="0.5"
+                                                    BlurRadius="1" />
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+                                                <Setter Property="Foreground" Value="#000000" />
+                                                <Setter Property="FontWeight" Value="Bold" />
+                                                <Setter Property="Effect" Value="{x:Null}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style><InlineUIContainer>
+                            		<TextBlock Text="{Binding Name}" />
+                            	</InlineUIContainer></TextBlock>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+            	</TreeView>
+                
+                <Border Width="1" Grid.Column="1" BorderThickness="1" BorderBrush="#292929" />
+            </Grid>
 
-            <ListView x:Name="SpotifySongs" Grid.Row="2" Grid.Column="1" BorderThickness="0" ItemContainerStyle="{StaticResource ResourceKey=TrackListRowStyle}" Background="#313131">
-                <ListView.Resources>
-                    <Style TargetType="GridViewColumnHeader">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="GridViewColumnHeader">
-                                    <Border BorderThickness="1,1,0,0" BorderBrush="#A4A4A4">
-                                        <Border BorderThickness="0,0,1,1" BorderBrush="#646464" Height="17">
-                                            <Border.Background>
-                                                <LinearGradientBrush EndPoint="0.504,1.5" StartPoint="0.504,0.03">
-                                                    <GradientStop Color="#A8A8A8" Offset="0"/>
-                                                    <GradientStop Color="#868686" Offset="0.567"/>
-                                                </LinearGradientBrush>
-                                            </Border.Background>
-                                            <TextBlock Text="{TemplateBinding Content}" FontWeight="Bold" Padding="5,0,0,0">
-                                                <TextBlock.Effect>
-                                                    <DropShadowEffect
-                                                        ShadowDepth="1"
-                                                        Direction="330"
-                                                        Color="#DDDDDD"
-                                                        Opacity="0.5"
-                                                        BlurRadius="1"
-                                                        />
-                                                </TextBlock.Effect>
-                                            </TextBlock>
-                                        </Border>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListView.Resources>
-                <ListView.View>
-                    <GridView AllowsColumnReorder="False">
-                        <GridViewColumn Width="25" Header="">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Image Source="{Binding Path=IsStarred, Converter={StaticResource ResourceKey=StarredConverter}}" Height="13" Width="13" Margin="0" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Width="150" Header="Track" DisplayMemberBinding="{Binding Path=Name}"></GridViewColumn>
-                        <GridViewColumn Width="150" Header="Artist">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ListView ItemsSource="{Binding Path=Artists}" BorderThickness="0" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent">
-                                        <ListView.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Horizontal" CanHorizontallyScroll="False" CanVerticallyScroll="False" ClipToBounds="True"
-                                                            Background="Transparent">
-                                                </StackPanel>
-                                            </ItemsPanelTemplate>
-                                        </ListView.ItemsPanel>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock>
-                                                    <Hyperlink NavigateUri="{Binding Path=Link}" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem, AncestorLevel=2}}"
-                                                               Background="Transparent" Style="{StaticResource ResourceKey=ArtistLink}">
-                                                        <TextBlock Text="{Binding Path=Name}" />
-                                                    </Hyperlink>
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Width="50" Header="Time">
-                            <GridViewColumn.DisplayMemberBinding>
-                                <Binding Path="Length">
-                                    <Binding.StringFormat>mm\:ss</Binding.StringFormat>
-                                </Binding>
-                            </GridViewColumn.DisplayMemberBinding>
-                        </GridViewColumn>
-                        <GridViewColumn Width="150" Header="Album" DisplayMemberBinding="{Binding Path=Album}"></GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <Border Background="#313131" Grid.Row="2" Grid.Column="1" x:Name="ViewSpace"></Border>
+
+            <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="2" Background="#787878" BorderBrush="#292929" BorderThickness="0,1,0,0" />
         
-            <Grid Grid.Row="3" Grid.Column="0" Background="#505050" Grid.ColumnSpan="2">
+            <Grid Grid.Row="4" Grid.Column="0" Background="#505050" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="35" />
                     <ColumnDefinition Width="40" />
@@ -314,20 +223,18 @@
                         <ControlTemplate>
                             <Image Height="25" Width="25">
                                 <Image.Style>
-                                    <Style TargetType="Image">
+                                    <Style TargetType="{x:Type Image}">
                                         <Setter Property="Source" Value="Images/previous_button.png" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                                            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="False">
                                                 <Setter Property="Source" Value="Images/previous_button_disabled.png" />
                                             </DataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True" />
-                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType=Button}}" Value="True" />
+                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True" />
+                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True" />
                                                 </MultiDataTrigger.Conditions>
-                                                <MultiDataTrigger.Setters>
-                                                    <Setter Property="Source" Value="Images/previous_button_pressed.png" />
-                                                </MultiDataTrigger.Setters>
+                                            	<Setter Property="Source" Value="Images/previous_button_pressed.png" />
                                             </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -336,56 +243,48 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-                <ToggleButton x:Name="PlayPauseButton" Grid.Column="1" Click="PlayPauseButton_Click" IsChecked="{Binding IsPlaying, Mode=TwoWay}" IsEnabled="{Binding CanStartPlayback}">
+                <ToggleButton x:Name="PlayPauseButton" Grid.Column="1" IsChecked="{Binding IsPlaying, Mode=TwoWay}" IsEnabled="{Binding CanStartPlayback}">
                     <ToggleButton.Template>
                         <ControlTemplate>
                             <Image Height="32">
                                 <Image.Style>
-                                    <Style TargetType="Image">
+                                    <Style TargetType="{x:Type Image}">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False">
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False">
                                                 <Setter Property="Source" Value="Images/play_button.png" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True">
                                                 <Setter Property="Source" Value="Images/pause_button.png" />
                                             </DataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False" />
-                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False" />
+                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False" />
+                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False" />
                                                 </MultiDataTrigger.Conditions>
-                                                <MultiDataTrigger.Setters>
-                                                    <Setter Property="Source" Value="Images/play_button_disabled.png" />
-                                                </MultiDataTrigger.Setters>
+                                            	<Setter Property="Source" Value="Images/play_button_disabled.png" />
                                             </MultiDataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
-                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False" />
+                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True" />
+                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False" />
                                                 </MultiDataTrigger.Conditions>
-                                                <MultiDataTrigger.Setters>
-                                                    <Setter Property="Source" Value="Images/pause_button_disabled.png" />
-                                                </MultiDataTrigger.Setters>
+                                            	<Setter Property="Source" Value="Images/pause_button_disabled.png" />
                                             </MultiDataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False" />
-                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
-                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
+                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False" />
+                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True" />
+                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True" />
                                                 </MultiDataTrigger.Conditions>
-                                                <MultiDataTrigger.Setters>
-                                                    <Setter Property="Source" Value="Images/play_button_pressed.png" />
-                                                </MultiDataTrigger.Setters>
+                                            	<Setter Property="Source" Value="Images/play_button_pressed.png" />
                                             </MultiDataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
-                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
-                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True" />
+                                                    <Condition Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True" />
+                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True" />
+                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True" />
                                                 </MultiDataTrigger.Conditions>
-                                                <MultiDataTrigger.Setters>
-                                                    <Setter Property="Source" Value="Images/pause_button_pressed.png" />
-                                                </MultiDataTrigger.Setters>
+                                            	<Setter Property="Source" Value="Images/pause_button_pressed.png" />
                                             </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -399,20 +298,18 @@
                         <ControlTemplate>
                             <Image Height="25" Width="25">
                                 <Image.Style>
-                                    <Style TargetType="Image">
+                                    <Style TargetType="{x:Type Image}">
                                         <Setter Property="Source" Value="Images/next_button.png" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                                            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="False">
                                                 <Setter Property="Source" Value="Images/next_button_disabled.png" />
                                             </DataTrigger>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True" />
-                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType=Button}}" Value="True" />
+                                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True" />
+                                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True" />
                                                 </MultiDataTrigger.Conditions>
-                                                <MultiDataTrigger.Setters>
-                                                    <Setter Property="Source" Value="Images/next_button_pressed.png" />
-                                                </MultiDataTrigger.Setters>
+                                            	<Setter Property="Source" Value="Images/next_button_pressed.png" />
                                             </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -422,38 +319,13 @@
                     </Button.Template>
                 </Button>
                 <Slider x:Name="VolumeSlider" Orientation="Horizontal" Minimum="0" Maximum="100"
-                        Grid.Column="3" VerticalAlignment="Center" ValueChanged="VolumeSlider_ValueChanged"
+                        Grid.Column="3" VerticalAlignment="Center"
                         Value="{Binding Volume}"/>
             
                 <Canvas Grid.Column="4">
-                    <!--<Line X1="8" Y1="17" X2="8" Y2="33" Stroke="White" StrokeThickness="4" />-->
-                    <Path Stroke="White" StrokeThickness="2" Opacity="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource ResourceKey=VolumeBarsConverter}, ConverterParameter=0}">
-                        <Path.Data>
-                            <PathGeometry>
-                                <PathFigure StartPoint="4,30">
-                                    <ArcSegment Point="4,20" Size="200,50" RotationAngle="0" IsLargeArc="False" />
-                                </PathFigure>
-                            </PathGeometry>
-                        </Path.Data>
-                    </Path>
-                    <Path Stroke="White" StrokeThickness="2" Opacity="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource ResourceKey=VolumeBarsConverter}, ConverterParameter=1}">
-                        <Path.Data>
-                            <PathGeometry>
-                                <PathFigure StartPoint="8,32">
-                                    <ArcSegment Point="8,18" Size="200,55" RotationAngle="0" IsLargeArc="False" />
-                                </PathFigure>
-                            </PathGeometry>
-                        </Path.Data>
-                    </Path>
-                    <Path Stroke="White" StrokeThickness="2" Opacity="{Binding ElementName=VolumeSlider, Path=Value, Converter={StaticResource ResourceKey=VolumeBarsConverter}, ConverterParameter=2}">
-                        <Path.Data>
-                            <PathGeometry>
-                                <PathFigure StartPoint="12,34">
-                                    <ArcSegment Point="12,16" Size="200,60" RotationAngle="0" IsLargeArc="False" />
-                                </PathFigure>
-                            </PathGeometry>
-                        </Path.Data>
-                    </Path>
+                    <Path Stroke="White" StrokeThickness="2" Opacity="{Binding Value, ConverterParameter=0, Converter={StaticResource ResourceKey=VolumeBarsConverter}, ElementName=VolumeSlider}" Data="M4,30 A200,50,0,0,0,4,20"/>
+                    <Path Stroke="White" StrokeThickness="2" Opacity="{Binding Value, ConverterParameter=1, Converter={StaticResource ResourceKey=VolumeBarsConverter}, ElementName=VolumeSlider}" Data="M8,32 A200,55,0,0,0,8,18"/>
+                    <Path Stroke="White" StrokeThickness="2" Opacity="{Binding Value, ConverterParameter=2, Converter={StaticResource ResourceKey=VolumeBarsConverter}, ElementName=VolumeSlider}" Data="M12,34 A200,60,0,0,0,12,16"/>
                 </Canvas>
 
                 <Border Grid.Column="5" Width="2" BorderThickness="1,0,0,0" BorderBrush="#343434" Background="#5E5E5E" />
@@ -464,18 +336,18 @@
 
                 <Border Grid.Column="9" Width="2" BorderThickness="1,0,0,0" BorderBrush="#343434" Background="#5E5E5E" />
 
-                <ToggleButton x:Name="ShuffleButton" Content="Rnd" Grid.Column="10" IsChecked="{Binding Shuffle, Mode=TwoWay}" Checked="ShuffleButton_Checked" Unchecked="ShuffleButton_Checked">
+                <ToggleButton x:Name="ShuffleButton" Content="Rnd" Grid.Column="10" IsChecked="{Binding Shuffle, Mode=TwoWay}">
                     <ToggleButton.Template>
                         <ControlTemplate>
                             <Image Width="32" Height="32">
                                 <Image.Style>
-                                    <Style TargetType="Image">
+                                    <Style TargetType="{x:Type Image}">
                                         <Setter Property="Source" Value="Images/shuffle_button_active.png" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False">
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False">
                                                 <Setter Property="Source" Value="Images/shuffle_button_inactive.png" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Path=IsPressed, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                            <DataTrigger Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True">
                                                 <Setter Property="Source" Value="Images/shuffle_button_pressed.png" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -485,18 +357,18 @@
                         </ControlTemplate>
                     </ToggleButton.Template>
                 </ToggleButton>
-                <ToggleButton x:Name="RepeatButton" Content="Rep" Grid.Column="11" IsChecked="{Binding Repeat, Mode=TwoWay}" Checked="RepeatButton_Checked" Unchecked="RepeatButton_Checked">
+                <ToggleButton x:Name="RepeatButton" Content="Rep" Grid.Column="11" IsChecked="{Binding Repeat, Mode=TwoWay}">
                     <ToggleButton.Template>
                         <ControlTemplate>
                             <Image Width="32" Height="32">
                                 <Image.Style>
-                                    <Style TargetType="Image">
+                                    <Style TargetType="{x:Type Image}">
                                         <Setter Property="Source" Value="Images/repeat_button_active.png" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="False">
+                                            <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="False">
                                                 <Setter Property="Source" Value="Images/repeat_button_inactive.png" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Path=IsPressed, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                            <DataTrigger Binding="{Binding IsPressed, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}" Value="True">
                                                 <Setter Property="Source" Value="Images/repeat_button_pressed.png" />
                                             </DataTrigger>
                                         </Style.Triggers>
