@@ -9,5 +9,11 @@ namespace SpotiFire.SpotifyLib
         {
             this.track = track;
         }
+
+        public ITrack Track
+        {
+            get { return track; }
+        }
+
     }
 }

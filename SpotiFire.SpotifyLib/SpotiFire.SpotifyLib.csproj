@@ -41,11 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventArgs\ArtistBrowseEventArgs.cs" />
+    <Compile Include="Interfaces\IArtistBrowse.cs" />
     <Compile Include="Interfaces\IContainerPlaylist.cs" />
     <Compile Include="Interfaces\IPlaylistTrack.cs" />
     <Compile Include="Interfaces\ILink.cs" />
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />
+    <Compile Include="SpotifyTypes\ArtistBrowse.cs" />
     <Compile Include="SpotifyTypes\Link.cs" />
     <Compile Include="SpotifyTypes\PlaylistTrack.cs" />
     <Compile Include="Spotify.cs" />
@@ -94,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="libspotify.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

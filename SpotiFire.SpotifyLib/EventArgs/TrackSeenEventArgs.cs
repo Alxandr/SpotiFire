@@ -9,5 +9,11 @@ namespace SpotiFire.SpotifyLib
         {
             this.seen = seen;
         }
+
+        public bool Seen
+        {
+            get { return this.seen; }
+        }
+
     }
 }

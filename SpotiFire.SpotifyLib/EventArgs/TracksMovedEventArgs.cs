@@ -12,7 +12,7 @@ namespace SpotiFire.SpotifyLib
 
         public int NewPosition
         {
-            get { return newPosition; }
+            get { return this.newPosition; }
         }
     }
 }
