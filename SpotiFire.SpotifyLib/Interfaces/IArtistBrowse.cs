@@ -9,6 +9,7 @@ namespace SpotiFire.SpotifyLib {
         sp_error Error { get; }
         IArtist Artist { get; }
         event ArtistBrowseEventHandler Complete;
+        bool IsComplete { get; }
         IArray<string> PortraitIds { get; }
         IArray<ITrack> Tracks { get; }
         IArray<IArtist> SimilarArtists { get; }
