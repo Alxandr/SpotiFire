@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -85,6 +84,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return search.Session; }
             }
 
+            public bool IsComplete
+            {
+                get { IsAlive(true); return search.IsComplete; }
+            }
+
             protected override int IntPtrHashCode()
             {
                 return IsAlive() ? search.searchPtr.GetHashCode() : 0;
@@ -138,6 +142,7 @@ namespace SpotiFire.SpotifyLib
         internal IntPtr searchPtr = IntPtr.Zero;
         private Session session;
         private object state;
+        private bool isComplete = false;
 
         internal static search_complete_cb search_complete = new search_complete_cb(_SearchCompleteCallback);
 
@@ -155,7 +160,7 @@ namespace SpotiFire.SpotifyLib
             if (session == null)
                 throw new ArgumentNullException("Session can't be null");
             this.session = session;
-            
+
             this.searchPtr = searchPtr;
 
             this.state = state;
@@ -204,6 +209,7 @@ namespace SpotiFire.SpotifyLib
         {
             if (searchPtr == this.searchPtr)
             {
+                this.isComplete = true;
                 session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this, this.state)));
                 _Complete -= new search_complete_cb(Search__Complete);
             }
@@ -306,6 +312,15 @@ namespace SpotiFire.SpotifyLib
                     return libspotify.sp_search_total_artists(searchPtr);
             }
         }
+
+        public bool IsComplete
+        {
+            get
+            {
+                IsAlive(true);
+                return isComplete;
+            }
+        }
         #endregion
 
         #region Public Methods
@@ -333,7 +348,7 @@ namespace SpotiFire.SpotifyLib
             _Complete -= new search_complete_cb(Search__Complete);
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
 
-            if(!session.ProcExit)
+            if (!session.ProcExit)
                 lock (libspotify.Mutex)
                     libspotify.sp_search_release(searchPtr);
 
