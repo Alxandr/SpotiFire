@@ -120,7 +120,7 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock><Hyperlink NavigateUri="{Binding Link}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorLevel=2, AncestorType={x:Type ListViewItem}}}"
-                                                    Background="Transparent" Style="{StaticResource ResourceKey=ArtistLink}"><InlineUIContainer>
+                                                    Background="Transparent" Style="{DynamicResource ArtistLink}"><InlineUIContainer>
                                                         <TextBlock Text="{Binding Name}" />
                                                     </InlineUIContainer></Hyperlink></TextBlock>
                                         </DataTemplate>

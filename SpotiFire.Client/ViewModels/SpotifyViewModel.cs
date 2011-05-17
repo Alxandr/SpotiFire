@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
+using SpotiFire.SpotiClient.Commands;
 using SpotiFire.SpotiClient.ServiceReference;
 
 namespace SpotiFire.SpotiClient.ViewModels
 {
-    public class SpotifyViewModel : BaseViewModel, ServiceReference.SpotifyCallback
+    public sealed class SpotifyViewModel : BaseViewModel, ServiceReference.SpotifyCallback
     {
         #region SpotifyClient
         private ServiceReference.Spotify client;
@@ -38,9 +40,51 @@ namespace SpotiFire.SpotiClient.ViewModels
         private ISpotifyViewViewModel currentView;
         #endregion
 
-        #region Constructors
-        public SpotifyViewModel()
+        #region Command Instances
+        private ICommand playPauseCommand;
+        #endregion
+
+        #region Command Properties
+        public ICommand PlayPauseCommand
         {
+            get { return playPauseCommand; }
+        }
+        #endregion
+
+        #region Command Implementations
+        private void PlayPause(object parameter)
+        {
+            if (track == null)
+            {
+                client.PlayPlaylistTrack(currentView.Id, -1);
+            }
+            else
+            {
+                client.PlayPause();
+            }
+        }
+        #endregion
+
+        #region Singelton
+        public static SpotifyViewModel Instance
+        {
+            get
+            {
+                return viewModel;
+            }
+        }
+        #endregion
+
+        #region Constructors
+        private static SpotifyViewModel viewModel;
+        static SpotifyViewModel()
+        {
+            viewModel = new SpotifyViewModel();
+        }
+        private SpotifyViewModel()
+        {
+            playPauseCommand = new PropertyBoundCommand(new CommandExecute(PlayPause), this, "CanStartPlayback");
+
             shuffle = false;
             repeat = false;
 
@@ -103,6 +147,11 @@ namespace SpotiFire.SpotiClient.ViewModels
             }
         }
 
+        public Track[] GetPlaylistTracks(Guid id)
+        {
+            return client.GetPlaylistTracks(id);
+        }
+
         private IEnumerable<PlaylistTreeItemViewModel> MakePlaylistTree(Playlist[] playlists)
         {
             for (int i = 0; i < playlists.Length; i++)
@@ -159,6 +208,10 @@ namespace SpotiFire.SpotiClient.ViewModels
             CanGoNext = spotifyStatus.CanGoNext;
 
             Volume = spotifyStatus.Volume;
+
+            Track = spotifyStatus.CurrentTrack != null ? new TrackViewModel(spotifyStatus.CurrentTrack) : null;
+            currentTime = spotifyStatus.LengthPlayed;
+            lastQueried = DateTime.Now;
         }
         #endregion
 
@@ -293,8 +346,43 @@ namespace SpotiFire.SpotiClient.ViewModels
             {
                 if (!Object.ReferenceEquals(currentView, value))
                 {
+                    if (value is PlaylistViewModel)
+                        CanStartPlayback = true;
                     currentView = value;
                     OnPropertyChanged(() => CurrentView);
+                }
+            }
+        }
+
+        public TrackViewModel Track
+        {
+            get
+            {
+                return track;
+            }
+            set
+            {
+                if (!Object.ReferenceEquals(track, value))
+                {
+                    track = value;
+                    currentTime = TimeSpan.Zero;
+                    OnPropertyChanged(() => Track);
+                }
+            }
+        }
+
+        public TimeSpan CurrentTime
+        {
+            get
+            {
+                return currentTime;
+            }
+            set
+            {
+                if (currentTime != value)
+                {
+                    lastQueried = DateTime.Now;
+                    OnPropertyChanged(() => CurrentTime);
                 }
             }
         }
@@ -321,5 +409,16 @@ namespace SpotiFire.SpotiClient.ViewModels
             //x throw new NotImplementedException();
         }
         #endregion
+
+        public void UpdateTrackTime()
+        {
+            if (lastQueried == DateTime.MinValue || DateTime.Now == lastQueried || track == null || currentTime > track.Length)
+                return;
+
+            DateTime dt = DateTime.Now;
+            currentTime += dt.Subtract(lastQueried);
+            lastQueried = dt;
+            OnPropertyChanged(() => CurrentTime);
+        }
     }
 }

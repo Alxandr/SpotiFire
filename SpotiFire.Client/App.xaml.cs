@@ -17,7 +17,7 @@ namespace SpotiFire.SpotiClient
         public App()
             : base()
         {
-            model = new SpotifyViewModel();
+            model = SpotifyViewModel.Instance;
             client = new ServiceReference.SpotifyClient(new InstanceContext(model));
             MainWindow = new MainWindow(model);
             AuthenticationStatus ok = AuthenticationStatus.Bad;

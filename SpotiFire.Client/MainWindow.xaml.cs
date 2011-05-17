@@ -28,8 +28,8 @@ namespace SpotiFire.SpotiClient
             {
                 //SpotifyTree.ItemsSource = model.Playlists;
             }
-            if (e.PropertyName == "CurrentView")
-                ViewSpace.Child = model.CurrentView.GetView();
+            //if (e.PropertyName == "CurrentView")
+            //    ViewSpace.Child = model.CurrentView.GetView();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -41,8 +41,7 @@ namespace SpotiFire.SpotiClient
 
         private void timer_Tick(object sender, EventArgs args)
         {
-            bool can = model.CanGoBack;
-            //? Query for model playback length
+            model.UpdateTrackTime();
         }
 
     }

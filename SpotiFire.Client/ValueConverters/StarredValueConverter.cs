@@ -6,8 +6,8 @@ namespace SpotiFire.SpotiClient.ValueConverters
 {
     public class StarredValueConverter : IValueConverter
     {
-        private const string STARRED = "Images/ico_track_starred.png";
-        private const string UNSTARRED = "Images/ico_track_unstarred.png";
+        private const string STARRED = "/Images/ico_track_starred.png";
+        private const string UNSTARRED = "/Images/ico_track_unstarred.png";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
