@@ -12,7 +12,7 @@ namespace SpotiFire.SpotifyLib
 
         public ITrack[] Tracks
         {
-            get { return tracks; }
+            get { return this.tracks; }
         }
     }
 }

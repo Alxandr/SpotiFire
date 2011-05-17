@@ -9,5 +9,12 @@ namespace SpotiFire.SpotifyLib
         {
             this.complete = complete;
         }
+
+
+        public bool Complete
+        {
+            get { return this.complete; }
+        }
+
     }
 }
