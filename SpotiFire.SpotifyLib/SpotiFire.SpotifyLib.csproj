@@ -48,6 +48,7 @@
     <Compile Include="Interfaces\ILink.cs" />
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />
+    <Compile Include="SpotifyLibExtensions.cs" />
     <Compile Include="SpotifyTypes\ArtistBrowse.cs" />
     <Compile Include="SpotifyTypes\Link.cs" />
     <Compile Include="SpotifyTypes\PlaylistTrack.cs" />
@@ -97,7 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="libspotify.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

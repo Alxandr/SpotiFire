@@ -22,8 +22,7 @@ namespace SpotiFire.SpotifyLib
         IPlaylistContainer PlaylistContainer { get; }
         IPlaylist Starred { get; }
         event SessionEventHandler PlayTokenLost;
-        ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, object state);
-        IArtistBrowse BrowseArtist(IArtist artist, object state);
+        ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, object state = null);
         void SetPrefferedBitrate(sp_bitrate bitrate);
         event SessionEventHandler StartPlayback;
         event SessionEventHandler StopPlayback;

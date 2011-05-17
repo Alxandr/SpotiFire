@@ -38,6 +38,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return artist.Session; }
             }
 
+            public IArtistBrowse Browse(object state = null)
+            {
+                return IsAlive() ? artist.Browse(state) : null;
+            }
+
             protected override int IntPtrHashCode()
             {
                 return IsAlive() ? artist.artistPtr.GetHashCode() : 0;
@@ -137,6 +142,18 @@ namespace SpotiFire.SpotifyLib
                 return session;
             }
         }
+        #endregion
+
+        #region Public methods
+
+        public IArtistBrowse Browse(object state = null) {
+            lock (libspotify.Mutex) {
+                IntPtr artistBrowsePtr = libspotify.sp_artistbrowse_create(session.sessionPtr, artistPtr,
+                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(SpotifyLib.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
+                return artistBrowsePtr != IntPtr.Zero ? SpotifyLib.ArtistBrowse.Get(session, artistBrowsePtr, state) : null;
+            }
+        }
+
         #endregion
 
         #region Cleanup

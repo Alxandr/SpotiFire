@@ -118,7 +118,6 @@ namespace SpotiFire.SpotifyLib
         {
             lock (tracksLock)
             {
-                if (!tracks.ContainsKey(trackPtr)) return; // TODO: should not be here?
                 Track track = tracks[trackPtr];
                 int count = track.RemRef();
                 if (count == 0)
