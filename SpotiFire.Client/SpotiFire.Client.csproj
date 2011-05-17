@@ -15,6 +15,8 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20525.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -57,6 +59,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\BoundCommand.cs" />
+    <Compile Include="Commands\PlayPauseCommand.cs" />
+    <Compile Include="Commands\PropertyBoundCommand.cs" />
     <Compile Include="PlaybackEventArgs.cs" />
     <Compile Include="PlaylistTreeItem.cs" />
     <Compile Include="Service References\ServiceReference\Reference.cs">
@@ -67,6 +72,8 @@
     <Compile Include="SpotifyLogin.xaml.cs">
       <DependentUpon>SpotifyLogin.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ValueConverters\TimeSpanSecondsConverter.cs" />
+    <Compile Include="ViewModels\ArtistViewModel.cs" />
     <Compile Include="Views\SpotifyPlaylistView.xaml.cs">
       <DependentUpon>SpotifyPlaylistView.xaml</DependentUpon>
     </Compile>
@@ -101,6 +108,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SpotifyPlaylistView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ViewTabControlResources.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

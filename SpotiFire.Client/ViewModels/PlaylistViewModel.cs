@@ -1,6 +1,9 @@
 ﻿
 using System;
-using System.Windows;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Controls;
 namespace SpotiFire.SpotiClient.ViewModels
 {
     public class PlaylistViewModel : BaseViewModel, ISpotifyViewViewModel
@@ -8,14 +11,41 @@ namespace SpotiFire.SpotiClient.ViewModels
         #region Data
         private Guid id;
         private string name;
+        private BindingList<TrackViewModel> tracks;
+        private bool loaded;
         #endregion
 
         #region View
-        public FrameworkElement GetView()
+        private int tabIndex = 0;
+        public IEnumerable<TabItem> Tabs
         {
-            var view = new SpotifyPlaylistView();
-            view.DataContext = this;
-            return view;
+            get
+            {
+                yield return new TabItem()
+                {
+                    Header = Name,
+                    Content = new SpotifyPlaylistView()
+                    {
+                        DataContext = this
+                    }
+                };
+            }
+        }
+
+        public int SelectedTabIndex
+        {
+            get
+            {
+                return tabIndex;
+            }
+            set
+            {
+                if (value != tabIndex)
+                {
+                    tabIndex = value;
+                    OnPropertyChanged(() => SelectedTabIndex);
+                }
+            }
         }
         #endregion
 
@@ -24,6 +54,8 @@ namespace SpotiFire.SpotiClient.ViewModels
         {
             Id = pl.Id;
             Name = pl.Name;
+            tracks = new BindingList<TrackViewModel>();
+            loaded = false;
         }
         #endregion
 
@@ -57,6 +89,31 @@ namespace SpotiFire.SpotiClient.ViewModels
                     name = value;
                     OnPropertyChanged(() => Name);
                 }
+            }
+        }
+
+        public BindingList<TrackViewModel> Tracks
+        {
+            get
+            {
+                if (!loaded)
+                {
+                    loaded = true;
+                    ThreadPool.QueueUserWorkItem((o) =>
+                    {
+                        List<TrackViewModel> midTracks = new List<TrackViewModel>();
+                        foreach (var t in SpotifyViewModel.Instance.GetPlaylistTracks(id))
+                        {
+                            midTracks.Add(new TrackViewModel(t));
+                        }
+                        App.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            foreach (var t in midTracks)
+                                tracks.Add(t);
+                        }));
+                    });
+                }
+                return tracks;
             }
         }
         #endregion

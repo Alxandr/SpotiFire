@@ -8,9 +8,9 @@
         Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" UseLayoutRounding="True"
         >
     <Window.Resources>
-    	<XmlDataProvider x:Key="playlistsDataSource" Source="C:\Users\Alxandr\Documents\Visual Studio 2010\Projects\SpotiFire\TestDesignData\playlists.xml" d:IsDataSource="True"/>
         <vc:StarredValueConverter x:Key="StarredConverter" />
         <vc:VolumeBarsConverter x:Key="VolumeBarsConverter" />
+        <vc:TimeSpanSecondsConverter x:Key="TimeSpanSecondsConverter" />
         <Style x:Key="ArtistLink" TargetType="{x:Type Hyperlink}">
             <Setter Property="TextDecorations" Value="None" />
             <Style.Triggers>
@@ -127,7 +127,12 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
             
                 <TextBlock Padding="15,0,0,0" Text="Username" FontWeight="Bold">
                     <TextBlock.Effect>
@@ -140,15 +145,9 @@
                             />
                     </TextBlock.Effect>
                 </TextBlock>
-            </Grid>
-        
-            <Grid Grid.Column="1" Grid.Row="1">
-                <Grid.Background>
-                    <LinearGradientBrush EndPoint="0.504,1.5" StartPoint="0.504,0.03">
-                        <GradientStop Color="#ACACAC" Offset="0"/>
-                        <GradientStop Color="#979797" Offset="0.567"/>
-                    </LinearGradientBrush>
-                </Grid.Background>
+
+                <Border Width="1" Grid.Column="2" Grid.RowSpan="2" BorderThickness="1" BorderBrush="#292929" />
+                <Border Height="1" Grid.ColumnSpan="2" Grid.Row="1" BorderBrush="#292929" BorderThickness="0,0,0,1" />
             </Grid>
         
             <Grid Grid.Row="2">
@@ -198,7 +197,8 @@
                 <Border Width="1" Grid.Column="1" BorderThickness="1" BorderBrush="#292929" />
             </Grid>
 
-            <Border Background="#313131" Grid.Row="2" Grid.Column="1" x:Name="ViewSpace"></Border>
+            <TabControl Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Background="#313131" ItemsSource="{Binding CurrentView.Tabs}" SelectedIndex="{Binding CurrentView.SelectedTabIndex, Mode=TwoWay}" BorderThickness="0">
+            </TabControl>
 
             <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="2" Background="#787878" BorderBrush="#292929" BorderThickness="0,1,0,0" />
         
@@ -243,7 +243,7 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-                <ToggleButton x:Name="PlayPauseButton" Grid.Column="1" IsChecked="{Binding IsPlaying, Mode=TwoWay}" IsEnabled="{Binding CanStartPlayback}">
+                <ToggleButton x:Name="PlayPauseButton" Grid.Column="1" IsChecked="{Binding IsPlaying, Mode=TwoWay}" Command="{Binding PlayPauseCommand}">
                     <ToggleButton.Template>
                         <ControlTemplate>
                             <Image Height="32">
@@ -331,7 +331,7 @@
                 <Border Grid.Column="5" Width="2" BorderThickness="1,0,0,0" BorderBrush="#343434" Background="#5E5E5E" />
 
                 <TextBlock Grid.Column="6" x:Name="SongProgress" Text="00:00" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#FFFFFF" />
-                <Slider x:Name="ProgressSlider" Minimum="0" Maximum="0" Grid.Column="7" Orientation="Horizontal" VerticalAlignment="Center" />
+                <Slider x:Name="ProgressSlider" Minimum="0" Maximum="{Binding Track.Length, Mode=OneWay, Converter={StaticResource TimeSpanSecondsConverter}}" Value="{Binding CurrentTime, Mode=OneWay, Converter={StaticResource TimeSpanSecondsConverter}}" Grid.Column="7" Orientation="Horizontal" VerticalAlignment="Center" />
                 <TextBlock x:Name="SongTotalLength" Text="00:00" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="8" Foreground="#FFFFFF" />
 
                 <Border Grid.Column="9" Width="2" BorderThickness="1,0,0,0" BorderBrush="#343434" Background="#5E5E5E" />

@@ -13,13 +13,13 @@ namespace SpotiFire.SpotiClient.ValueConverters
                 double val = (double)values[0],
                     min = (double)values[1],
                     max = (double)values[2],
-                    width = (double)values[3];
+                    width = (double)values[3] - 5;
 
                 if (min == max)
                     return width;
 
                 double ret = ((val - min) / (max - min)) * width;
-                return ret;
+                return ret + 5;
             }
             catch
             {
