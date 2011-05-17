@@ -23,6 +23,11 @@ namespace SpotiFire.SpotifyLib
             {
             }
 
+            protected override void OnDispose() {
+                PlaylistTrack.Delete(((PlaylistTrack)track).Playlist, ((PlaylistTrack)track).Position);
+                track = null;
+            }
+
             public DateTime CreateTime
             {
                 get { IsAlive(true); return ((PlaylistTrack)track).CreateTime; }
@@ -199,6 +204,15 @@ namespace SpotiFire.SpotifyLib
         public bool Seen
         {
             get { IsAlive(true); return playlist.GetTrackSeen(this); }
+        }
+
+        public Playlist Playlist
+        {
+            get { IsAlive(true); return playlist; }
+        }
+
+        public int Position {
+            get { IsAlive(true); return position; }
         }
         #endregion
 
