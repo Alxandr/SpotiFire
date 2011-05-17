@@ -9,5 +9,11 @@ namespace SpotiFire.SpotifyLib
         {
             this.description = description;
         }
+
+        public string Description
+        {
+            get { return this.description; }
+        }
+
     }
 }

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace SpotiFire.SpotifyLib
 {
-    public delegate void SearchEventHandler(ISearch sender, EventArgs e);
+    public delegate void SearchEventHandler(ISearch sender, SearchEventArgs e);
     internal class Search : CountedDisposeableSpotifyObject, ISearch
     {
         #region Wrapper
@@ -19,7 +19,7 @@ namespace SpotiFire.SpotifyLib
                 search.Complete += new SearchEventHandler(search_Complete);
             }
 
-            void search_Complete(ISearch sender, EventArgs e)
+            void search_Complete(ISearch sender, SearchEventArgs e)
             {
                 if (sender == search)
                     if (Complete != null)
@@ -102,14 +102,14 @@ namespace SpotiFire.SpotifyLib
         private static Dictionary<IntPtr, Search> searchs = new Dictionary<IntPtr, Search>();
         private static readonly object searchsLock = new object();
 
-        internal static ISearch Get(Session session, IntPtr searchPtr)
+        internal static ISearch Get(Session session, IntPtr searchPtr, object state)
         {
             Search search;
             lock (searchsLock)
             {
                 if (!searchs.ContainsKey(searchPtr))
                 {
-                    searchs.Add(searchPtr, new Search(session, searchPtr));
+                    searchs.Add(searchPtr, new Search(session, searchPtr, state));
                 }
                 search = searchs[searchPtr];
                 search.AddRef();
@@ -137,6 +137,7 @@ namespace SpotiFire.SpotifyLib
 
         internal IntPtr searchPtr = IntPtr.Zero;
         private Session session;
+        private object state;
 
         internal static search_complete_cb search_complete = new search_complete_cb(_SearchCompleteCallback);
 
@@ -146,7 +147,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Constructor and setup
-        private Search(Session session, IntPtr searchPtr)
+        private Search(Session session, IntPtr searchPtr, object state)
         {
             if (searchPtr == IntPtr.Zero)
                 throw new ArgumentException("searchPtr can't be zero");
@@ -154,8 +155,10 @@ namespace SpotiFire.SpotifyLib
             if (session == null)
                 throw new ArgumentNullException("Session can't be null");
             this.session = session;
-
+            
             this.searchPtr = searchPtr;
+
+            this.state = state;
 
             this.tracks = new DelegateArray<ITrack>(() =>
             {
@@ -201,7 +204,7 @@ namespace SpotiFire.SpotifyLib
         {
             if (searchPtr == this.searchPtr)
             {
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(s => s.OnComplete, this), new EventArgs()));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this, this.state)));
                 _Complete -= new search_complete_cb(Search__Complete);
             }
         }
@@ -344,19 +347,19 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Private Methods
-        private static Delegate CreateDelegate<T>(Expression<Func<Search, Action<T>>> expr, Search s) where T : EventArgs
+        private static Delegate CreateDelegate<T>(Expression<Func<Search, Action<T>>> expr, Search s) where T : SearchEventArgs
         {
             return expr.Compile().Invoke(s);
         }
         private void ImageLoadedCallback(IntPtr searchPtr, IntPtr userdataPtr)
         {
             if (searchPtr == this.searchPtr)
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<EventArgs>(s => s.OnComplete, this), new EventArgs()));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this, this.state)));
         }
         #endregion
 
         #region Protected Methods
-        protected virtual void OnComplete(EventArgs args)
+        protected virtual void OnComplete(SearchEventArgs args)
         {
             if (this.Complete != null)
                 this.Complete(this, args);
