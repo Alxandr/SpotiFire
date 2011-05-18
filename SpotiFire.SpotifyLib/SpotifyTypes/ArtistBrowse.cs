@@ -132,7 +132,9 @@ namespace SpotiFire.SpotifyLib {
             this.session = session;
 
             this.artistBrowsePtr = artistBrowsePtr;
-
+            lock (libspotify.Mutex)
+                libspotify.sp_artistbrowse_add_ref(artistBrowsePtr);
+            
             this.state = state;
 
             this.portraitIds = new DelegateArray<string>(() => {

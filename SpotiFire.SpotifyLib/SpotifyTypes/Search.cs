@@ -162,7 +162,9 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
 
             this.searchPtr = searchPtr;
-
+            lock (libspotify.Mutex)
+                libspotify.sp_search_add_ref(searchPtr);
+            
             this.state = state;
 
             this.tracks = new DelegateArray<ITrack>(() =>
