@@ -41,7 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventArgs\AlbumBrowseEventArgs.cs" />
     <Compile Include="EventArgs\ArtistBrowseEventArgs.cs" />
+    <Compile Include="Interfaces\IAlbumBrowse.cs" />
     <Compile Include="Interfaces\IArtistBrowse.cs" />
     <Compile Include="Interfaces\IContainerPlaylist.cs" />
     <Compile Include="Interfaces\IPlaylistTrack.cs" />
@@ -49,6 +51,7 @@
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />
     <Compile Include="SpotifyLibExtensions.cs" />
+    <Compile Include="SpotifyTypes\AlbumBrowse.cs" />
     <Compile Include="SpotifyTypes\ArtistBrowse.cs" />
     <Compile Include="SpotifyTypes\Link.cs" />
     <Compile Include="SpotifyTypes\PlaylistTrack.cs" />
