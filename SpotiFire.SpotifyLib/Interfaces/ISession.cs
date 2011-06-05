@@ -19,6 +19,7 @@ namespace SpotiFire.SpotifyLib
         sp_error PlayerPause();
         sp_error PlayerPlay();
         sp_error PlayerSeek(int offset);
+        sp_error PlayerSeek(TimeSpan offset);
         void PlayerUnload();
         IPlaylistContainer PlaylistContainer { get; }
         IPlaylist Starred { get; }
