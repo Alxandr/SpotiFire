@@ -29,13 +29,22 @@ namespace SpotiFire.SpotifyLib
         }
 
         // ArtistBrowse methods made Synchronously
-        public static void WaitForCompletion(this IArtistBrowse artist)
+        public static void WaitForCompletion(this IArtistBrowse artistBrowse)
         {
-            var reset = new ManualResetEvent(artist.IsComplete);
+            var reset = new ManualResetEvent(artistBrowse.IsComplete);
             ArtistBrowseEventHandler handler = (a, e) => reset.Set();
-            artist.Complete += handler;
+            artistBrowse.Complete += handler;
             reset.WaitOne();
-            artist.Complete -= handler;
+            artistBrowse.Complete -= handler;
+        }
+
+        // AlbumBrowse methods made Synchronously
+        public static void WaitForCompletion(this IAlbumBrowse albumBrowse) {
+            var reset = new ManualResetEvent(albumBrowse.IsComplete);
+            AlbumBrowseEventHandler handler = (a, e) => reset.Set();
+            albumBrowse.Complete += handler;
+            reset.WaitOne();
+            albumBrowse.Complete -= handler;
         }
 
     }

@@ -444,7 +444,6 @@ namespace SpotiFire.SpotifyLib
         [DllImport("libspotify")]
         internal static extern bool sp_track_is_starred(IntPtr sessionPtr, IntPtr trackPtr);
 
-
         /// <summary>
         /// Star/Unstar the specified tracks.
         /// </summary>
@@ -1168,7 +1167,6 @@ namespace SpotiFire.SpotifyLib
         [DllImport("libspotify")]
         internal static extern sp_playlist_type sp_playlistcontainer_playlist_type(IntPtr pcPtr, int index);
 
-
         /// <summary>
         /// Gets the name of the playlist folder.
         /// </summary>
@@ -1251,7 +1249,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Check if an artist browse request is completed.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>True if browsing is completed, false if not.</returns>
         [DllImport("libspotify")]
         internal static extern bool sp_artistbrowse_is_loaded(IntPtr artistBrowsePtr);
@@ -1259,7 +1257,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Check if browsing returned an error code.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>One of the following errors, from sp_error SP_ERROR_OK SP_ERROR_IS_LOADING SP_ERROR_OTHER_PERMANENT SP_ERROR_OTHER_TRANSIENT.</returns>
         [DllImport("libspotify")]
         internal static extern sp_error sp_artistbrowse_error(IntPtr artistBrowsePtr);
@@ -1267,7 +1265,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Given an artist browse object, return a pointer to its artist object.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>Artist object.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_artistbrowse_artist(IntPtr artistBrowsePtr);
@@ -1275,7 +1273,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns></returns>
         [DllImport("libspotify")]
         internal static extern int sp_artistbrowse_num_portraits(IntPtr artistBrowsePtr);
@@ -1283,7 +1281,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Given an artist browse object, return number of portraits available.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>Number of portraits for given artist.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_artistbrowse_portrait(IntPtr artistBrowsePtr, int index);
@@ -1291,24 +1289,24 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Given an artist browse object, return number of tracks.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>Number of tracks for given artist.</returns>
         [DllImport("libspotify")]
         internal static extern int sp_artistbrowse_num_tracks(IntPtr artistBrowsePtr);
 
         /// <summary>
-        /// Given an artist browse object, return a similar artist by index.
+        /// Given an artist browse object, return one of its tracks.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
-        /// <param name="index">The index for the artist. Should be in the interval [0, sp_artistbrowse_num_similar_artists() - 1].</param>
-        /// <returns>A pointer to an artist object.</returns>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
+        /// <param name="index">The index for the track. Should be in the interval [0, sp_artistbrowse_num_tracks() - 1].</param>
+        /// <returns>A track object, or NULL if the index is out of range.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_artistbrowse_track(IntPtr artistBrowsePtr, int index);
 
         /// <summary>
         /// Given an artist browse object, return number of albums.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>Number of albums for given artist.</returns>
         [DllImport("libspotify")]
         internal static extern int sp_artistbrowse_num_albums(IntPtr artistBrowsePtr);
@@ -1316,7 +1314,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Given an artist browse object, return one of its albums.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <param name="index">The index for the album. Should be in the interval [0, sp_artistbrowse_num_albums() - 1].</param>
         /// <returns>A album object, or NULL if the index is out of range.</returns>
         [DllImport("libspotify")]
@@ -1325,7 +1323,7 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Given an artist browse object, return number of similar artists
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>Number of similar artists for given artist.</returns>
         [DllImport("libspotify")]
         internal static extern int sp_artistbrowse_num_similar_artists(IntPtr artistBrowsePtr);
@@ -1333,16 +1331,16 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Given an artist browse object, return a similar artist by index.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <param name="index">The index for the artist. Should be in the interval [0, sp_artistbrowse_num_similar_artists() - 1].</param>
-        /// <returns></returns>
+        /// <returns>A pointer to an artist object.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_artistbrowse_similar_artist(IntPtr artistBrowsePtr, int index);
 
         /// <summary>
         /// Given an artist browse object, return the artists biography. This function must be called from the same thread that did sp_session_create().
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         /// <returns>Biography string in UTF-8 format. Returned string is valid as long as the album object stays allocated and no longer than the next call to sp_session_process_events().</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_artistbrowse_biography(IntPtr artistBrowsePtr);
@@ -1350,18 +1348,117 @@ namespace SpotiFire.SpotifyLib
         /// <summary>
         /// Increase the reference count of an artist browse result.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         [DllImport("libspotify")]
         internal static extern void sp_artistbrowse_add_ref(IntPtr artistBrowsePtr);
 
         /// <summary>
         /// Decrease the reference count of an artist browse result.
         /// </summary>
-        /// <param name="artistPtr">Artist browse object.</param>
+        /// <param name="artistBrowsePtr">Artist browse object.</param>
         [DllImport("libspotify")]
         internal static extern void sp_artistbrowse_release(IntPtr artistBrowsePtr);
+        #endregion
 
+        #region Album browsing
+        /// <summary>
+        /// Initiate a request for browsing an album.
+        /// </summary>
+        /// <param name="sessionPtr">Session object.</param>
+        /// <param name="albumPtr">Album to be browsed. The album metadata does not have to be loaded.</param>
+        /// <param name="callbackPtr">Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.</param>
+        /// <param name="userDataPtr">Userdata passed to callback.</param>
+        /// <returns>Album browse object.</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_albumbrowse_create(IntPtr sessionPtr, IntPtr albumPtr, IntPtr callbackPtr, IntPtr userDataPtr);
 
+        /// <summary>
+        /// Check if an album browse request is completed.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>True if browsing is completed, false if not.</returns>
+        [DllImport("libspotify")]
+        internal static extern bool sp_albumbrowse_is_loaded(IntPtr albumBrowsePtr);
+
+        /// <summary>
+        /// Check if browsing returned an error code.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>One of the following errors, from sp_error SP_ERROR_OK SP_ERROR_IS_LOADING SP_ERROR_OTHER_PERMANENT SP_ERROR_OTHER_TRANSIENT.</returns>
+        [DllImport("libspotify")]
+        internal static extern sp_error sp_albumbrowse_error(IntPtr albumBrowsePtr);
+
+        /// <summary>
+        /// Given an album browse object, return a pointer to its album object.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>Album object.</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_albumbrowse_album(IntPtr albumBrowsePtr);
+        
+        /// <summary>
+        /// Given an album browse object, return a pointer to its artist object.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>Artist object.</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_albumbrowse_artist(IntPtr albumBrowsePtr);
+        
+        /// <summary>
+        /// Given an album browse object, return number of copyright strings.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>Number of copyright strings available, 0 if unknown.</returns>
+        [DllImport("libspotify")]
+        internal static extern int sp_albumbrowse_num_copyrights(IntPtr albumBrowsePtr);
+
+        /// <summary>
+        /// Given an album browse object, return one of its copyright strings.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <param name="index">The index for the copyright string. Should be in the interval [0, sp_albumbrowse_num_copyrights() - 1].</param>
+        /// <returns>Copyright string in UTF-8 format, or NULL if the index is invalid. Returned string is valid as long as the album object stays allocated and no longer than the next call to sp_session_process_events().</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_albumbrowse_copyright(IntPtr albumBrowsePtr, int index);
+
+        /// <summary>
+        /// Given an album browse object, return number of tracks.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>Number of tracks on album.</returns>
+        [DllImport("libspotify")]
+        internal static extern int sp_albumbrowse_num_tracks(IntPtr albumBrowsePtr);
+
+        /// <summary>
+        /// Given an album browse object, return a pointer to one of its tracks.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <param name="index">The index for the track. Should be in the interval [0, sp_albumbrowse_num_tracks() - 1].</param>
+        /// <returns>A track.</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_albumbrowse_track(IntPtr albumBrowsePtr, int index);
+
+        /// <summary>
+        /// Given an album browse object, return its review.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        /// <returns>Review string in UTF-8 format. Returned string is valid as long as the album object stays allocated and no longer than the next call to sp_session_process_events().</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_albumbrowse_review(IntPtr albumBrowsePtr);
+
+        /// <summary>
+        /// Increase the reference count of an album browse result.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        [DllImport("libspotify")]
+        internal static extern void sp_albumbrowse_add_ref(IntPtr albumBrowsePtr);
+
+        /// <summary>
+        /// Decrease the reference count of an album browse result.
+        /// </summary>
+        /// <param name="albumBrowsePtr">Album browse object.</param>
+        [DllImport("libspotify")]
+        internal static extern void sp_albumbrowse_release(IntPtr albumBrowsePtr);
         #endregion
 
         #region Structs
