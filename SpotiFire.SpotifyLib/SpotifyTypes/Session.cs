@@ -623,6 +623,17 @@ namespace SpotiFire.SpotifyLib
                 return libspotify.sp_session_player_play(sessionPtr, false);
         }
 
+        public sp_error PlayerSeek(int offset)
+        {
+            lock (libspotify.Mutex)
+                return libspotify.sp_session_player_seek(sessionPtr, offset);
+        }
+
+        public sp_error PlayerSeek(TimeSpan offset)
+        {
+            return this.PlayerSeek((int)offset.TotalMilliseconds);
+        }
+
         public void PlayerUnload()
         {
             lock (libspotify.Mutex)

@@ -132,7 +132,7 @@ namespace SpotiFire.SpotifyLib {
             this.session = session;
 
             this.artistBrowsePtr = artistBrowsePtr;
-
+            
             this.state = state;
 
             this.portraitIds = new DelegateArray<string>(() => {

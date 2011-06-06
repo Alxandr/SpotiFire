@@ -162,7 +162,7 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
 
             this.searchPtr = searchPtr;
-
+            
             this.state = state;
 
             this.tracks = new DelegateArray<ITrack>(() =>
