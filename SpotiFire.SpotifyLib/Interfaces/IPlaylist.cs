@@ -4,7 +4,7 @@ namespace SpotiFire.SpotifyLib
     public interface IPlaylist : ISpotifyObject
     {
         string Name { get; set; }
-        IEditableArray<IPlaylistTrack> Tracks { get; }
+        IPlaylistTrackList Tracks { get; }
         string ImageId { get; }
         bool IsColaberativ { get; set; }
         void AutoLinkTracks(bool autoLink);

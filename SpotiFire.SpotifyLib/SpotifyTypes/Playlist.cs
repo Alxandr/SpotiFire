@@ -121,7 +121,7 @@ namespace SpotiFire.SpotifyLib
                 return IsAlive() ? playlist.IntPtrHashCode() : 0;
             }
 
-            public IEditableArray<IPlaylistTrack> Tracks
+            public IPlaylistTrackList Tracks
             {
                 get { IsAlive(true); return playlist.Tracks; }
             }
@@ -464,7 +464,7 @@ namespace SpotiFire.SpotifyLib
         private IntPtr callbacksPtr = IntPtr.Zero;
         private bool registerCallbacks;
 
-        private IEditableArray<IPlaylistTrack> tracks;
+        private IPlaylistTrackList tracks;
         #endregion
 
         #region Constructor
@@ -521,7 +521,7 @@ namespace SpotiFire.SpotifyLib
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
 
-            tracks = new DelegateList<IPlaylistTrack>(
+            tracks = new PlaylistTrackList(
                 () =>
                 {
                     IsAlive(true);
@@ -610,7 +610,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public IEditableArray<IPlaylistTrack> Tracks
+        public IPlaylistTrackList Tracks
         {
             get
             {

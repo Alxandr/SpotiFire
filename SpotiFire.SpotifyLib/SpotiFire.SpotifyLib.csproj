@@ -48,8 +48,10 @@
     <Compile Include="Interfaces\IContainerPlaylist.cs" />
     <Compile Include="Interfaces\IPlaylistTrack.cs" />
     <Compile Include="Interfaces\ILink.cs" />
+    <Compile Include="Interfaces\IPlaylistTrackList.cs" />
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />
+    <Compile Include="PlaylistTrackList.cs" />
     <Compile Include="SpotifyLibExtensions.cs" />
     <Compile Include="SpotifyTypes\AlbumBrowse.cs" />
     <Compile Include="SpotifyTypes\ArtistBrowse.cs" />
