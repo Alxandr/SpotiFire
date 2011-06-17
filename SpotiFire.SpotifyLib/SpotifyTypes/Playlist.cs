@@ -536,13 +536,25 @@ namespace SpotiFire.SpotifyLib
                 },
                 (track, index) =>
                 {
-                    IntPtr[] ptrArray = new IntPtr[1];
-                    IntPtr trackArrayPtr = Marshal.AllocHGlobal(Marshal.SizeOf(ptrArray));
-                    Marshal.Copy(ptrArray, 0, trackArrayPtr, 1);
                     IsAlive(true);
-                    lock (libspotify.Mutex)
-                        libspotify.sp_playlist_add_tracks(playlistPtr, trackArrayPtr, 1, index, session.sessionPtr);
-                    Marshal.FreeHGlobal(trackArrayPtr);
+                    IntPtr trackArrayPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
+                    IntPtr[] ptrArray = new[] { Track.GetPointer(track) };
+                    
+                    try
+                    {
+                        Marshal.Copy(ptrArray, 0, trackArrayPtr, 1);
+
+                        lock (libspotify.Mutex)
+                            libspotify.sp_playlist_add_tracks(playlistPtr, trackArrayPtr, 1, index, session.sessionPtr);
+                    }
+                    finally
+                    {
+                        try { Marshal.FreeHGlobal(trackArrayPtr); }
+                        catch
+                        {}
+                    }
+
+
                 },
                 (index) =>
                 {
