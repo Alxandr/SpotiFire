@@ -74,7 +74,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return pc.Session; }
             }
 
-            public IEditableArray<IContainerPlaylist> Playlists
+            public IPlaylistList Playlists
             {
                 get { IsAlive(true); return pc.Playlists; }
             }
@@ -151,7 +151,7 @@ namespace SpotiFire.SpotifyLib
         private playlist_moved_cb playlist_moved;
         private container_loaded_cb container_loaded;
 
-        private IEditableArray<IContainerPlaylist> playlists;
+        private PlaylistList playlists;
         private bool loaded;
         #endregion
 
@@ -190,7 +190,7 @@ namespace SpotiFire.SpotifyLib
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
 
-            playlists = new DelegateList<IContainerPlaylist>(
+            playlists = new PlaylistList(
                 () =>
                 {
                     IsAlive(true);
@@ -224,7 +224,19 @@ namespace SpotiFire.SpotifyLib
                     lock (libspotify.Mutex)
                         libspotify.sp_playlistcontainer_remove_playlist(pcPtr, index);
                 },
-                () => false
+                () => false,
+                (name) =>
+                {
+                    IsAlive(true);
+                    IntPtr playlistPtr;
+                    int index;
+                    lock (libspotify.Mutex)
+                    {
+                        playlistPtr = libspotify.sp_playlistcontainer_add_new_playlist(pcPtr, name);
+                        index = playlistPtr == IntPtr.Zero ? -1 : libspotify.sp_playlistcontainer_num_playlists(pcPtr) - 1;
+                    }
+                    return index == -1 ? null : playlists[index];
+                }
             );
         }
 
@@ -235,7 +247,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public IEditableArray<IContainerPlaylist> Playlists
+        public IPlaylistList Playlists
         {
             get { return playlists; }
         }

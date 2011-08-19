@@ -3,7 +3,7 @@
     public interface IPlaylistContainer : ISpotifyObject
     {
         //IUser User {get;}
-        IEditableArray<IContainerPlaylist> Playlists { get; }
+        IPlaylistList Playlists { get; }
         bool IsLoaded { get; }
         event PlaylistContainerHandler Loaded;
         event PlaylistContainerHandler<PlaylistEventArgs> PlaylistAdded;
