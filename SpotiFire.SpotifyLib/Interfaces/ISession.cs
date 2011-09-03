@@ -7,7 +7,7 @@ namespace SpotiFire.SpotifyLib
         sp_connectionstate ConnectionState { get; }
         event SessionEventHandler EndOfTrack;
         event SessionEventHandler Exception;
-        void Login(string username, string password);
+        void Login(string username, string password, bool remember);
         event SessionEventHandler LoginComplete;
         event SessionEventHandler LogMessage;
         void Logout();

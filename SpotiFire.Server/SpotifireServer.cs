@@ -205,7 +205,7 @@ namespace SpotiFire.Server
             {
                 if (spotify.ConnectionState == sp_connectionstate.LOGGED_OUT)
                 {
-                    spotify.Login(username, password);
+                    spotify.Login(username, password, false);
                     loginComplete.WaitOne();
                     return spotify.ConnectionState == sp_connectionstate.LOGGED_IN;
                 }

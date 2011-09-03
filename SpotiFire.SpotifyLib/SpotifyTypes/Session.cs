@@ -568,14 +568,11 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Public Methods
-        public void Login(string username, string password)
+        public void Login(string username, string password, bool remember)
         {
             lock (libspotify.Mutex)
             {
-                sp_error res = libspotify.sp_session_login(sessionPtr, username, password);
-
-                if (res != sp_error.OK)
-                    throw new SpotifyException(res);
+                libspotify.sp_session_login(sessionPtr, username, password, remember); ;
             }
         }
 
@@ -583,10 +580,7 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
             {
-                sp_error res = libspotify.sp_session_logout(sessionPtr);
-
-                if (res != sp_error.OK)
-                    throw new SpotifyException(res);
+                libspotify.sp_session_logout(sessionPtr);
             }
         }
 

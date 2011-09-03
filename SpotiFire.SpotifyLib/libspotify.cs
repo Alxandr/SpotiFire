@@ -8,7 +8,7 @@ namespace SpotiFire.SpotifyLib
         internal static readonly object Mutex = new object();
 
         #region Constraints
-        public const int SPOTIFY_API_VERSION = 7;
+        public const int SPOTIFY_API_VERSION = 9;
         public const int STRINGBUFFER_SIZE = 256;
         #endregion
 
@@ -112,7 +112,7 @@ namespace SpotiFire.SpotifyLib
         /// <param name="password">The password for the specified username.</param>
         /// <returns>Error code.</returns>
         [DllImport("libspotify")]
-        internal static extern sp_error sp_session_login(IntPtr sessionPtr, string username, string password);
+        internal static extern void sp_session_login(IntPtr sessionPtr, string username, string password, bool remember);
 
         /// <summary>
         /// Fetches the currently logged in user.
@@ -131,7 +131,7 @@ namespace SpotiFire.SpotifyLib
         /// <param name="sessionPtr">Session object returned from <c>sp_session_create</c>.</param>
         /// <returns>Error code.</returns>
         [DllImport("libspotify")]
-        internal static extern sp_error sp_session_logout(IntPtr sessionPtr);
+        internal static extern void sp_session_logout(IntPtr sessionPtr);
 
         /// <summary>
         /// Gets the connection state of the specified session.
@@ -1269,7 +1269,7 @@ namespace SpotiFire.SpotifyLib
         /// <returns>Artist object.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_artistbrowse_artist(IntPtr artistBrowsePtr);
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -1395,7 +1395,7 @@ namespace SpotiFire.SpotifyLib
         /// <returns>Album object.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_albumbrowse_album(IntPtr albumBrowsePtr);
-        
+
         /// <summary>
         /// Given an album browse object, return a pointer to its artist object.
         /// </summary>
@@ -1403,7 +1403,7 @@ namespace SpotiFire.SpotifyLib
         /// <returns>Artist object.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_albumbrowse_artist(IntPtr albumBrowsePtr);
-        
+
         /// <summary>
         /// Given an album browse object, return number of copyright strings.
         /// </summary>
