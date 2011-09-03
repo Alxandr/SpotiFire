@@ -1539,7 +1539,8 @@ namespace SpotiFire.SpotifyLib
         LOGGED_OUT = 0,
         LOGGED_IN = 1,
         DISCONNECTED = 2,
-        UNDEFINED = 3
+        UNDEFINED = 3,
+        OFFLINE = 4
     }
 
     public enum sp_bitrate

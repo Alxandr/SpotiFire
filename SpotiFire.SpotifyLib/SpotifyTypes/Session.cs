@@ -293,7 +293,7 @@ namespace SpotiFire.SpotifyLib
             if (s == null)
                 return;
 
-            if (s.ConnectionState == sp_connectionstate.LOGGED_IN && error == sp_error.OK)
+            if ((s.ConnectionState == sp_connectionstate.LOGGED_IN || s.ConnectionState == sp_connectionstate.OFFLINE) && error == sp_error.OK)
                 s.playlistContainer = SpotifyLib.PlaylistContainer.Get(s, libspotify.sp_session_playlistcontainer(sessionPtr));
 
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnLoginComplete, s), new SessionEventArgs(error)));
