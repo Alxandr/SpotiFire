@@ -10,6 +10,6 @@ namespace SpotiFire.SpotifyLib
         string Name { get; }
         sp_albumtype Type { get; }
         int Year { get; }
-        IAlbumBrowse Browse(object state = null);
+        IAlbumBrowse Browse();
     }
 }

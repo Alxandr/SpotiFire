@@ -5,6 +5,6 @@ namespace SpotiFire.SpotifyLib
     {
         bool IsLoaded { get; }
         string Name { get; }
-        IArtistBrowse Browse(object state = null);
+        IArtistBrowse Browse();
     }
 }

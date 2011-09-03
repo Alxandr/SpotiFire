@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
 
 namespace SpotiFire.SpotifyLib
 {
-    
+
     internal class Artist : CountedDisposeableSpotifyObject, IArtist
     {
         #region Wrapper
@@ -38,9 +37,9 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return artist.Session; }
             }
 
-            public IArtistBrowse Browse(object state = null)
+            public IArtistBrowse Browse()
             {
-                return IsAlive() ? artist.Browse(state) : null;
+                return IsAlive() ? artist.Browse() : null;
             }
 
             protected override int IntPtrHashCode()
@@ -56,7 +55,7 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
         #region Counter
-        private static Dictionary<IntPtr, Artist> artists = new Dictionary<IntPtr,Artist>();
+        private static Dictionary<IntPtr, Artist> artists = new Dictionary<IntPtr, Artist>();
         private static readonly object artistsLock = new object();
 
         internal static IArtist Get(Session session, IntPtr artistPtr)
@@ -146,11 +145,13 @@ namespace SpotiFire.SpotifyLib
 
         #region Public methods
 
-        public IArtistBrowse Browse(object state = null) {
-            lock (libspotify.Mutex) {
+        public IArtistBrowse Browse()
+        {
+            lock (libspotify.Mutex)
+            {
                 IntPtr artistBrowsePtr = libspotify.sp_artistbrowse_create(session.sessionPtr, artistPtr,
-                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(SpotifyLib.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
-                return artistBrowsePtr != IntPtr.Zero ? SpotifyLib.ArtistBrowse.Get(session, artistBrowsePtr, state) : null;
+                    Marshal.GetFunctionPointerForDelegate(SpotifyLib.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
+                return artistBrowsePtr != IntPtr.Zero ? SpotifyLib.ArtistBrowse.Get(session, artistBrowsePtr) : null;
             }
         }
 

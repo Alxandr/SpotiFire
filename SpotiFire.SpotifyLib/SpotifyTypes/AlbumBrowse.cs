@@ -78,11 +78,11 @@ namespace SpotiFire.SpotifyLib {
         private static Dictionary<IntPtr, AlbumBrowse> albumBrowsers = new Dictionary<IntPtr, AlbumBrowse>();
         private static readonly object albumsBrowseLock = new object();
 
-        internal static IAlbumBrowse Get(Session session, IntPtr albumBrowsePtr, object state) {
+        internal static IAlbumBrowse Get(Session session, IntPtr albumBrowsePtr) {
             AlbumBrowse albumBrowse;
             lock (albumsBrowseLock) {
                 if (!albumBrowsers.ContainsKey(albumBrowsePtr)) {
-                    albumBrowsers.Add(albumBrowsePtr, new AlbumBrowse(session, albumBrowsePtr, state));
+                    albumBrowsers.Add(albumBrowsePtr, new AlbumBrowse(session, albumBrowsePtr));
                 }
                 albumBrowse = albumBrowsers[albumBrowsePtr];
                 albumBrowse.AddRef();
@@ -108,7 +108,6 @@ namespace SpotiFire.SpotifyLib {
 
         internal IntPtr albumBrowsePtr = IntPtr.Zero;
         private Session session;
-        private object state;
         private bool isComplete = false;
 
         internal static albumbrowse_complete_cb albumbrowse_complete = new albumbrowse_complete_cb(_AlbumBrowseCompleteCallback);
@@ -121,7 +120,7 @@ namespace SpotiFire.SpotifyLib {
         #endregion
 
         #region Constructor and setup
-        private AlbumBrowse(Session session, IntPtr albumBrowsePtr, object state) {
+        private AlbumBrowse(Session session, IntPtr albumBrowsePtr) {
 
             if (albumBrowsePtr == IntPtr.Zero)
                 throw new ArgumentException("albumBrowsePtr can't be zero.");
@@ -131,8 +130,6 @@ namespace SpotiFire.SpotifyLib {
             this.session = session;
 
             this.albumBrowsePtr = albumBrowsePtr;
-
-            this.state = state;
 
             this.copyrights = new DelegateArray<string>(() => {
                 IsAlive(true);
@@ -161,7 +158,7 @@ namespace SpotiFire.SpotifyLib {
         private void AlbumBrowse__Complete(IntPtr albumBrowsePtr, IntPtr userdataPtr) {
             if (albumBrowsePtr == this.albumBrowsePtr) {
                 this.isComplete = true;
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<AlbumBrowseEventArgs>(ab => ab.OnComplete, this), new AlbumBrowseEventArgs(this, this.state)));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<AlbumBrowseEventArgs>(ab => ab.OnComplete, this), new AlbumBrowseEventArgs(this)));
                 _Complete -= new albumbrowse_complete_cb(AlbumBrowse__Complete);
             }
         }

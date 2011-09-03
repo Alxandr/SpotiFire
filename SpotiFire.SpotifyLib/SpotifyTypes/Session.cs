@@ -590,13 +590,13 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, object state = null)
+        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount)
         {
             lock (libspotify.Mutex)
             {
                 IntPtr browsePtr = libspotify.sp_search_create(sessionPtr, query, trackOffset, trackCount, albumOffset, albumCount, artistOffset, artistCount,
                     Marshal.GetFunctionPointerForDelegate(SpotifyLib.Search.search_complete), IntPtr.Zero);
-                return browsePtr != IntPtr.Zero ? SpotifyLib.Search.Get(this, browsePtr, state) : null;
+                return browsePtr != IntPtr.Zero ? SpotifyLib.Search.Get(this, browsePtr) : null;
             }
         }
 

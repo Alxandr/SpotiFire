@@ -106,14 +106,14 @@ namespace SpotiFire.SpotifyLib
         private static Dictionary<IntPtr, Search> searchs = new Dictionary<IntPtr, Search>();
         private static readonly object searchsLock = new object();
 
-        internal static ISearch Get(Session session, IntPtr searchPtr, object state)
+        internal static ISearch Get(Session session, IntPtr searchPtr)
         {
             Search search;
             lock (searchsLock)
             {
                 if (!searchs.ContainsKey(searchPtr))
                 {
-                    searchs.Add(searchPtr, new Search(session, searchPtr, state));
+                    searchs.Add(searchPtr, new Search(session, searchPtr));
                 }
                 search = searchs[searchPtr];
                 search.AddRef();
@@ -141,7 +141,6 @@ namespace SpotiFire.SpotifyLib
 
         internal IntPtr searchPtr = IntPtr.Zero;
         private Session session;
-        private object state;
         private bool isComplete = false;
 
         internal static search_complete_cb search_complete = new search_complete_cb(_SearchCompleteCallback);
@@ -152,7 +151,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Constructor and setup
-        private Search(Session session, IntPtr searchPtr, object state)
+        private Search(Session session, IntPtr searchPtr)
         {
             if (searchPtr == IntPtr.Zero)
                 throw new ArgumentException("searchPtr can't be zero");
@@ -163,8 +162,6 @@ namespace SpotiFire.SpotifyLib
 
             this.searchPtr = searchPtr;
             
-            this.state = state;
-
             this.tracks = new DelegateArray<ITrack>(() =>
             {
                 IsAlive(true);
@@ -210,7 +207,7 @@ namespace SpotiFire.SpotifyLib
             if (searchPtr == this.searchPtr)
             {
                 this.isComplete = true;
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this, this.state)));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this)));
                 _Complete -= new search_complete_cb(Search__Complete);
             }
         }
@@ -369,7 +366,7 @@ namespace SpotiFire.SpotifyLib
         private void ImageLoadedCallback(IntPtr searchPtr, IntPtr userdataPtr)
         {
             if (searchPtr == this.searchPtr)
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this, this.state)));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this)));
         }
         #endregion
 

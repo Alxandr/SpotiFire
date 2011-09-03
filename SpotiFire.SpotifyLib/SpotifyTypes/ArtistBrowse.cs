@@ -1,23 +1,27 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Text;
 
-namespace SpotiFire.SpotifyLib {
+namespace SpotiFire.SpotifyLib
+{
 
     public delegate void ArtistBrowseEventHandler(IArtistBrowse sender, ArtistBrowseEventArgs e);
-    internal class ArtistBrowse : CountedDisposeableSpotifyObject, IArtistBrowse {
+    internal class ArtistBrowse : CountedDisposeableSpotifyObject, IArtistBrowse
+    {
 
         #region Wrapper
-        private sealed class ArtistBrowseWrapper : DisposeableSpotifyObject, IArtistBrowse {
+        private sealed class ArtistBrowseWrapper : DisposeableSpotifyObject, IArtistBrowse
+        {
             internal ArtistBrowse artistBrowse;
-            public ArtistBrowseWrapper(ArtistBrowse artistBrowse) {
+            public ArtistBrowseWrapper(ArtistBrowse artistBrowse)
+            {
                 this.artistBrowse = artistBrowse;
                 artistBrowse.Complete += new ArtistBrowseEventHandler(artistBrowse_Complete);
             }
 
-            void artistBrowse_Complete(IArtistBrowse sender, ArtistBrowseEventArgs e) {
+            void artistBrowse_Complete(IArtistBrowse sender, ArtistBrowseEventArgs e)
+            {
                 if (sender == artistBrowse)
                     if (Complete != null)
                         Complete(this, e);
@@ -25,50 +29,61 @@ namespace SpotiFire.SpotifyLib {
 
             public event ArtistBrowseEventHandler Complete;
 
-            protected override void OnDispose() {
+            protected override void OnDispose()
+            {
                 artistBrowse.Complete -= new ArtistBrowseEventHandler(artistBrowse_Complete);
                 ArtistBrowse.Delete(artistBrowse.artistBrowsePtr);
                 artistBrowse = null;
             }
 
-            public sp_error Error {
+            public sp_error Error
+            {
                 get { IsAlive(true); return artistBrowse.Error; }
             }
 
-            public IArtist Artist {
+            public IArtist Artist
+            {
                 get { IsAlive(true); return artistBrowse.Artist; }
             }
 
-            public IArray<string> PortraitIds {
+            public IArray<string> PortraitIds
+            {
                 get { IsAlive(true); return artistBrowse.PortraitIds; }
             }
 
-            public IArray<ITrack> Tracks {
+            public IArray<ITrack> Tracks
+            {
                 get { IsAlive(true); return artistBrowse.Tracks; }
             }
 
-            public IArray<IArtist> SimilarArtists {
+            public IArray<IArtist> SimilarArtists
+            {
                 get { IsAlive(true); return artistBrowse.SimilarArtists; }
             }
 
-            public string Biography {
+            public string Biography
+            {
                 get { IsAlive(true); return artistBrowse.Biography; }
             }
 
-            public ISession Session {
+            public ISession Session
+            {
                 get { IsAlive(true); return artistBrowse.Session; }
             }
 
-            public bool IsComplete {
+            public bool IsComplete
+            {
                 get { IsAlive(true); return artistBrowse.IsComplete; }
             }
 
-            protected override int IntPtrHashCode() {
+            protected override int IntPtrHashCode()
+            {
                 return IsAlive() ? artistBrowse.artistBrowsePtr.GetHashCode() : 0;
             }
 
         }
-        internal static IntPtr GetPointer(IArtistBrowse artistBrowse) {
+        internal static IntPtr GetPointer(IArtistBrowse artistBrowse)
+        {
             if (artistBrowse.GetType() == typeof(ArtistBrowseWrapper))
                 return ((ArtistBrowseWrapper)artistBrowse).artistBrowse.artistBrowsePtr;
             throw new ArgumentException("Invalid artist browse");
@@ -78,11 +93,14 @@ namespace SpotiFire.SpotifyLib {
         private static Dictionary<IntPtr, ArtistBrowse> artistBrowsers = new Dictionary<IntPtr, ArtistBrowse>();
         private static readonly object artistsBrowseLock = new object();
 
-        internal static IArtistBrowse Get(Session session, IntPtr artistBrowsePtr, object state) {
+        internal static IArtistBrowse Get(Session session, IntPtr artistBrowsePtr)
+        {
             ArtistBrowse artistBrowse;
-            lock (artistsBrowseLock) {
-                if (!artistBrowsers.ContainsKey(artistBrowsePtr)) {
-                    artistBrowsers.Add(artistBrowsePtr, new ArtistBrowse(session, artistBrowsePtr, state));
+            lock (artistsBrowseLock)
+            {
+                if (!artistBrowsers.ContainsKey(artistBrowsePtr))
+                {
+                    artistBrowsers.Add(artistBrowsePtr, new ArtistBrowse(session, artistBrowsePtr));
                 }
                 artistBrowse = artistBrowsers[artistBrowsePtr];
                 artistBrowse.AddRef();
@@ -90,8 +108,10 @@ namespace SpotiFire.SpotifyLib {
             return new ArtistBrowseWrapper(artistBrowse);
         }
 
-        internal static void Delete(IntPtr artistBrowsePtr) {
-            lock (artistsBrowseLock) {
+        internal static void Delete(IntPtr artistBrowsePtr)
+        {
+            lock (artistsBrowseLock)
+            {
                 ArtistBrowse artistBrowse = artistBrowsers[artistBrowsePtr];
                 int count = artistBrowse.RemRef();
                 if (count == 0)
@@ -108,7 +128,6 @@ namespace SpotiFire.SpotifyLib {
 
         internal IntPtr artistBrowsePtr = IntPtr.Zero;
         private Session session;
-        private object state;
         private bool isComplete = false;
 
         internal static artistbrowse_complete_cb artistbrowse_complete = new artistbrowse_complete_cb(_ArtistBrowseCompleteCallback);
@@ -122,7 +141,8 @@ namespace SpotiFire.SpotifyLib {
         #endregion
 
         #region Constructor and setup
-        private ArtistBrowse(Session session, IntPtr artistBrowsePtr, object state) {
+        private ArtistBrowse(Session session, IntPtr artistBrowsePtr)
+        {
 
             if (artistBrowsePtr == IntPtr.Zero)
                 throw new ArgumentException("artistBrowsePtr can't be zero.");
@@ -132,44 +152,50 @@ namespace SpotiFire.SpotifyLib {
             this.session = session;
 
             this.artistBrowsePtr = artistBrowsePtr;
-            
-            this.state = state;
 
-            this.portraitIds = new DelegateArray<string>(() => {
+            this.portraitIds = new DelegateArray<string>(() =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_artistbrowse_num_portraits(artistBrowsePtr);
-            }, (index) => {
+            }, (index) =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.ImageIdToString(libspotify.sp_artistbrowse_portrait(artistBrowsePtr, index));
             });
 
-            this.tracks = new DelegateArray<ITrack>(() => {
+            this.tracks = new DelegateArray<ITrack>(() =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_artistbrowse_num_tracks(artistBrowsePtr);
-            }, (index) => {
+            }, (index) =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return Track.Get(session, libspotify.sp_artistbrowse_track(artistBrowsePtr, index));
             });
 
-            this.albums = new DelegateArray<IAlbum>(() => {
+            this.albums = new DelegateArray<IAlbum>(() =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_artistbrowse_num_albums(artistBrowsePtr);
-            }, (index) => {
+            }, (index) =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return Album.Get(session, libspotify.sp_artistbrowse_album(artistBrowsePtr, index));
             });
 
-            this.similarArtists = new DelegateArray<IArtist>(() => {
+            this.similarArtists = new DelegateArray<IArtist>(() =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_artistbrowse_num_similar_artists(artistBrowsePtr);
-            }, (index) => {
+            }, (index) =>
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return SpotifyLib.Artist.Get(session, libspotify.sp_artistbrowse_similar_artist(artistBrowsePtr, index));
@@ -179,15 +205,18 @@ namespace SpotiFire.SpotifyLib {
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
 
-        private void ArtistBrowse__Complete(IntPtr artistBrowsePtr, IntPtr userdataPtr) {
-            if (artistBrowsePtr == this.artistBrowsePtr) {
+        private void ArtistBrowse__Complete(IntPtr artistBrowsePtr, IntPtr userdataPtr)
+        {
+            if (artistBrowsePtr == this.artistBrowsePtr)
+            {
                 this.isComplete = true;
-                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<ArtistBrowseEventArgs>(ab => ab.OnComplete, this), new ArtistBrowseEventArgs(this, this.state)));
+                session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<ArtistBrowseEventArgs>(ab => ab.OnComplete, this), new ArtistBrowseEventArgs(this)));
                 _Complete -= new artistbrowse_complete_cb(ArtistBrowse__Complete);
             }
         }
 
-        static void _ArtistBrowseCompleteCallback(IntPtr artistBrowsePtr, IntPtr userdataPtr) {
+        static void _ArtistBrowseCompleteCallback(IntPtr artistBrowsePtr, IntPtr userdataPtr)
+        {
             if (_Complete != null)
                 _Complete(artistBrowsePtr, userdataPtr);
         }
@@ -195,17 +224,22 @@ namespace SpotiFire.SpotifyLib {
 
         #region Properties
 
-        public sp_error Error {
-            get {
+        public sp_error Error
+        {
+            get
+            {
                 IsAlive(true);
                 lock (libspotify.Mutex)
                     return libspotify.sp_artistbrowse_error(artistBrowsePtr);
             }
         }
 
-        public IArtist Artist {
-            get {
-                if (artist == null) {
+        public IArtist Artist
+        {
+            get
+            {
+                if (artist == null)
+                {
                     IsAlive(true);
                     lock (libspotify.Mutex)
                         artist = SpotifyLib.Artist.Get(session, libspotify.sp_artistbrowse_artist(artistBrowsePtr));
@@ -214,27 +248,36 @@ namespace SpotiFire.SpotifyLib {
             }
         }
 
-        public IArray<string> PortraitIds {
-            get {
+        public IArray<string> PortraitIds
+        {
+            get
+            {
                 return portraitIds;
             }
         }
 
-        public IArray<ITrack> Tracks {
-            get {
+        public IArray<ITrack> Tracks
+        {
+            get
+            {
                 return tracks;
             }
         }
 
-        public IArray<IArtist> SimilarArtists {
-            get {
+        public IArray<IArtist> SimilarArtists
+        {
+            get
+            {
                 return similarArtists;
             }
         }
 
-        public string Biography {
-            get {
-                if (biography == null) {
+        public string Biography
+        {
+            get
+            {
+                if (biography == null)
+                {
                     IsAlive(true);
                     lock (libspotify.Mutex)
                         biography = libspotify.GetString(libspotify.sp_artistbrowse_biography(artistBrowsePtr), String.Empty);
@@ -243,15 +286,19 @@ namespace SpotiFire.SpotifyLib {
             }
         }
 
-        public ISession Session {
-            get {
+        public ISession Session
+        {
+            get
+            {
                 IsAlive(true);
                 return session;
             }
         }
 
-        public bool IsComplete {
-            get {
+        public bool IsComplete
+        {
+            get
+            {
                 IsAlive(true);
                 return isComplete;
             }
@@ -260,7 +307,8 @@ namespace SpotiFire.SpotifyLib {
 
         #region Public methods
 
-        public override string ToString() {
+        public override string ToString()
+        {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("[ArtistBrowse]");
             sb.AppendLine("Error=" + Error);
@@ -286,7 +334,8 @@ namespace SpotiFire.SpotifyLib {
 
         #region Cleanup
 
-        protected override void OnDispose() {
+        protected override void OnDispose()
+        {
             _Complete -= new artistbrowse_complete_cb(ArtistBrowse__Complete);
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
 
@@ -297,19 +346,22 @@ namespace SpotiFire.SpotifyLib {
             artistBrowsePtr = IntPtr.Zero;
         }
 
-        private void session_DisposeAll(ISession sender, SessionEventArgs e) {
+        private void session_DisposeAll(ISession sender, SessionEventArgs e)
+        {
             Dispose();
         }
         #endregion
 
         #region Private methods
-        private static Delegate CreateDelegate<T>(Expression<Func<ArtistBrowse, Action<T>>> expr, ArtistBrowse ab) where T : ArtistBrowseEventArgs {
+        private static Delegate CreateDelegate<T>(Expression<Func<ArtistBrowse, Action<T>>> expr, ArtistBrowse ab) where T : ArtistBrowseEventArgs
+        {
             return expr.Compile().Invoke(ab);
         }
         #endregion
 
         #region Protected Methods
-        protected virtual void OnComplete(ArtistBrowseEventArgs args) {
+        protected virtual void OnComplete(ArtistBrowseEventArgs args)
+        {
             if (this.Complete != null)
                 this.Complete(this, args);
         }
@@ -319,8 +371,9 @@ namespace SpotiFire.SpotifyLib {
         public event ArtistBrowseEventHandler Complete;
         private static event artistbrowse_complete_cb _Complete;
         #endregion
-        
-        protected override int IntPtrHashCode() {
+
+        protected override int IntPtrHashCode()
+        {
             throw new NotImplementedException();
         }
 
