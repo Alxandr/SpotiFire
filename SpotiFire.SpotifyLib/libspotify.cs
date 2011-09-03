@@ -1545,9 +1545,9 @@ namespace SpotiFire.SpotifyLib
 
     public enum sp_bitrate
     {
-        SP_BITRATE_160k = 0,
-        SP_BITRATE_320k = 1,
-        SP_BITRATE_96k = 2
+        BITRATE_160k = 0,
+        BITRATE_320k = 1,
+        BITRATE_96k = 2
     }
 
     public enum sp_radio_genre
