@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotiFire.SpotifyLib", "Spo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotiFire.Client", "SpotiFire.Client\SpotiFire.Client.csproj", "{FEDDFB3D-1650-461F-895D-BA9D7C13948D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotiFire.Tests", "SpotiFire.Tests\SpotiFire.Tests.csproj", "{344EBB6A-420B-4711-8FD1-B0E44D4F9EB1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
