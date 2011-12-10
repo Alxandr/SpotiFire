@@ -7,10 +7,5 @@ namespace SpotiFire.SpotifyLib
         {
             return Session.Create(applicationKey, cacheLocation, settingsLocation, userAgent);
         }
-
-        public static IImage GetImageFromId(ISession session, string id)
-        {
-            return Image.FromId(session, id);
-        }
     }
 }

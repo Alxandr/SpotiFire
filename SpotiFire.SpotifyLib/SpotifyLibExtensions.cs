@@ -1,10 +1,47 @@
-﻿using System.Threading;
+﻿using System;
+using System.IO;
+using System.Threading;
 
 namespace SpotiFire.SpotifyLib
 {
 
     public static class ISessionExtensions
     {
+        // IImage methods
+        public static IImage GetImageFromId(this ISession session, string id)
+        {
+            return Image.FromId(session, id);
+        }
+
+        public static System.Drawing.Image GetImage(this IImage image)
+        {
+            if (image == null)
+                throw new ArgumentNullException("image");
+
+            if (!image.IsLoaded)
+                throw new InvalidOperationException("Can't convert to Image before data is loaded.");
+
+            if (image.Format != sp_imageformat.SP_IMAGE_FORMAT_JPEG)
+                throw new InvalidOperationException("Can only parse Jpeg image data.");
+
+            return System.Drawing.Image.FromStream(new MemoryStream(image.Data));
+        }
+
+        public static void Save(this IImage image, string location)
+        {
+            image.GetImage().Save(location);
+        }
+
+        // IImage Synchronously
+        public static void WaitForLoaded(this IImage image)
+        {
+            var reset = new ManualResetEvent(image.IsLoaded);
+            ImageEventHandler handler = (i, e) => reset.Set();
+            image.Loaded += handler;
+            reset.WaitOne();
+            image.Loaded -= handler;
+        }
+
 
         // Search methods made Synchronously
         public static void WaitForCompletion(this ISearch search)
@@ -47,7 +84,6 @@ namespace SpotiFire.SpotifyLib
             reset.WaitOne();
             albumBrowse.Complete -= handler;
         }
-
     }
 
 }
