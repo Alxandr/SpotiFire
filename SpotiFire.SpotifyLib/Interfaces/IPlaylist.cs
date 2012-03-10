@@ -10,6 +10,7 @@ namespace SpotiFire.SpotifyLib
         void AutoLinkTracks(bool autoLink);
         string Description { get; }
         bool PendingChanges { get; }
+        bool IsLoaded { get; }
 
         event PlaylistEventHandler<TracksAddedEventArgs> TracksAdded;
         event PlaylistEventHandler<TracksEventArgs> TracksRemoved;
