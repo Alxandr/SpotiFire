@@ -300,6 +300,15 @@ namespace SpotiFire.SpotifyLib
 
         #region Links (Spotify URIs)
         /// <summary>
+        /// Create a Spotify link given a string.
+        /// </summary>
+        /// <remarks>You need to release the link when you are done with it.</remarks>
+        /// <param name="link">A string representation of a Spotify link.</param>
+        /// <returns>A link representation of the given string representation. If the link could not be parsed, this function returns NULL.</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_link_create_from_string(string link);
+
+        /// <summary>
         /// Creates a link object from an artist.
         /// </summary>
         /// <remarks>You need to release the link when you are done with it.</remarks>
@@ -307,6 +316,15 @@ namespace SpotiFire.SpotifyLib
         /// <returns>A link object representing the artist.</returns>
         [DllImport("libspotify")]
         internal static extern IntPtr sp_link_create_from_artist(IntPtr artistPtr);
+
+        /// <summary>
+        /// Generates a link object from a track.
+        /// </summary>
+        /// <remarks>You need to release the link when you are done with it.</remarks>
+        /// <param name="trackPtr">The track.</param>
+        /// <returns>>A link object representing the track.</returns>
+        [DllImport("libspotify")]
+        internal static extern IntPtr sp_link_create_from_track(IntPtr trackPtr);
 
         /// <summary>
         /// Create a string representation of the given Spotify link.

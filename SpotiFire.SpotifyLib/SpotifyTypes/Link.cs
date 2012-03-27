@@ -152,7 +152,7 @@ namespace SpotiFire.SpotifyLib
             switch (type)
             {
                 case sp_linktype.SP_LINKTYPE_TRACK:
-                    return new LinkWrapper<ITrack>(link);
+                    return new LinkWrapper<ITrackAndOffset>(link);
                 case sp_linktype.SP_LINKTYPE_ALBUM:
                     return new LinkWrapper<IAlbum>(link);
                 case sp_linktype.SP_LINKTYPE_ARTIST:
@@ -167,7 +167,7 @@ namespace SpotiFire.SpotifyLib
                 case sp_linktype.SP_LINKTYPE_STARRED:
                     return new LinkWrapper<IPlaylist>(link);
                 case sp_linktype.SP_LINKTYPE_LOCALTRACK:
-                    return new LinkWrapper<ITrack>(link);
+                    return new LinkWrapper<ITrackAndOffset>(link);
                 default:
                     throw new ArgumentException("Invalid link.");
             }
