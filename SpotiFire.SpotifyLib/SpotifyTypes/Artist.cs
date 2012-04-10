@@ -37,9 +37,9 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return artist.Session; }
             }
 
-            public IArtistBrowse Browse()
+            public IArtistBrowse Browse(sp_artistbrowse_type type = sp_artistbrowse_type.FULL)
             {
-                return IsAlive() ? artist.Browse() : null;
+                return IsAlive() ? artist.Browse(type) : null;
             }
 
             protected override int IntPtrHashCode()
@@ -145,11 +145,11 @@ namespace SpotiFire.SpotifyLib
 
         #region Public methods
 
-        public IArtistBrowse Browse()
+        public IArtistBrowse Browse(sp_artistbrowse_type type = sp_artistbrowse_type.FULL)
         {
             lock (libspotify.Mutex)
             {
-                IntPtr artistBrowsePtr = libspotify.sp_artistbrowse_create(session.sessionPtr, artistPtr,
+                IntPtr artistBrowsePtr = libspotify.sp_artistbrowse_create(session.sessionPtr, artistPtr, type,
                     Marshal.GetFunctionPointerForDelegate(SpotifyLib.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
                 return artistBrowsePtr != IntPtr.Zero ? SpotifyLib.ArtistBrowse.Get(session, artistBrowsePtr) : null;
             }

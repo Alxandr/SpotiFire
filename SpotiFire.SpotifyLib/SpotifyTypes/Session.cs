@@ -50,6 +50,9 @@ namespace SpotiFire.SpotifyLib
         private delegate void start_playback_delegate(IntPtr sessionPtr);
         private delegate void stop_playback_delegate(IntPtr sessionPtr);
         private delegate void get_audio_buffer_stats_delegate(IntPtr sessionPtr, IntPtr statsPtr);
+        private delegate void offline_status_updated_delegate(IntPtr sessionPtr);
+        private delegate void offline_error_delegate(IntPtr sessionPtr, sp_error error);
+        private delegate void credentials_blob_updated_delegate(IntPtr sessionPtr, string blob);
         #endregion
 
         #region Spotify Event Handlers
@@ -68,6 +71,9 @@ namespace SpotiFire.SpotifyLib
         private static start_playback_delegate start_playback = new start_playback_delegate(StartPlaybackCallback);
         private static stop_playback_delegate stop_playback = new stop_playback_delegate(StopPlaybackCallback);
         private static get_audio_buffer_stats_delegate get_audio_buffer_stats = new get_audio_buffer_stats_delegate(GetAudioBufferStatsCallback);
+        private static offline_status_updated_delegate offline_status_updated = new offline_status_updated_delegate(OfflineStatusUpdatedCallback);
+        private static offline_error_delegate offline_error = new offline_error_delegate(OfflineErrorCallback);
+        private static credentials_blob_updated_delegate credentials_blob_updated = new credentials_blob_updated_delegate(CredentialsBlobUpdatedCallback);
         #endregion
 
         #region Properties
@@ -166,6 +172,9 @@ namespace SpotiFire.SpotifyLib
                 callbacks.start_playback = Marshal.GetFunctionPointerForDelegate(start_playback);
                 callbacks.stop_playback = Marshal.GetFunctionPointerForDelegate(stop_playback);
                 callbacks.get_audio_buffer_stats = Marshal.GetFunctionPointerForDelegate(get_audio_buffer_stats);
+                callbacks.offline_status_updated = Marshal.GetFunctionPointerForDelegate(offline_status_updated);
+                callbacks.offline_error = Marshal.GetFunctionPointerForDelegate(offline_error);
+                callbacks.credentials_blob_updated = Marshal.GetFunctionPointerForDelegate(credentials_blob_updated);
             }
         }
 
@@ -440,7 +449,26 @@ namespace SpotiFire.SpotifyLib
 
         private static void GetAudioBufferStatsCallback(IntPtr sessionPtr, IntPtr statsPtr)
         {
-            //x throw new NotImplementedException("GetAudioBufferStatsCallback");
+            Session s = GetSession(sessionPtr);
+            // TODO: Implement
+        }
+
+        private static void OfflineStatusUpdatedCallback(IntPtr sessionPtr)
+        {
+            Session s = GetSession(sessionPtr);
+            // TODO: Implement
+        }
+
+        private static void OfflineErrorCallback(IntPtr sessionPtr, sp_error error)
+        {
+            Session s = GetSession(sessionPtr);
+            // TODO: Implement
+        }
+
+        private static void CredentialsBlobUpdatedCallback(IntPtr sessionPtr, string blob)
+        {
+            Session s = GetSession(sessionPtr);
+            // TODO: Implement
         }
         #endregion
 
@@ -570,9 +598,10 @@ namespace SpotiFire.SpotifyLib
         #region Public Methods
         public void Login(string username, string password, bool remember)
         {
+            // TODO: Implement blob
             lock (libspotify.Mutex)
             {
-                libspotify.sp_session_login(sessionPtr, username, password, remember); ;
+                libspotify.sp_session_login(sessionPtr, username, password, remember, null);
             }
         }
 
@@ -584,12 +613,12 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount)
+        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, int playlistOffset, int playlistCount, sp_search_type type)
         {
             lock (libspotify.Mutex)
             {
                 IntPtr browsePtr = libspotify.sp_search_create(sessionPtr, query, trackOffset, trackCount, albumOffset, albumCount, artistOffset, artistCount,
-                    Marshal.GetFunctionPointerForDelegate(SpotifyLib.Search.search_complete), IntPtr.Zero);
+                    playlistOffset, playlistCount, type, Marshal.GetFunctionPointerForDelegate(SpotifyLib.Search.search_complete), IntPtr.Zero);
                 return browsePtr != IntPtr.Zero ? SpotifyLib.Search.Get(this, browsePtr) : null;
             }
         }

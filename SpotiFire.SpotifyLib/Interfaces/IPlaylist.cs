@@ -1,7 +1,7 @@
 ﻿
 namespace SpotiFire.SpotifyLib
 {
-    public interface IPlaylist : ISpotifyObject
+    public interface IPlaylist : ISpotifyObject, IAsyncLoaded
     {
         string Name { get; set; }
         IPlaylistTrackList Tracks { get; }
@@ -10,7 +10,6 @@ namespace SpotiFire.SpotifyLib
         void AutoLinkTracks(bool autoLink);
         string Description { get; }
         bool PendingChanges { get; }
-        bool IsLoaded { get; }
 
         event PlaylistEventHandler<TracksAddedEventArgs> TracksAdded;
         event PlaylistEventHandler<TracksEventArgs> TracksRemoved;

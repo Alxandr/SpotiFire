@@ -5,6 +5,6 @@ namespace SpotiFire.SpotifyLib
     {
         bool IsLoaded { get; }
         string Name { get; }
-        IArtistBrowse Browse();
+        IArtistBrowse Browse(sp_artistbrowse_type type = sp_artistbrowse_type.FULL);
     }
 }

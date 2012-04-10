@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -54,15 +56,19 @@ namespace SpotiFire.SpotifyLib
         }
         public static ISearch SearchTracks(this ISession session, string query, int trackOffset, int trackCount)
         {
-            return session.Search(query, trackOffset, trackCount, 0, 0, 0, 0);
+            return session.Search(query, trackOffset, trackCount, 0, 0, 0, 0, 0, 0, sp_search_type.STANDARD);
         }
         public static ISearch SearchAlbums(this ISession session, string query, int albumOffset, int albumCount)
         {
-            return session.Search(query, 0, 0, albumOffset, albumCount, 0, 0);
+            return session.Search(query, 0, 0, albumOffset, albumCount, 0, 0, 0, 0, sp_search_type.STANDARD);
         }
         public static ISearch SearchArtists(this ISession session, string query, int artistOffset, int artistCount)
         {
-            return session.Search(query, 0, 0, 0, 0, artistOffset, artistCount);
+            return session.Search(query, 0, 0, 0, 0, artistOffset, artistCount, 0, 0, sp_search_type.STANDARD);
+        }
+        public static ISearch SearchPlaylist(this ISession session, string query, int playlistOffset, int playlistCount)
+        {
+            return session.Search(query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, sp_search_type.STANDARD);
         }
 
         // ArtistBrowse methods made Synchronously
@@ -83,6 +89,72 @@ namespace SpotiFire.SpotifyLib
             albumBrowse.Complete += handler;
             reset.WaitOne();
             albumBrowse.Complete -= handler;
+        }
+
+        // Load made a task
+        private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
+        private static bool running = false;
+        public static Task<IAsyncLoaded> Load(this IAsyncLoaded loadable)
+        {
+            Action start = () =>
+            {
+                running = true;
+                ThreadPool.QueueUserWorkItem(delegate
+                {
+                    while (true)
+                    {
+                        Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>[] l;
+                        Thread.Sleep(100);
+                        lock (waiting)
+                            l = waiting.ToArray();
+
+                        HashSet<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> r = new HashSet<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
+
+                        foreach (var i in l)
+                            if (i.Item1.IsLoaded)
+                            {
+                                i.Item2.SetResult(i.Item1);
+                                r.Add(i);
+                            }
+
+                        lock (waiting)
+                        {
+                            waiting.RemoveAll(e => r.Contains(e));
+                            if (waiting.Count == 0)
+                            {
+                                running = false;
+                                break;
+                            }
+                        }
+                    }
+                });
+            };
+
+            TaskCompletionSource<IAsyncLoaded> tcs = new TaskCompletionSource<IAsyncLoaded>();
+            if (loadable.IsLoaded)
+                tcs.SetResult(loadable);
+            else if (running)
+                lock (waiting)
+                    if (running)
+                        waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
+                    else
+                    {
+                        waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
+                        start();
+                    }
+            else
+                lock (waiting)
+                {
+                    waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
+                    start();
+                }
+
+            return tcs.Task;
+        }
+
+        public static Task<ITrack> Load(this ITrack track)
+        {
+            return ((IAsyncLoaded)track).Load().ContinueWith(task => (ITrack)task.Result);
         }
     }
 

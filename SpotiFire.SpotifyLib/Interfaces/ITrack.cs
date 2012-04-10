@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SpotiFire.SpotifyLib
 {
-    public interface ITrack : ISpotifyObject, IDisposable
+    public interface ITrack : ISpotifyObject, IAsyncLoaded, IDisposable
     {
         IAlbum Album { get; }
         IArray<IArtist> Artists { get; }
@@ -10,7 +10,6 @@ namespace SpotiFire.SpotifyLib
         sp_error Error { get; }
         int Index { get; }
         bool IsAvailable { get; }
-        bool IsLoaded { get; }
         bool IsStarred { get; set; }
         string Name { get; }
         int Popularity { get; }

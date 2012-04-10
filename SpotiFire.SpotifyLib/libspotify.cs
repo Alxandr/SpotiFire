@@ -8,7 +8,7 @@ namespace SpotiFire.SpotifyLib
         internal static readonly object Mutex = new object();
 
         #region Constraints
-        public const int SPOTIFY_API_VERSION = 9;
+        public const int SPOTIFY_API_VERSION = 11;
         public const int STRINGBUFFER_SIZE = 256;
         #endregion
 
@@ -110,9 +110,11 @@ namespace SpotiFire.SpotifyLib
         /// <param name="sessionPtr">Session object returned from <c>sp_session_create</c>.</param>
         /// <param name="username">The username to log in.</param>
         /// <param name="password">The password for the specified username.</param>
+        /// <param name="remember">If set, the username / password will be remembered by libspotify.</param>
+        /// <param name="blob">If you have received a blob in the credentials_blob_updated you can pas this here instead of password</param>
         /// <returns>Error code.</returns>
         [DllImport("libspotify")]
-        internal static extern void sp_session_login(IntPtr sessionPtr, string username, string password, bool remember);
+        internal static extern void sp_session_login(IntPtr sessionPtr, string username, string password, bool remember, string blob);
 
         /// <summary>
         /// Fetches the currently logged in user.
@@ -777,6 +779,9 @@ namespace SpotiFire.SpotifyLib
         /// <param name="album_count">The number of albums to ask for.</param>
         /// <param name="artist_offset">The offset among the artists of the result.</param>
         /// <param name="artist_count">The number of artists to ask for.</param>
+        /// <param name="playlist_offset">The offset among the playlists of the result.</param>
+        /// <param name="playlist_count">The number of playlists to ask for.</param>
+        /// <param name="search_type">	Type of search, can be used for suggest searches.</param>
         /// <param name="callbackPtr">Callback that will be called once the search operation is complete.
         /// Pass null if you are not interested in this event.</param>
         /// <param name="userdataPtr">Opaque pointer passed to callback.</param>
@@ -784,7 +789,7 @@ namespace SpotiFire.SpotifyLib
         [DllImport("libspotify")]
         internal static extern IntPtr sp_search_create(IntPtr sessionPtr, string query, int track_offset,
             int track_count, int album_offset, int album_count, int artist_offset, int artist_count,
-            IntPtr callbackPtr, IntPtr userdataPtr);
+            int playlist_offset, int playlist_count, sp_search_type search_type, IntPtr callbackPtr, IntPtr userdataPtr);
 
         /// <summary>
         /// Create a search object from the radio channel.
@@ -1259,10 +1264,11 @@ namespace SpotiFire.SpotifyLib
         /// <param name="sessionPtr">Session object.</param>
         /// <param name="artistPtr">Artist to be browsed. The artist metadata does not have to be loaded.</param>
         /// <param name="callbackPtr">Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.</param>
+        /// <param name="type">Type of data requested, see the sp_artistbrowse_type enum for details.</param>
         /// <param name="userDataPtr">Userdata passed to callback.</param>
         /// <returns>Artist browse object.</returns>
         [DllImport("libspotify")]
-        internal static extern IntPtr sp_artistbrowse_create(IntPtr sessionPtr, IntPtr artistPtr, IntPtr callbackPtr, IntPtr userDataPtr);
+        internal static extern IntPtr sp_artistbrowse_create(IntPtr sessionPtr, IntPtr artistPtr, sp_artistbrowse_type type, IntPtr callbackPtr, IntPtr userDataPtr);
 
         /// <summary>
         /// Check if an artist browse request is completed.
@@ -1493,6 +1499,8 @@ namespace SpotiFire.SpotifyLib
             internal bool compress_playlists;
             internal bool dont_save_metadata_for_playlists;
             internal bool initially_unload_playlists;
+            internal string device_id;
+            internal string tracefile;
         }
 
         internal struct sp_session_callbacks
@@ -1512,6 +1520,9 @@ namespace SpotiFire.SpotifyLib
             internal IntPtr start_playback;
             internal IntPtr stop_playback;
             internal IntPtr get_audio_buffer_stats;
+            internal IntPtr offline_status_updated;
+            internal IntPtr offline_error;
+            internal IntPtr credentials_blob_updated;
         }
 
         internal struct sp_audioformat
@@ -1549,7 +1560,23 @@ namespace SpotiFire.SpotifyLib
         INDEX_OUT_OF_RANGE = 14,
         USER_NEEDS_PREMIUM = 15,
         OTHER_TRANSIENT = 16,
-        IS_LOADING = 17
+        IS_LOADING = 17,
+        NO_STREAM_AVAILABLE = 18,
+        PERMISSION_DENIED = 19,
+        INBOX_IS_FULL = 20,
+        NO_CACHE = 21,
+        NO_SUCH_USER = 22,
+        NO_CREDENTIALS = 23,
+        NETWORK_DISABLED = 24,
+        INVALID_DEVICE_ID = 25,
+        CANT_OPEN_TRACE_FILE = 26,
+        APPLICATION_BANNED = 27,
+        OFFLINE_TOO_MANY_TRACKS = 28,
+        OFFLINE_DISK_CACHE = 29,
+        OFFLINE_EXPIRED = 30,
+        OFFLINE_NOT_ALLOWED = 31,
+        OFFLINE_LICENSE_LOST = 32,
+        OFFLINE_LICENSE_ERROR = 33
     }
 
     public enum sp_connectionstate
@@ -1613,18 +1640,49 @@ namespace SpotiFire.SpotifyLib
         /// A normal playlist.
         /// </summary>
         SP_PLAYLIST_TYPE_PLAYLIST = 0,
+
         /// <summary>
         /// Marks a folder starting point.
         /// </summary>
         SP_PLAYLIST_TYPE_START_FOLDER = 1,
+
         /// <summary>
         /// Marks a folder ending point.
         /// </summary>
         SP_PLAYLIST_TYPE_END_FOLDER = 2,
+
         /// <summary>
         /// Unknown entry.
         /// </summary>
         SP_PLAYLIST_TYPE_PLACEHOLDER = 3
+    }
+
+    public enum sp_search_type
+    {
+        STANDARD = 0,
+        SUGGEST = 1
+    }
+
+    /// <summary>
+    /// Controls the type of data that will be included in artist browse queries.
+    /// </summary>
+    public enum sp_artistbrowse_type
+    {
+        /// <summary>
+        /// All information except tophit tracks This mode is deprecated and will removed in a future release.
+        /// </summary>
+        FULL = 0,
+
+        /// <summary>
+        /// Only albums and data about them, no tracks. In other words, sp_artistbrowse_num_tracks() will return 0.
+        /// </summary>
+        NO_TRACKS = 1,
+
+        /// <summary>
+        /// Only return data about the artist (artist name, similar artist biography, etc.
+        /// No tracks or album will be abailable. sp_artistbrowse_num_tracks() and sp_artistbrowse_num_albums() will both return 0.
+        /// </summary>
+        NO_ALBUMS = 2
     }
     #endregion
 }
