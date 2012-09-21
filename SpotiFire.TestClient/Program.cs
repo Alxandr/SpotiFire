@@ -11,7 +11,7 @@ namespace SpotiFire.TestClient
     class Program
     {
         static byte[] key = new byte[] {
-            0x01, 0xF7, 0x8F, 0x3C, 0x44, 0x98, 0xF7, 0xD3, 0xD6, 0xF5, 0xD2, 0x40, 0x23, 0x02, 0x98, 0x1B,
+    0x01, 0xF7, 0x8F, 0x3C, 0x44, 0x98, 0xF7, 0xD3, 0xD6, 0xF5, 0xD2, 0x40, 0x23, 0x02, 0x98, 0x1B,
 	0x30, 0x6B, 0xE4, 0xCC, 0x82, 0xB3, 0x97, 0x2A, 0xE1, 0x42, 0x1F, 0x90, 0x3B, 0xE4, 0xCD, 0x25,
 	0xD5, 0x90, 0xBC, 0x2C, 0xCD, 0x48, 0x33, 0xB8, 0x13, 0xC0, 0xD7, 0x1C, 0x94, 0xBD, 0x16, 0x1E,
 	0xCD, 0xAD, 0x3D, 0x1C, 0xCA, 0xAF, 0xF0, 0x6D, 0x06, 0x64, 0x87, 0xA4, 0xBC, 0x32, 0x13, 0xFE,
@@ -52,12 +52,31 @@ namespace SpotiFire.TestClient
 
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
             session.SetPrefferedBitrate(sp_bitrate.BITRATE_320k);
-            //await session.PlaylistContainer;
-            var playlist = await session.Starred;
-            Console.WriteLine("Found playlist " + playlist.Name);
+
+            await session.PlaylistContainer;
+            var playlist = await session.PlaylistContainer[0];
+            Console.WriteLine("Playing first from " + playlist.Name);
             var track = await playlist[0];
+            await session.Play(track);
+
+            playlist = await session.Starred;
+            Console.WriteLine("Playing first starred track");
+            track = await playlist[0];
             Console.WriteLine("Found track " + track.Name);
             await session.Play(track);
+
+            Console.WriteLine("Enter song search");
+            var search = await session.SearchTracks(Console.ReadLine(), 0, 1);
+            if (search.Tracks.Count > 0)
+            {
+                track = await search.Tracks[0];
+                Console.WriteLine("Playing " + track.Name);
+                await session.Play(track);
+            }
+            else
+            {
+                Console.WriteLine("No matching tracks.");
+            }
             await session.Logout();
         }
 
