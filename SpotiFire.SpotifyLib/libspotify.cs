@@ -8,7 +8,7 @@ namespace SpotiFire.SpotifyLib
         internal static readonly object Mutex = new object();
 
         #region Constraints
-        public const int SPOTIFY_API_VERSION = 11;
+        public const int SPOTIFY_API_VERSION = 12;
         public const int STRINGBUFFER_SIZE = 256;
         #endregion
 
@@ -1500,6 +1500,10 @@ namespace SpotiFire.SpotifyLib
             internal bool dont_save_metadata_for_playlists;
             internal bool initially_unload_playlists;
             internal string device_id;
+            internal string proxy;
+            internal string proxy_username;
+            internal string proxy_password;
+            internal string ca_certs_filename;
             internal string tracefile;
         }
 
@@ -1523,6 +1527,9 @@ namespace SpotiFire.SpotifyLib
             internal IntPtr offline_status_updated;
             internal IntPtr offline_error;
             internal IntPtr credentials_blob_updated;
+            internal IntPtr connectionstate_updated;
+            internal IntPtr scrobble_error;
+            internal IntPtr private_session_mode_changed;
         }
 
         internal struct sp_audioformat
@@ -1541,42 +1548,190 @@ namespace SpotiFire.SpotifyLib
     }
 
     #region Enums
+    /// <summary>
+    /// Error codes returned by various functions
+    /// </summary>
     public enum sp_error
     {
+        /// <summary>
+        /// No errors encountered
+        /// </summary>
         OK = 0,
+
+        /// <summary>
+        /// The library version targeted does not match the one you claim you support
+        /// </summary>
         BAD_API_VERSION = 1,
+
+        /// <summary>
+        /// Initialization of library failed - are cache locations etc. valid?
+        /// </summary>
         API_INITIALIZATION_FAILED = 2,
+
+        /// <summary>
+        /// The track specified for playing cannot be played
+        /// </summary>
         TRACK_NOT_PLAYABLE = 3,
-        RESOURCE_NOT_LOADED = 4,
-        APPLICATION_KEY = 5,
+
+        /// <summary>
+        /// The application key is invalid
+        /// </summary>
+        BAD_APPLICATION_KEY = 5,
+
+        /// <summary>
+        /// Login failed because of bad username and/or password
+        /// </summary>
         BAD_USERNAME_OR_PASSWORD = 6,
+
+        /// <summary>
+        /// The specified username is banned
+        /// </summary>
         USER_BANNED = 7,
+
+        /// <summary>
+        /// Cannot connect to the Spotify backend system
+        /// </summary>
         UNABLE_TO_CONTACT_SERVER = 8,
+
+        /// <summary>
+        /// Client is too old, library will need to be updated
+        /// </summary>
         CLIENT_TOO_OLD = 9,
+
+        /// <summary>
+        /// Some other error occurred, and it is permanent (e.g. trying to relogin will not help)
+        /// </summary>
         OTHER_PERMANENT = 10,
+
+        /// <summary>
+        /// The user agent string is invalid or too long
+        /// </summary>
         BAD_USER_AGENT = 11,
+
+        /// <summary>
+        /// No valid callback registered to handle events
+        /// </summary>
         MISSING_CALLBACK = 12,
+
+        /// <summary>
+        /// Input data was either missing or invalid
+        /// </summary>
         INVALID_INDATA = 13,
+
+        /// <summary>
+        /// Index out of range
+        /// </summary>
         INDEX_OUT_OF_RANGE = 14,
+
+        /// <summary>
+        /// The specified user needs a premium account
+        /// </summary>
         USER_NEEDS_PREMIUM = 15,
+
+        /// <summary>
+        /// A transient error occurred.
+        /// </summary>
         OTHER_TRANSIENT = 16,
+
+        /// <summary>
+        /// The resource is currently loading
+        /// </summary>
         IS_LOADING = 17,
+
+        /// <summary>
+        /// Could not find any suitable stream to play
+        /// </summary>
         NO_STREAM_AVAILABLE = 18,
+
+        /// <summary>
+        /// Requested operation is not allowed
+        /// </summary>
         PERMISSION_DENIED = 19,
+
+        /// <summary>
+        /// Target inbox is full
+        /// </summary>
         INBOX_IS_FULL = 20,
+
+        /// <summary>
+        /// Cache is not enabled
+        /// </summary>
         NO_CACHE = 21,
+
+        /// <summary>
+        /// Requested user does not exist
+        /// </summary>
         NO_SUCH_USER = 22,
+
+        /// <summary>
+        /// No credentials are stored
+        /// </summary>
         NO_CREDENTIALS = 23,
+
+        /// <summary>
+        /// Network disabled
+        /// </summary>
         NETWORK_DISABLED = 24,
+
+        /// <summary>
+        /// Invalid device ID
+        /// </summary>
         INVALID_DEVICE_ID = 25,
+
+        /// <summary>
+        /// Unable to open trace file
+        /// </summary>
         CANT_OPEN_TRACE_FILE = 26,
+
+        /// <summary>
+        /// This application is no longer allowed to use the Spotify service
+        /// </summary>
         APPLICATION_BANNED = 27,
-        OFFLINE_TOO_MANY_TRACKS = 28,
-        OFFLINE_DISK_CACHE = 29,
-        OFFLINE_EXPIRED = 30,
-        OFFLINE_NOT_ALLOWED = 31,
-        OFFLINE_LICENSE_LOST = 32,
-        OFFLINE_LICENSE_ERROR = 33
+
+        /// <summary>
+        /// Reached the device limit for number of tracks to download
+        /// </summary>
+        OFFLINE_TOO_MANY_TRACKS = 31,
+
+        /// <summary>
+        /// Disk cache is full so no more tracks can be downloaded to offline mode
+        /// </summary>
+        OFFLINE_DISK_CACHE = 32,
+
+        /// <summary>
+        /// Offline key has expired, the user needs to go online again
+        /// </summary>
+        OFFLINE_EXPIRED = 33,
+
+        /// <summary>
+        /// This user is not allowed to use offline mode
+        /// </summary>
+        OFFLINE_NOT_ALLOWED = 34,
+
+        /// <summary>
+        /// The license for this device has been lost. Most likely because the user used offline on three other device
+        /// </summary>
+        OFFLINE_LICENSE_LOST = 35,
+
+        /// <summary>
+        /// The Spotify license server does not respond correctly
+        /// </summary>
+        OFFLINE_LICENSE_ERROR = 36,
+
+        /// <summary>
+        /// A LastFM scrobble authentication error has occurred
+        /// </summary>
+        LASTFM_AUTH_ERROR = 39,
+
+        /// <summary>
+        /// An invalid argument was specified
+        /// </summary>
+        INVALID_ARGUMENT = 40,
+
+        /// <summary>
+        /// An operating system error
+        /// </summary>
+        SYSTEM_FAILURE = 41,
     }
 
     public enum sp_connectionstate

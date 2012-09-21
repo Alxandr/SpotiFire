@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,16 +45,11 @@ namespace SpotiFire.SpotifyLib
             image.Loaded -= handler;
         }
 
-
-        // Search methods made Synchronously
-        public static void WaitForCompletion(this ISearch search)
+        public static ISpotifyAwaiter<ISearch> GetAwaiter(this ISearch search)
         {
-            var reset = new ManualResetEvent(search.IsComplete);
-            SearchEventHandler handler = (s, e) => reset.Set();
-            search.Complete += handler;
-            reset.WaitOne();
-            search.Complete -= handler;
+            return new AwaitableAwaiter<ISearch>(search);
         }
+
         public static ISearch SearchTracks(this ISession session, string query, int trackOffset, int trackCount)
         {
             return session.Search(query, trackOffset, trackCount, 0, 0, 0, 0, 0, 0, sp_search_type.STANDARD);
@@ -72,23 +68,58 @@ namespace SpotiFire.SpotifyLib
         }
 
         // ArtistBrowse methods made Synchronously
-        public static void WaitForCompletion(this IArtistBrowse artistBrowse)
+        public static ISpotifyAwaiter<IArtistBrowse> GetAwaiter(this IArtistBrowse artistBrowse)
         {
-            var reset = new ManualResetEvent(artistBrowse.IsComplete);
-            ArtistBrowseEventHandler handler = (a, e) => reset.Set();
-            artistBrowse.Complete += handler;
-            reset.WaitOne();
-            artistBrowse.Complete -= handler;
+            return new AwaitableAwaiter<IArtistBrowse>(artistBrowse);
         }
 
         // AlbumBrowse methods made Synchronously
-        public static void WaitForCompletion(this IAlbumBrowse albumBrowse)
+        public static ISpotifyAwaiter<IAlbumBrowse> GetAwaiter(this IAlbumBrowse albumBrowse)
         {
-            var reset = new ManualResetEvent(albumBrowse.IsComplete);
-            AlbumBrowseEventHandler handler = (a, e) => reset.Set();
-            albumBrowse.Complete += handler;
-            reset.WaitOne();
-            albumBrowse.Complete -= handler;
+            return new AwaitableAwaiter<IAlbumBrowse>(albumBrowse);
+        }
+
+        // PlaylistContainer
+        public static ISpotifyAwaiter<IPlaylistContainer> GetAwaiter(this IPlaylistContainer pc)
+        {
+            return new AwaitableAwaiter<IPlaylistContainer>(pc);
+        }
+
+        class AwaitableAwaiter<T> : ISpotifyAwaiter<T>
+            where T : ISpotifyObject
+        {
+            T result;
+            ISpotifyAwaitable awaitable;
+
+            public AwaitableAwaiter(T value)
+            {
+                result = value;
+            }
+
+            ISpotifyAwaitable Awaitable
+            {
+                get
+                {
+                    if (awaitable == null)
+                        Interlocked.CompareExchange(ref awaitable, (ISpotifyAwaitable)result, null);
+                    return awaitable;
+                }
+            }
+
+            public bool IsCompleted
+            {
+                get { return Awaitable.IsComplete; }
+            }
+
+            public T GetResult()
+            {
+                return result;
+            }
+
+            public void OnCompleted(Action continuation)
+            {
+                Awaitable.OnCompleted(continuation);
+            }
         }
 
         // Load made a task
@@ -152,9 +183,43 @@ namespace SpotiFire.SpotifyLib
             return tcs.Task;
         }
 
-        public static Task<ITrack> Load(this ITrack track)
+        public static TaskAwaiter<ITrack> GetAwaiter(this ITrack track)
         {
-            return ((IAsyncLoaded)track).Load().ContinueWith(task => (ITrack)task.Result);
+            return ((IAsyncLoaded)track).Load().ContinueWith(task => (ITrack)task.Result).GetAwaiter();
+        }
+
+        public static TaskAwaiter<IArtist> GetAwaiter(this IArtist artist)
+        {
+            return ((IAsyncLoaded)artist).Load().ContinueWith(task => (IArtist)task.Result).GetAwaiter();
+        }
+
+        public static TaskAwaiter<IAlbum> GetAwaiter(this IAlbum album)
+        {
+            return ((IAsyncLoaded)album).Load().ContinueWith(task => (IAlbum)task.Result).GetAwaiter();
+        }
+
+        public static TaskAwaiter<IPlaylist> GetAwaiter(this IPlaylist playlist)
+        {
+            return ((IAsyncLoaded)playlist).Load().ContinueWith(task => (IPlaylist)task.Result).GetAwaiter();
+        }
+
+        // play through track
+        public static Task Play(this ISession session, ITrack track)
+        {
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            SessionEventHandler handler = null;
+            handler = (s, e) =>
+            {
+                session.EndOfTrack -= handler;
+                tcs.SetResult(null);
+            };
+
+            session.PlayerUnload();
+            session.EndOfTrack += handler;
+            session.PlayerLoad(track);
+            session.PlayerPlay();
+
+            return tcs.Task;
         }
     }
 

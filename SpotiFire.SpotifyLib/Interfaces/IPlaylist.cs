@@ -5,6 +5,7 @@ namespace SpotiFire.SpotifyLib
     {
         string Name { get; set; }
         IPlaylistTrackList Tracks { get; }
+        IPlaylistTrack this[int i] { get; }
         string ImageId { get; }
         bool IsColaberativ { get; set; }
         void AutoLinkTracks(bool autoLink);

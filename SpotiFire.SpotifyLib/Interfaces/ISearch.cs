@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 namespace SpotiFire.SpotifyLib
 {
     public interface ISearch : ISpotifyObject, IDisposable

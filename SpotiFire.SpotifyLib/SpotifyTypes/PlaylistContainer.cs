@@ -7,10 +7,10 @@ namespace SpotiFire.SpotifyLib
 {
     public delegate void PlaylistContainerHandler(IPlaylistContainer pc, EventArgs args);
     public delegate void PlaylistContainerHandler<TEventArgs>(IPlaylistContainer pc, TEventArgs args) where TEventArgs : EventArgs;
-    internal class PlaylistContainer : CountedDisposeableSpotifyObject, IPlaylistContainer
+    internal class PlaylistContainer : CountedDisposeableSpotifyObject, IPlaylistContainer, ISpotifyAwaitable
     {
         #region Wrapper
-        private class PlaylistContainerWrapper : DisposeableSpotifyObject, IPlaylistContainer
+        private class PlaylistContainerWrapper : DisposeableSpotifyObject, IPlaylistContainer, ISpotifyAwaitable
         {
             internal PlaylistContainer pc;
             public PlaylistContainerWrapper(PlaylistContainer pc)
@@ -79,9 +79,25 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return pc.Playlists; }
             }
 
+            public IContainerPlaylist this[int i]
+            {
+                get { IsAlive(true); return pc[i]; }
+            }
+
             public bool IsLoaded
             {
                 get { IsAlive(true); return pc.IsLoaded; }
+            }
+
+            bool ISpotifyAwaitable.IsComplete
+            {
+                get { IsAlive(true); return ((ISpotifyAwaitable)pc).IsComplete; }
+            }
+
+            void ISpotifyAwaitable.OnCompleted(Action action)
+            {
+                IsAlive(true);
+                ((ISpotifyAwaitable)pc).OnCompleted(action);
             }
         }
 
@@ -251,6 +267,12 @@ namespace SpotiFire.SpotifyLib
         {
             get { return playlists; }
         }
+
+        public IContainerPlaylist this[int i]
+        {
+            get { return playlists[i]; }
+        }
+
         public ISession Session
         {
             get
@@ -315,7 +337,8 @@ namespace SpotiFire.SpotifyLib
         }
         protected virtual void OnLoaded(EventArgs args)
         {
-            loaded = true;
+            lock (this)
+                loaded = true;
             if (Loaded != null)
                 Loaded(this, args);
         }
@@ -372,6 +395,38 @@ namespace SpotiFire.SpotifyLib
             catch { }
             callbacksPtr = IntPtr.Zero;
             pcPtr = IntPtr.Zero;
+        }
+        #endregion
+
+        #region Await
+        bool ISpotifyAwaitable.IsComplete
+        {
+            get
+            {
+                lock (this)
+                    return IsLoaded;
+            }
+        }
+
+        void ISpotifyAwaitable.OnCompleted(Action continuation)
+        {
+            lock (this)
+            {
+                if (IsLoaded)
+                {
+                    continuation();
+                }
+                else
+                {
+                    PlaylistContainerHandler handler = null;
+                    handler = (s, e) =>
+                    {
+                        continuation();
+                        Loaded -= handler;
+                    };
+                    Loaded += handler;
+                }
+            }
         }
         #endregion
 

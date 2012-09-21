@@ -1,7 +1,7 @@
 ﻿using System;
 namespace SpotiFire.SpotifyLib
 {
-    public interface ITrack : ISpotifyObject, IAsyncLoaded, IDisposable
+    public interface ITrack : ISpotifyObject, IAsyncLoaded
     {
         IAlbum Album { get; }
         IArray<IArtist> Artists { get; }

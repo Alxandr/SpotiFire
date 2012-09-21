@@ -256,10 +256,10 @@ namespace SpotiFire.SpotifyLib
             get
             {
                 IsAlive(true);
-                //x lock (libspotify.Mutex)
-                //x     return libspotify.sp_track_is_starred(session.sessionPtr, trackPtr);
+                lock (libspotify.Mutex)
+                    return libspotify.sp_track_is_starred(session.sessionPtr, trackPtr);
 
-                return session.Starred.Tracks.Any(t => Track.GetPointer(t) == this.trackPtr);
+                //return session.Starred.Tracks.Any(t => Track.GetPointer(t) == this.trackPtr);
             }
             set
             {

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace SpotiFire.SpotifyLib
 {
     public delegate void SearchEventHandler(ISearch sender, SearchEventArgs e);
-    internal class Search : CountedDisposeableSpotifyObject, ISearch
+    internal class Search : CountedDisposeableSpotifyObject, ISearch, ISpotifyAwaitable
     {
         #region Wrapper
-        private sealed class SearchWrapper : DisposeableSpotifyObject, ISearch
+        private sealed class SearchWrapper : DisposeableSpotifyObject, ISearch, ISpotifyAwaitable
         {
             internal Search search;
             public SearchWrapper(Search search)
@@ -92,6 +93,16 @@ namespace SpotiFire.SpotifyLib
             protected override int IntPtrHashCode()
             {
                 return IsAlive() ? search.searchPtr.GetHashCode() : 0;
+            }
+
+            bool ISpotifyAwaitable.IsComplete
+            {
+                get { IsAlive(true);  return ((ISpotifyAwaitable)search).IsComplete; }
+            }
+
+            void ISpotifyAwaitable.OnCompleted(Action action)
+            {
+                IsAlive(true); ((ISpotifyAwaitable)search).OnCompleted(action);
             }
         }
 
@@ -206,7 +217,8 @@ namespace SpotiFire.SpotifyLib
         {
             if (searchPtr == this.searchPtr)
             {
-                this.isComplete = true;
+                lock(this)
+                    this.isComplete = true;
                 session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SearchEventArgs>(s => s.OnComplete, this), new SearchEventArgs(this)));
                 _Complete -= new search_complete_cb(Search__Complete);
             }
@@ -381,6 +393,38 @@ namespace SpotiFire.SpotifyLib
         #region Event
         public event SearchEventHandler Complete;
         private static event search_complete_cb _Complete;
+        #endregion
+
+        #region Await
+        void ISpotifyAwaitable.OnCompleted(Action continuation)
+        {
+            lock (this)
+            {
+                if (IsComplete)
+                {
+                    continuation();
+                }
+                else
+                {
+                    SearchEventHandler handler = null;
+                    handler = (s, e) =>
+                    {
+                        continuation();
+                        Complete -= handler;
+                    };
+                    Complete += handler;
+                }
+            }
+        }
+
+        bool ISpotifyAwaitable.IsComplete
+        {
+            get
+            {
+                lock(this)
+                    return IsComplete;
+            }
+        }
         #endregion
 
         protected override int IntPtrHashCode()

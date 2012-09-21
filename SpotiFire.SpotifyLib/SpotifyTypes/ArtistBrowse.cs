@@ -7,11 +7,11 @@ namespace SpotiFire.SpotifyLib
 {
 
     public delegate void ArtistBrowseEventHandler(IArtistBrowse sender, ArtistBrowseEventArgs e);
-    internal class ArtistBrowse : CountedDisposeableSpotifyObject, IArtistBrowse
+    internal class ArtistBrowse : CountedDisposeableSpotifyObject, IArtistBrowse, ISpotifyAwaitable
     {
 
         #region Wrapper
-        private sealed class ArtistBrowseWrapper : DisposeableSpotifyObject, IArtistBrowse
+        private sealed class ArtistBrowseWrapper : DisposeableSpotifyObject, IArtistBrowse, ISpotifyAwaitable
         {
             internal ArtistBrowse artistBrowse;
             public ArtistBrowseWrapper(ArtistBrowse artistBrowse)
@@ -81,6 +81,17 @@ namespace SpotiFire.SpotifyLib
                 return IsAlive() ? artistBrowse.artistBrowsePtr.GetHashCode() : 0;
             }
 
+
+            bool ISpotifyAwaitable.IsComplete
+            {
+                get { IsAlive(true); return ((ISpotifyAwaitable)artistBrowse).IsComplete; }
+            }
+
+            void ISpotifyAwaitable.OnCompleted(Action action)
+            {
+                IsAlive(true);
+                ((ISpotifyAwaitable)artistBrowse).OnCompleted(action);
+            }
         }
         internal static IntPtr GetPointer(IArtistBrowse artistBrowse)
         {
@@ -209,7 +220,8 @@ namespace SpotiFire.SpotifyLib
         {
             if (artistBrowsePtr == this.artistBrowsePtr)
             {
-                this.isComplete = true;
+                lock (this)
+                    this.isComplete = true;
                 session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<ArtistBrowseEventArgs>(ab => ab.OnComplete, this), new ArtistBrowseEventArgs(this)));
                 _Complete -= new artistbrowse_complete_cb(ArtistBrowse__Complete);
             }
@@ -370,6 +382,38 @@ namespace SpotiFire.SpotifyLib
         #region Event
         public event ArtistBrowseEventHandler Complete;
         private static event artistbrowse_complete_cb _Complete;
+        #endregion
+
+        #region Await
+        bool ISpotifyAwaitable.IsComplete
+        {
+            get
+            {
+                lock (this)
+                    return IsComplete;
+            }
+        }
+
+        void ISpotifyAwaitable.OnCompleted(Action continuation)
+        {
+            lock (this)
+            {
+                if (IsComplete)
+                {
+                    continuation();
+                }
+                else
+                {
+                    ArtistBrowseEventHandler handler = null;
+                    handler = (s, e) =>
+                    {
+                        continuation();
+                        Complete -= handler;
+                    };
+                    Complete += handler;
+                }
+            }
+        }
         #endregion
 
         protected override int IntPtrHashCode()

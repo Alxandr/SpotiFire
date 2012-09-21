@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+
 namespace SpotiFire.SpotifyLib
 {
     public interface ISession : IDisposable
@@ -7,10 +9,10 @@ namespace SpotiFire.SpotifyLib
         sp_connectionstate ConnectionState { get; }
         event SessionEventHandler EndOfTrack;
         event SessionEventHandler Exception;
-        void Login(string username, string password, bool remember);
-        event SessionEventHandler LoginComplete;
+        Task<bool> Login(string username, string password, bool remember);
+        //event SessionEventHandler LoginComplete;
         event SessionEventHandler LogMessage;
-        void Logout();
+        Task Logout();
         event SessionEventHandler LogoutComplete;
         event SessionEventHandler MessageToUser;
         event SessionEventHandler MetadataUpdated;

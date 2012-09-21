@@ -126,6 +126,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return playlist.Tracks; }
             }
 
+            public IPlaylistTrack this[int i]
+            {
+                get { IsAlive(true); return playlist[i]; }
+            }
+
             public bool IsLoaded
             {
                 get { IsAlive(true); return playlist.IsLoaded; }
@@ -643,6 +648,15 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 return tracks;
+            }
+        }
+
+        public IPlaylistTrack this[int i]
+        {
+            get
+            {
+                IsAlive(true);
+                return tracks[i];
             }
         }
 

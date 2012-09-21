@@ -7,10 +7,10 @@ using System.Linq.Expressions;
 namespace SpotiFire.SpotifyLib {
 
     public delegate void AlbumBrowseEventHandler(IAlbumBrowse sender, AlbumBrowseEventArgs e);
-    internal class AlbumBrowse : CountedDisposeableSpotifyObject, IAlbumBrowse {
+    internal class AlbumBrowse : CountedDisposeableSpotifyObject, IAlbumBrowse, ISpotifyAwaitable {
 
         #region Wrapper
-        private sealed class AlbumBrowseWrapper : DisposeableSpotifyObject, IAlbumBrowse {
+        private sealed class AlbumBrowseWrapper : DisposeableSpotifyObject, IAlbumBrowse, ISpotifyAwaitable {
             internal AlbumBrowse albumBrowse;
             public AlbumBrowseWrapper(AlbumBrowse albumBrowse) {
                 this.albumBrowse = albumBrowse;
@@ -67,6 +67,17 @@ namespace SpotiFire.SpotifyLib {
                 return IsAlive() ? albumBrowse.albumBrowsePtr.GetHashCode() : 0;
             }
 
+
+            bool ISpotifyAwaitable.IsComplete
+            {
+                get { IsAlive(true); return ((ISpotifyAwaitable)albumBrowse).IsComplete; }
+            }
+
+            void ISpotifyAwaitable.OnCompleted(Action action)
+            {
+                IsAlive(true);
+                ((ISpotifyAwaitable)albumBrowse).OnCompleted(action);
+            }
         }
         internal static IntPtr GetPointer(IAlbumBrowse albumBrowse) {
             if (albumBrowse.GetType() == typeof(AlbumBrowseWrapper))
@@ -157,7 +168,8 @@ namespace SpotiFire.SpotifyLib {
 
         private void AlbumBrowse__Complete(IntPtr albumBrowsePtr, IntPtr userdataPtr) {
             if (albumBrowsePtr == this.albumBrowsePtr) {
-                this.isComplete = true;
+                lock (this)
+                    this.isComplete = true;
                 session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<AlbumBrowseEventArgs>(ab => ab.OnComplete, this), new AlbumBrowseEventArgs(this)));
                 _Complete -= new albumbrowse_complete_cb(AlbumBrowse__Complete);
             }
@@ -294,6 +306,38 @@ namespace SpotiFire.SpotifyLib {
         #region Event
         public event AlbumBrowseEventHandler Complete;
         private static event albumbrowse_complete_cb _Complete;
+        #endregion
+
+        #region Await
+        bool ISpotifyAwaitable.IsComplete
+        {
+            get
+            {
+                lock (this)
+                    return IsComplete;
+            }
+        }
+
+        void ISpotifyAwaitable.OnCompleted(Action continuation)
+        {
+            lock (this)
+            {
+                if (IsComplete)
+                {
+                    continuation();
+                }
+                else
+                {
+                    AlbumBrowseEventHandler handler = null;
+                    handler = (s, e) =>
+                    {
+                        continuation();
+                        Complete -= handler;
+                    };
+                    Complete += handler;
+                }
+            }
+        }
         #endregion
 
         protected override int IntPtrHashCode() {
