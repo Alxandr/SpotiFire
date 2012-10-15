@@ -47,7 +47,7 @@ namespace SpotiFire.SpotifyLib
 
         public static ISpotifyAwaiter<ISearch> GetAwaiter(this ISearch search)
         {
-            return new AwaitableAwaiter<ISearch>(search);
+            return AwaitHelper.GetAwaiter<ISearch>(search);
         }
 
         public static ISearch SearchTracks(this ISession session, string query, int trackOffset, int trackCount)
@@ -70,62 +70,19 @@ namespace SpotiFire.SpotifyLib
         // ArtistBrowse methods made Synchronously
         public static ISpotifyAwaiter<IArtistBrowse> GetAwaiter(this IArtistBrowse artistBrowse)
         {
-            return new AwaitableAwaiter<IArtistBrowse>(artistBrowse);
+            return AwaitHelper.GetAwaiter<IArtistBrowse>(artistBrowse);
         }
 
         // AlbumBrowse methods made Synchronously
         public static ISpotifyAwaiter<IAlbumBrowse> GetAwaiter(this IAlbumBrowse albumBrowse)
         {
-            return new AwaitableAwaiter<IAlbumBrowse>(albumBrowse);
+            return AwaitHelper.GetAwaiter<IAlbumBrowse>(albumBrowse);
         }
 
         // PlaylistContainer
         public static ISpotifyAwaiter<IPlaylistContainer> GetAwaiter(this IPlaylistContainer pc)
         {
-            return new AwaitableAwaiter<IPlaylistContainer>(pc);
-        }
-
-        struct AwaitableAwaiter<T> : ISpotifyAwaiter<T>
-            where T : ISpotifyObject
-        {
-            T result;
-            ISpotifyAwaitable awaitable;
-
-            public AwaitableAwaiter(T value)
-            {
-                result = value;
-                awaitable = null;
-            }
-
-            ISpotifyAwaitable Awaitable
-            {
-                get
-                {
-                    if (awaitable == null)
-                        Interlocked.CompareExchange(ref awaitable, (ISpotifyAwaitable)result, null);
-                    return awaitable;
-                }
-            }
-
-            public bool IsCompleted
-            {
-                get { return Awaitable.IsComplete; }
-            }
-
-            public T GetResult()
-            {
-                return result;
-            }
-
-            public void OnCompleted(Action continuation)
-            {
-                Awaitable.OnCompleted(continuation);
-            }
-
-            public void UnsafeOnCompleted(Action continuation)
-            {
-                Awaitable.OnCompleted(continuation);
-            }
+            return AwaitHelper.GetAwaiter<IPlaylistContainer>(pc);
         }
 
         // Load made a task
@@ -148,7 +105,7 @@ namespace SpotiFire.SpotifyLib
                         HashSet<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> r = new HashSet<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
 
                         foreach (var i in l)
-                            if (i.Item1.IsLoaded)
+                            if (i.Item1.IsLoaded && i.Item1.IsReady)
                             {
                                 i.Item2.SetResult(i.Item1);
                                 r.Add(i);
@@ -168,7 +125,7 @@ namespace SpotiFire.SpotifyLib
             };
 
             TaskCompletionSource<IAsyncLoaded> tcs = new TaskCompletionSource<IAsyncLoaded>();
-            if (loadable.IsLoaded)
+            if (loadable.IsLoaded && loadable.IsReady)
                 tcs.SetResult(loadable);
             else if (running)
                 lock (waiting)

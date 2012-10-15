@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AwaitHelper.cs" />
     <Compile Include="EventArgs\AlbumBrowseEventArgs.cs" />
     <Compile Include="EventArgs\ArtistBrowseEventArgs.cs" />
     <Compile Include="Interfaces\IAlbumBrowse.cs" />

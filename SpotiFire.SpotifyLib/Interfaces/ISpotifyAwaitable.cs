@@ -9,6 +9,6 @@ namespace SpotiFire.SpotifyLib
     interface ISpotifyAwaitable
     {
         bool IsComplete { get; }
-        void OnCompleted(Action action);
+        bool AddContinuation(AwaitHelper.Continuation continuation, bool addBeforeOthers);
     }
 }

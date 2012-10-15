@@ -27,6 +27,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return artist.IsLoaded; }
             }
 
+            public bool IsReady
+            {
+                get { IsAlive(true); return artist.IsReady; }
+            }
+
             public string Name
             {
                 get { IsAlive(true); return artist.Name; }
@@ -167,6 +172,13 @@ namespace SpotiFire.SpotifyLib
                     libspotify.sp_artist_release(artistPtr);
 
             artistPtr = IntPtr.Zero;
+        }
+        #endregion
+
+        #region Await
+        public bool IsReady
+        {
+            get { return !String.IsNullOrEmpty(Name); }
         }
         #endregion
 

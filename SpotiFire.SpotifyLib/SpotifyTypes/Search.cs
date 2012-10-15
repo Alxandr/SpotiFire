@@ -100,9 +100,9 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true);  return ((ISpotifyAwaitable)search).IsComplete; }
             }
 
-            void ISpotifyAwaitable.OnCompleted(Action action)
+            bool ISpotifyAwaitable.AddContinuation(AwaitHelper.Continuation continuation, bool addBeforeOthers)
             {
-                IsAlive(true); ((ISpotifyAwaitable)search).OnCompleted(action);
+                IsAlive(true); return ((ISpotifyAwaitable)search).AddContinuation(continuation, addBeforeOthers);
             }
         }
 
@@ -396,23 +396,44 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Await
-        void ISpotifyAwaitable.OnCompleted(Action continuation)
+        SearchEventHandler _handler;
+        List<AwaitHelper.Continuation> _handlers;
+        private void EnsureHandler()
+        {
+            if (_handlers == null)
+            {
+                _handlers = new List<AwaitHelper.Continuation>();
+                _handler = (s, e) =>
+                {
+                    lock (this)
+                    {
+                        foreach (var h in _handlers)
+                            h.Run(this, true);
+                        _handlers = null;
+                        Complete -= _handler;
+                        _handler = null;
+                    }
+                };
+                Complete += _handler;
+            }
+        }
+
+        bool ISpotifyAwaitable.AddContinuation(AwaitHelper.Continuation continuation, bool addBeforeOthers)
         {
             lock (this)
             {
                 if (IsComplete)
                 {
-                    continuation();
+                    return false;
                 }
                 else
                 {
-                    SearchEventHandler handler = null;
-                    handler = (s, e) =>
-                    {
-                        continuation();
-                        Complete -= handler;
-                    };
-                    Complete += handler;
+                    EnsureHandler();
+                    if (addBeforeOthers)
+                        _handlers.Insert(0, continuation);
+                    else
+                        _handlers.Add(continuation);
+                    return true;
                 }
             }
         }

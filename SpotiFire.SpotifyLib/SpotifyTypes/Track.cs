@@ -62,6 +62,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return track.IsLoaded; }
             }
 
+            public bool IsReady
+            {
+                get { IsAlive(true); return track.IsReady; }
+            }
+
             public string Name
             {
                 get { IsAlive(true); return track.Name; }
@@ -184,8 +189,15 @@ namespace SpotiFire.SpotifyLib
             get
             {
                 IsAlive(true);
-                lock (libspotify.Mutex)
-                    return libspotify.sp_track_is_available(session.sessionPtr, trackPtr);
+                try
+                {
+                    lock (libspotify.Mutex)
+                        return libspotify.sp_track_is_available(session.sessionPtr, trackPtr);
+                }
+                catch (EntryPointNotFoundException e)
+                {
+                    return false;
+                }
             }
         }
 
@@ -320,6 +332,13 @@ namespace SpotiFire.SpotifyLib
                     libspotify.sp_track_release(trackPtr);
 
             trackPtr = IntPtr.Zero;
+        }
+        #endregion
+
+        #region Await
+        public bool IsReady
+        {
+            get { return !string.IsNullOrEmpty(Name); }
         }
         #endregion
 

@@ -43,6 +43,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return album.IsLoaded; }
             }
 
+            public bool IsReady
+            {
+                get { IsAlive(true); return album.IsReady; }
+            }
+
             public string Name
             {
                 get { IsAlive(true); return album.Name; }
@@ -245,6 +250,13 @@ namespace SpotiFire.SpotifyLib
                     libspotify.sp_album_release(albumPtr);
 
             albumPtr = IntPtr.Zero;
+        }
+        #endregion
+
+        #region Await
+        public bool IsReady
+        {
+            get { return !String.IsNullOrEmpty(Name); }
         }
         #endregion
 

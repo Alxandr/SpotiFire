@@ -136,6 +136,11 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return playlist.IsLoaded; }
             }
 
+            public bool IsReady
+            {
+                get { IsAlive(true); return playlist.IsReady; }
+            }
+
             public string Name
             {
                 get { IsAlive(true); return playlist.Name; }
@@ -747,6 +752,13 @@ namespace SpotiFire.SpotifyLib
 
             playlistPtr = IntPtr.Zero;
             callbacksPtr = IntPtr.Zero;
+        }
+        #endregion
+
+        #region Await
+        public bool IsReady
+        {
+            get { return !string.IsNullOrEmpty(Name); }
         }
         #endregion
 
