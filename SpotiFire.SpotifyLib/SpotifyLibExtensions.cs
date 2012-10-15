@@ -85,7 +85,7 @@ namespace SpotiFire.SpotifyLib
             return new AwaitableAwaiter<IPlaylistContainer>(pc);
         }
 
-        class AwaitableAwaiter<T> : ISpotifyAwaiter<T>
+        struct AwaitableAwaiter<T> : ISpotifyAwaiter<T>
             where T : ISpotifyObject
         {
             T result;
@@ -94,6 +94,7 @@ namespace SpotiFire.SpotifyLib
             public AwaitableAwaiter(T value)
             {
                 result = value;
+                awaitable = null;
             }
 
             ISpotifyAwaitable Awaitable
@@ -117,6 +118,11 @@ namespace SpotiFire.SpotifyLib
             }
 
             public void OnCompleted(Action continuation)
+            {
+                Awaitable.OnCompleted(continuation);
+            }
+
+            public void UnsafeOnCompleted(Action continuation)
             {
                 Awaitable.OnCompleted(continuation);
             }

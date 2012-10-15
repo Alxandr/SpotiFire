@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SpotiFire.SpotifyLib
 {
-    public interface ISpotifyAwaiter<T> : INotifyCompletion
+    public interface ISpotifyAwaiter<T> : ICriticalNotifyCompletion
         where T : ISpotifyObject
     {
         bool IsCompleted { get; }
