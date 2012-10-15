@@ -131,7 +131,7 @@ namespace SpotiFire.SpotifyLib
         // Load made a task
         private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
         private static bool running = false;
-        public static Task<IAsyncLoaded> Load(this IAsyncLoaded loadable)
+        private static Task<IAsyncLoaded> Load(this IAsyncLoaded loadable)
         {
             Action start = () =>
             {
