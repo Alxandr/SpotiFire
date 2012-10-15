@@ -104,7 +104,7 @@ namespace SpotiFire.SpotifyLib
 
             public virtual void Run(ISpotifyAwaitable awaitable, bool canInlineContinueTask)
             {
-                throw new NotImplementedException();
+                RunCallback(GetInvokeActionCallback(), _action);
             }
 
             [SecurityCritical]

@@ -417,16 +417,16 @@ namespace SpotiFire.SpotifyLib
         internal static extern sp_error sp_track_error(IntPtr trackPtr);
 
         /// <summary>
-        /// Return true if the track is available for playback.
+        /// Return availability for a track.
         /// </summary>
         /// <param name="sessionPtr">Session object returned from <c>sp_session_create</c>.</param>
         /// <param name="albumPtr">The track.</param>
         /// <remarks>The track must be loaded or this function will always return false.
         /// <seealso cref="libspotify.sp_track_is_loaded"/>
         /// </remarks>
-        /// <returns>True if track is available for playback, otherwise false.</returns>
+        /// <returns>Availability status, see <see cref="SpotiFire.SpotifyLib.TrackAvailability"/>.</returns>
         [DllImport("libspotify")]
-        internal static extern bool sp_track_is_available(IntPtr sessionPtr, IntPtr trackPtr);
+        internal static extern TrackAvailability sp_track_get_availability(IntPtr sessionPtr, IntPtr trackPtr);
 
         /// <summary>
         /// Return true if the track is a local file.
@@ -1548,6 +1548,35 @@ namespace SpotiFire.SpotifyLib
     }
 
     #region Enums
+    #region Tracks subsystem
+    /// <summary>
+    /// Track availability.
+    /// </summary>
+    public enum TrackAvailability
+    {
+        /// <summary>
+        /// Track is not available.
+        /// </summary>
+        Unavailable,
+
+        /// <summary>
+        /// Track is available and can be played.
+        /// </summary>
+        Available,
+
+        /// <summary>
+        /// Track can not be streamed using this account.
+        /// </summary>
+        NotStreamable,
+
+        /// <summary>
+        /// Track not available on artist's reqeust.
+        /// </summary>
+        BannedByArtist
+    }
+    #endregion
+
+
     /// <summary>
     /// Error codes returned by various functions
     /// </summary>

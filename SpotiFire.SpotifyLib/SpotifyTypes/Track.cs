@@ -52,9 +52,9 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return track.Index; }
             }
 
-            public bool IsAvailable
+            public TrackAvailability Availability
             {
-                get { IsAlive(true); return track.IsAvailable; }
+                get { IsAlive(true); return track.Availability; }
             }
 
             public bool IsLoaded
@@ -184,20 +184,13 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public bool IsAvailable
+        public TrackAvailability Availability
         {
             get
             {
                 IsAlive(true);
-                try
-                {
-                    lock (libspotify.Mutex)
-                        return libspotify.sp_track_is_available(session.sessionPtr, trackPtr);
-                }
-                catch (EntryPointNotFoundException e)
-                {
-                    return false;
-                }
+                lock (libspotify.Mutex)
+                    return libspotify.sp_track_get_availability(session.sessionPtr, trackPtr);
             }
         }
 

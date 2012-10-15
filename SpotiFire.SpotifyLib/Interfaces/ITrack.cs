@@ -9,7 +9,7 @@ namespace SpotiFire.SpotifyLib
         TimeSpan Duration { get; }
         sp_error Error { get; }
         int Index { get; }
-        bool IsAvailable { get; }
+        TrackAvailability Availability { get; }
         bool IsStarred { get; set; }
         string Name { get; }
         int Popularity { get; }

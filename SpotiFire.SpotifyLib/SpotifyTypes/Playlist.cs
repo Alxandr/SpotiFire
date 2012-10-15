@@ -758,7 +758,7 @@ namespace SpotiFire.SpotifyLib
         #region Await
         public bool IsReady
         {
-            get { return !string.IsNullOrEmpty(Name); }
+            get { return !string.IsNullOrEmpty(Name) || !string.IsNullOrEmpty(ImageId); }
         }
         #endregion
 

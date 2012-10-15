@@ -37,6 +37,7 @@
             this._Name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Artists = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column1 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,7 +70,8 @@
             this.Starred,
             this._Name,
             this.Artists,
-            this._Duration});
+            this._Duration,
+            this.Column1});
             this.dataGridView1.Location = new System.Drawing.Point(174, 11);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
@@ -131,6 +133,13 @@
             this._Duration.Name = "_Duration";
             this._Duration.ReadOnly = true;
             // 
+            // Column1
+            // 
+            this.Column1.DataPropertyName = "IsAvail";
+            this.Column1.HeaderText = "Avail";
+            this.Column1.Name = "Column1";
+            this.Column1.ReadOnly = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -155,11 +164,12 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ColumnHeader PL_Name;
+        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Starred;
         private System.Windows.Forms.DataGridViewTextBoxColumn _Name;
         private System.Windows.Forms.DataGridViewTextBoxColumn Artists;
         private System.Windows.Forms.DataGridViewTextBoxColumn _Duration;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Column1;
     }
 }
 

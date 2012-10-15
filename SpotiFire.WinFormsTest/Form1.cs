@@ -105,6 +105,7 @@ namespace SpotiFire.WinFormsTest
         {
             string _name;
             bool _isStarred;
+            bool _isAvail;
             string _artist;
             string _duration;
 
@@ -117,6 +118,7 @@ namespace SpotiFire.WinFormsTest
                 _isStarred = track.IsStarred;
                 _artist = String.Join(", ", track.Artists.Select(a => a.Name));
                 _duration = track.Duration.ToString();
+                _isAvail = track.Availability == TrackAvailability.Available;
             }
 
             public static async Task<CachedTrack> Make(ITrack track)
@@ -131,6 +133,7 @@ namespace SpotiFire.WinFormsTest
             public string Artists { get { return _artist; } }
             public string Duration { get { return _duration; } }
             public bool IsStarred { get { return _isStarred; } }
+            public bool IsAvail { get { return _isAvail; } }
         }
 
         private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
