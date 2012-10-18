@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using SPArtist = SpotiFire.Artist;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -106,7 +107,7 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
             this.artistPtr = artistPtr;
             lock (libspotify.Mutex)
-                libspotify.sp_artist_add_ref(artistPtr);
+                SPArtist.add_ref(artistPtr);
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
@@ -124,7 +125,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_artist_is_loaded(artistPtr);
+                    return SPArtist.is_loaded(artistPtr);
             }
         }
 
@@ -134,7 +135,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_artist_name(artistPtr));
+                    return SPArtist.name(artistPtr);
             }
         }
 
@@ -154,7 +155,7 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
             {
-                IntPtr artistBrowsePtr = libspotify.sp_artistbrowse_create(session.sessionPtr, artistPtr, type,
+                IntPtr artistBrowsePtr = SpotiFire.Artistbrowse.create(session.sessionPtr, artistPtr, (int)type,
                     Marshal.GetFunctionPointerForDelegate(SpotifyLib.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
                 return artistBrowsePtr != IntPtr.Zero ? SpotifyLib.ArtistBrowse.Get(session, artistBrowsePtr) : null;
             }
@@ -169,7 +170,7 @@ namespace SpotiFire.SpotifyLib
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_artist_release(artistPtr);
+                    SPArtist.release(artistPtr);
 
             artistPtr = IntPtr.Zero;
         }

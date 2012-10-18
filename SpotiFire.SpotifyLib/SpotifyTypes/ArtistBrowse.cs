@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using SPArtistbrowse = SpotiFire.Artistbrowse;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -167,48 +168,48 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_artistbrowse_num_portraits(artistBrowsePtr);
+                    return SPArtistbrowse.num_portraits(artistBrowsePtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.ImageIdToString(libspotify.sp_artistbrowse_portrait(artistBrowsePtr, index));
+                    return libspotify.ImageIdToString(SPArtistbrowse.portrait(artistBrowsePtr, index));
             });
 
             this.tracks = new DelegateArray<ITrack>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_artistbrowse_num_tracks(artistBrowsePtr);
+                    return SPArtistbrowse.num_tracks(artistBrowsePtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Track.Get(session, libspotify.sp_artistbrowse_track(artistBrowsePtr, index));
+                    return Track.Get(session, SPArtistbrowse.track(artistBrowsePtr, index));
             });
 
             this.albums = new DelegateArray<IAlbum>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_artistbrowse_num_albums(artistBrowsePtr);
+                    return SPArtistbrowse.num_albums(artistBrowsePtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Album.Get(session, libspotify.sp_artistbrowse_album(artistBrowsePtr, index));
+                    return Album.Get(session, SPArtistbrowse.album(artistBrowsePtr, index));
             });
 
             this.similarArtists = new DelegateArray<IArtist>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_artistbrowse_num_similar_artists(artistBrowsePtr);
+                    return SPArtistbrowse.num_similar_artists(artistBrowsePtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return SpotifyLib.Artist.Get(session, libspotify.sp_artistbrowse_similar_artist(artistBrowsePtr, index));
+                    return SpotifyLib.Artist.Get(session, SPArtistbrowse.similar_artist(artistBrowsePtr, index));
             });
 
             _Complete += new artistbrowse_complete_cb(ArtistBrowse__Complete);
@@ -241,7 +242,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_artistbrowse_error(artistBrowsePtr);
+                    return (Error)SPArtistbrowse.error(artistBrowsePtr);
             }
         }
 
@@ -253,7 +254,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        artist = SpotifyLib.Artist.Get(session, libspotify.sp_artistbrowse_artist(artistBrowsePtr));
+                        artist = SpotifyLib.Artist.Get(session, SPArtistbrowse.artist(artistBrowsePtr));
                 }
                 return artist;
             }
@@ -291,7 +292,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        biography = libspotify.sp_artistbrowse_biography(artistBrowsePtr);
+                        biography = SPArtistbrowse.biography(artistBrowsePtr);
                 }
                 return biography;
             }
@@ -352,7 +353,7 @@ namespace SpotiFire.SpotifyLib
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_artistbrowse_release(artistBrowsePtr);
+                    SPArtistbrowse.release(artistBrowsePtr);
 
             artistBrowsePtr = IntPtr.Zero;
         }

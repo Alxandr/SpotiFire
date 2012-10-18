@@ -33,21 +33,4 @@ namespace SpotiFire.SpotifyLib
         Bidirectional = 3,
     }
 
-    static partial class libspotify
-    {
-        [DllImport("libspotify")]
-        static internal extern string sp_user_canonical_name(IntPtr userPtr);
-
-        [DllImport("libspotify")]
-        static internal extern string sp_user_display_name(IntPtr userPtr);
-
-        [DllImport("libspotify")]
-        static internal extern bool sp_user_is_loaded(IntPtr userPtr);
-
-        [DllImport("libspotify")]
-        static internal extern Error sp_user_add_ref(IntPtr userPtr);
-
-        [DllImport("libspotify")]
-        static internal extern Error sp_user_release(IntPtr userPtr);
-    }
 }

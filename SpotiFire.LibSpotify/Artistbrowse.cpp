@@ -4,6 +4,12 @@
 #include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 IntPtr SpotiFire::Artistbrowse::create(IntPtr sessionPtr, IntPtr artistPtr, int type, IntPtr callbackPtr, IntPtr userDataPtr)
 {
 	sp_session* session = SP_TYPE(sp_session, sessionPtr);
@@ -109,7 +115,7 @@ String^ SpotiFire::Artistbrowse::biography(IntPtr arbPtr)
 {
 	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
 
-	return gcnew String(sp_artistbrowse_biography(arb));
+	return UTF8(sp_artistbrowse_biography(arb));
 }
 
 Int32 SpotiFire::Artistbrowse::backend_request_duration(IntPtr arbPtr)

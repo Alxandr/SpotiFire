@@ -17,7 +17,7 @@ namespace SpotiFire {
 		static Boolean is_loaded(IntPtr imagePtr);
 		static int error(IntPtr imagePtr);
 		static int format(IntPtr imagePtr);
-		static IntPtr data(IntPtr imagePtr, Int32& dataSize);
+		static IntPtr data(IntPtr imagePtr, [System::Runtime::InteropServices::Out]int %dataSize);
 		static IntPtr image_id(IntPtr imagePtr);
 		static int add_ref(IntPtr imagePtr);
 		static int release(IntPtr imagePtr);

@@ -8,6 +8,12 @@ using namespace System::Runtime::InteropServices;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 Int32 SpotiFire::Search::num_artists(IntPtr searchPtr)
 {
 	sp_search* search = SP_TYPE(sp_search, searchPtr);
@@ -26,14 +32,14 @@ String^ SpotiFire::Search::query(IntPtr searchPtr)
 {
 	sp_search* search = SP_TYPE(sp_search, searchPtr);
 
-	return gcnew String(sp_search_query(search));
+	return UTF8(sp_search_query(search));
 }
 
 String^ SpotiFire::Search::did_you_mean(IntPtr searchPtr)
 {
 	sp_search* search = SP_TYPE(sp_search, searchPtr);
 
-	return gcnew String(sp_search_did_you_mean(search));
+	return UTF8(sp_search_did_you_mean(search));
 }
 
 Int32 SpotiFire::Search::total_tracks(IntPtr searchPtr)
@@ -143,20 +149,20 @@ String^ SpotiFire::Search::playlist_name(IntPtr searchPtr, Int32 index)
 {
 	sp_search* search = SP_TYPE(sp_search, searchPtr);
 
-	return gcnew String(sp_search_playlist_name(search, index));
+	return UTF8(sp_search_playlist_name(search, index));
 }
 
 String^ SpotiFire::Search::playlist_uri(IntPtr searchPtr, Int32 index)
 {
 	sp_search* search = SP_TYPE(sp_search, searchPtr);
 
-	return gcnew String(sp_search_playlist_uri(search, index));
+	return UTF8(sp_search_playlist_uri(search, index));
 }
 
 String^ SpotiFire::Search::playlist_image_uri(IntPtr searchPtr, Int32 index)
 {
 	sp_search* search = SP_TYPE(sp_search, searchPtr);
 
-	return gcnew String(sp_search_playlist_image_uri(search, index));
+	return UTF8(sp_search_playlist_image_uri(search, index));
 }
 

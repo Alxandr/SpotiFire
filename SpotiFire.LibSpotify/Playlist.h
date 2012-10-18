@@ -36,9 +36,9 @@ namespace SpotiFire {
 		static String^ get_description(IntPtr plPtr);
 		static Boolean get_image(IntPtr plPtr, IntPtr imageIdPtr);
 		static Boolean has_pending_changes(IntPtr plPtr);
-		static int add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int32 numTracks, Int32 position, IntPtr sessionPtr);
-		static int remove_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 numTracks);
-		static int reorder_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 numTracks, Int32 newPosition);
+		static int add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int32 position, IntPtr sessionPtr);
+		static int remove_tracks(IntPtr plPtr, array<Int32>^ trackIndexs);
+		static int reorder_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 newPosition);
 		static UInt32 num_subscribers(IntPtr plPtr);
 		static IntPtr subscribers(IntPtr plPtr);
 		static Boolean is_loaded(IntPtr plPtr);

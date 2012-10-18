@@ -4,6 +4,12 @@
 #include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 IntPtr SpotiFire::Albumbrowse::album(IntPtr albPtr)
 {
 	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
@@ -29,7 +35,7 @@ String^ SpotiFire::Albumbrowse::copyright(IntPtr albPtr, Int32 index)
 {
 	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
 
-	return gcnew String(sp_albumbrowse_copyright(alb, index));
+	return UTF8(sp_albumbrowse_copyright(alb, index));
 }
 
 Int32 SpotiFire::Albumbrowse::num_tracks(IntPtr albPtr)
@@ -50,7 +56,7 @@ String^ SpotiFire::Albumbrowse::review(IntPtr albPtr)
 {
 	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
 
-	return gcnew String(sp_albumbrowse_review(alb));
+	return UTF8(sp_albumbrowse_review(alb));
 }
 
 Int32 SpotiFire::Albumbrowse::backend_request_duration(IntPtr albPtr)

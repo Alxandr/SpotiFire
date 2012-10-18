@@ -192,16 +192,4 @@ namespace SpotiFire.SpotifyLib
         /// </summary>
         SYSTEM_FAILURE = 41,
     }
-
-    static partial class libspotify
-    {
-        /// <summary>
-        /// Convert a numeric libspotify error code to a text string.
-        /// The error message is in English. This function is useful for logging purposes.
-        /// </summary>
-        /// <param name="error">The error code.</param>
-        /// <returns>The text-representation of the error.</returns>
-        [DllImport("libspotify")]
-        public static extern string Error_message(Error error);
-    }
 }

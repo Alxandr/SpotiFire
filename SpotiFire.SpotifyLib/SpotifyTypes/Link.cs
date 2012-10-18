@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using SPLink = SpotiFire.Session;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -105,7 +106,7 @@ namespace SpotiFire.SpotifyLib
         {
             LinkType type;
             lock (libspotify.Mutex)
-                type = libspotify.sp_link_type(linkPtr);
+                type = (LinkType)SPLink.link_type(linkPtr);
 
             switch (type)
             {
@@ -176,7 +177,7 @@ namespace SpotiFire.SpotifyLib
             this.linkPtr = linkPtr;
 
             lock (libspotify.Mutex)
-                libspotify.sp_link_add_ref(linkPtr);
+                SPLink.link_add_ref(linkPtr);
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
@@ -194,7 +195,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_link_type(linkPtr);
+                    return (LinkType)SPLink.link_type(linkPtr);
             }
         }
 
@@ -215,31 +216,8 @@ namespace SpotiFire.SpotifyLib
         {
             if (!IsAlive())
                 return "";
-            IntPtr bufferPtr = IntPtr.Zero;
-            try
-            {
-                int size = libspotify.STRINGBUFFER_SIZE,
-                    tSize;
-                bufferPtr = Marshal.AllocHGlobal(size);
-                lock (libspotify.Mutex)
-                    tSize = libspotify.sp_link_as_string(linkPtr, bufferPtr, size);
 
-                if (tSize >= size)
-                {
-                    size = tSize + 1;
-                    Marshal.FreeHGlobal(bufferPtr);
-                    bufferPtr = Marshal.AllocHGlobal(size);
-                    lock (libspotify.Mutex)
-                        libspotify.sp_link_as_string(linkPtr, bufferPtr, size);
-                }
-
-                return libspotify.GetString(bufferPtr, String.Empty);
-            }
-            finally
-            {
-                try { Marshal.FreeHGlobal(bufferPtr); }
-                catch { }
-            }
+            return SpotiFire.Session.link_as_string(linkPtr);
         }
         #endregion
 
@@ -250,7 +228,7 @@ namespace SpotiFire.SpotifyLib
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_link_release(linkPtr);
+                    SPLink.link_release(linkPtr);
 
             linkPtr = IntPtr.Zero;
         }
@@ -265,7 +243,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Artist.Get(session, libspotify.sp_link_as_artist(linkPtr));
+                        return Artist.Get(session, SPLink.link_as_artist(linkPtr));
                 }
             }
 
@@ -311,7 +289,7 @@ namespace SpotiFire.SpotifyLib
                     int offset;
                     IntPtr trackPtr;
                     lock (libspotify.Mutex)
-                        trackPtr = libspotify.sp_link_as_track_and_offset(linkPtr, out offset);
+                        trackPtr = SPLink.link_as_track_and_offset(linkPtr, out offset);
                     return new LinkAndOffset(session, trackPtr, offset);
                 }
             }
@@ -333,7 +311,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Album.Get(session, libspotify.sp_link_as_album(linkPtr));
+                        return Album.Get(session, SPLink.link_as_album(linkPtr));
                 }
             }
 
@@ -354,7 +332,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Playlist.Get(session, libspotify.sp_playlist_create(session.sessionPtr, linkPtr));
+                        return Playlist.Get(session, SpotiFire.Playlist.create(session.sessionPtr, linkPtr));
                 }
             }
 

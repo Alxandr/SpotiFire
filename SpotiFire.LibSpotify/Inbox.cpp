@@ -6,6 +6,12 @@
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 using namespace System::Runtime::InteropServices;
 
 IntPtr SpotiFire::Inbox::post_tracks(IntPtr sessionPtr, String^ user, array<IntPtr>^ trackPtrs, Int32 numTracks, String^ message, IntPtr callbackPtr, IntPtr userDataPtr)

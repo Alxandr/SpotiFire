@@ -8,6 +8,17 @@ using namespace System::Runtime::InteropServices;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
+Int32 SpotiFire::Session::__ApiVersion()
+{
+	return SPOTIFY_API_VERSION;
+}
+
 Int32 SpotiFire::Session::offline_num_playlists(IntPtr sessionPtr)
 {
 	sp_session* session = SP_TYPE(sp_session, sessionPtr);
@@ -204,7 +215,7 @@ int SpotiFire::Session::link_release(IntPtr linkPtr)
 	return (int)sp_link_release(link);
 }
 
-int SpotiFire::Session::create(IntPtr configPtr, IntPtr& sessionPtr)
+int SpotiFire::Session::create(IntPtr configPtr, [System::Runtime::InteropServices::Out]IntPtr %sessionPtr)
 {
 	sp_session_config* config = SP_TYPE(sp_session_config, configPtr);
 	sp_session* session;
@@ -249,7 +260,7 @@ String^ SpotiFire::Session::remembered_user(IntPtr sessionPtr)
 	char* buffer = new char[size];
 	sp_session_remembered_user(session, buffer, size);
 
-	String^ ret = gcnew String(buffer);
+	String^ ret = UTF8(buffer);
 	delete buffer;
 	return ret;
 }
@@ -258,7 +269,7 @@ String^ SpotiFire::Session::user_name(IntPtr sessionPtr)
 {
 	sp_session* session = SP_TYPE(sp_session, sessionPtr);
 
-	return gcnew String(sp_session_user_name(session));
+	return UTF8(sp_session_user_name(session));
 }
 
 int SpotiFire::Session::forget_me(IntPtr sessionPtr)
@@ -310,11 +321,12 @@ int SpotiFire::Session::set_cache_size(IntPtr sessionPtr, Int32 size)
 	return (int)sp_session_set_cache_size(session, size);
 }
 
-int SpotiFire::Session::process_events(IntPtr sessionPtr, Int32& nextTimeout)
+int SpotiFire::Session::process_events(IntPtr sessionPtr, [System::Runtime::InteropServices::Out]int %nextTimeout)
 {
 	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+	pin_ptr<int> nt = &nextTimeout;
 
-	return (int)sp_session_process_events(session, &nextTimeout);
+	return (int)sp_session_process_events(session, nt);
 }
 
 int SpotiFire::Session::player_load(IntPtr sessionPtr, IntPtr trackPtr)
@@ -418,7 +430,7 @@ String^ SpotiFire::Session::link_as_string(IntPtr linkPtr)
 	char* buffer = new char[length];
 	sp_link_as_string(link, buffer, length);
 
-	String^ ret = gcnew String(buffer);
+	String^ ret = UTF8(buffer);
 	delete buffer;
 	return ret;
 }
@@ -437,11 +449,12 @@ IntPtr SpotiFire::Session::link_as_track(IntPtr linkPtr)
 	return (IntPtr)(void *)sp_link_as_track(link);
 }
 
-IntPtr SpotiFire::Session::link_as_track_and_offset(IntPtr linkPtr, Int32& offset)
+IntPtr SpotiFire::Session::link_as_track_and_offset(IntPtr linkPtr, [System::Runtime::InteropServices::Out]Int32 %offset)
 {
 	sp_link* link = SP_TYPE(sp_link, linkPtr);
+	pin_ptr<int> pinned = &offset;
 
-	return (IntPtr)(void *)sp_link_as_track_and_offset(link, &offset);
+	return (IntPtr)(void *)sp_link_as_track_and_offset(link, pinned);
 }
 
 IntPtr SpotiFire::Session::link_as_album(IntPtr linkPtr)

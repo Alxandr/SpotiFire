@@ -4,6 +4,12 @@
 #include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 int SpotiFire::Album::type(IntPtr albumPtr)
 {
 	sp_album* album = SP_TYPE(sp_album, albumPtr);
@@ -57,7 +63,7 @@ String^ SpotiFire::Album::name(IntPtr albumPtr)
 {
 	sp_album* album = SP_TYPE(sp_album, albumPtr);
 
-	return gcnew String(sp_album_name(album));
+	return UTF8(sp_album_name(album));
 }
 
 Int32 SpotiFire::Album::year(IntPtr albumPtr)

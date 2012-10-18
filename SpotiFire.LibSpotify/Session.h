@@ -10,6 +10,8 @@ namespace SpotiFire {
 	public ref class Session
 	{
 	internal:
+		static Int32 __ApiVersion();
+
 		static Int32 offline_num_playlists(IntPtr sessionPtr);
 		static Boolean offline_sync_get_status(IntPtr sessionPtr, int& status);
 		static Int32 offline_time_left(IntPtr sessionPtr);
@@ -36,7 +38,7 @@ namespace SpotiFire {
 		static int set_connection_rules(IntPtr sessionPtr, int rules);
 		static Int32 offline_tracks_to_sync(IntPtr sessionPtr);
 		static int link_release(IntPtr linkPtr);
-		static int create(IntPtr configPtr, IntPtr& sessionPtr);
+		static int create(IntPtr configPtr, [System::Runtime::InteropServices::Out]IntPtr %sessionPtr);
 		static int release(IntPtr sessionPtr);
 		static int login(IntPtr sessionPtr, String^ username, String^ password, Boolean rememberMe, String^ blob);
 		static int relogin(IntPtr sessionPtr);
@@ -49,7 +51,7 @@ namespace SpotiFire {
 		static int connectionstate(IntPtr sessionPtr);
 		static IntPtr userdata(IntPtr sessionPtr);
 		static int set_cache_size(IntPtr sessionPtr, Int32 size);
-		static int process_events(IntPtr sessionPtr, Int32& nextTimeout);
+		static int process_events(IntPtr sessionPtr, [System::Runtime::InteropServices::Out]int %nextTimeout);
 		static int player_load(IntPtr sessionPtr, IntPtr trackPtr);
 		static int player_seek(IntPtr sessionPtr, Int32 offset);
 		static IntPtr link_create_from_string(String^ link);
@@ -66,7 +68,7 @@ namespace SpotiFire {
 		static String^ link_as_string(IntPtr linkPtr);
 		static int link_type(IntPtr linkPtr);
 		static IntPtr link_as_track(IntPtr linkPtr);
-		static IntPtr link_as_track_and_offset(IntPtr linkPtr, Int32& offset);
+		static IntPtr link_as_track_and_offset(IntPtr linkPtr, [System::Runtime::InteropServices::Out]Int32 %offset);
 		static IntPtr link_as_album(IntPtr linkPtr);
 		static IntPtr link_as_artist(IntPtr linkPtr);
 		static IntPtr link_as_user(IntPtr linkPtr);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
+using SPSearch = SpotiFire.Search;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -177,36 +178,36 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_num_tracks(searchPtr);
+                    return SPSearch.num_tracks(searchPtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Track.Get(session, libspotify.sp_search_track(searchPtr, index));
+                    return Track.Get(session, SPSearch.track(searchPtr, index));
             });
 
             this.albums = new DelegateArray<IAlbum>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_num_albums(searchPtr);
+                    return SPSearch.num_albums(searchPtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Album.Get(session, libspotify.sp_search_album(searchPtr, index));
+                    return Album.Get(session, SPSearch.album(searchPtr, index));
             });
 
             this.artists = new DelegateArray<IArtist>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_num_artists(searchPtr);
+                    return SPSearch.num_artists(searchPtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Artist.Get(session, libspotify.sp_search_artist(searchPtr, index));
+                    return Artist.Get(session, SPSearch.artist(searchPtr, index));
             });
 
             _Complete += new search_complete_cb(Search__Complete);
@@ -241,7 +242,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_error(searchPtr);
+                    return (Error)SPSearch.error(searchPtr);
             }
         }
 
@@ -278,7 +279,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_query(searchPtr);
+                    return SPSearch.query(searchPtr);
             }
         }
 
@@ -288,7 +289,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_did_you_mean(searchPtr);
+                    return SPSearch.did_you_mean(searchPtr);
             }
         }
 
@@ -298,7 +299,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_total_tracks(searchPtr);
+                    return SPSearch.total_tracks(searchPtr);
             }
         }
 
@@ -308,7 +309,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_total_albums(searchPtr);
+                    return SPSearch.total_albums(searchPtr);
             }
         }
 
@@ -318,7 +319,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_search_total_artists(searchPtr);
+                    return SPSearch.total_artists(searchPtr);
             }
         }
 
@@ -359,7 +360,7 @@ namespace SpotiFire.SpotifyLib
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_search_release(searchPtr);
+                    SPSearch.release(searchPtr);
 
             searchPtr = IntPtr.Zero;
         }

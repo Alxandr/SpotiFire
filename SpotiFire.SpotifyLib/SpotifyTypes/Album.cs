@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using SPAlbum = SpotiFire.Album;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -135,7 +136,7 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
             this.albumPtr = albumPtr;
             lock (libspotify.Mutex)
-                libspotify.sp_album_add_ref(albumPtr);
+                SPAlbum.add_ref(albumPtr);
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
@@ -153,7 +154,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_album_is_loaded(albumPtr);
+                    return SPAlbum.is_loaded(albumPtr);
             }
         }
 
@@ -163,7 +164,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_album_is_available(albumPtr);
+                    return SPAlbum.is_available(albumPtr);
             }
         }
 
@@ -173,7 +174,7 @@ namespace SpotiFire.SpotifyLib
             {
                 if (artist == null)
                     lock (libspotify.Mutex)
-                        artist = SpotifyLib.Artist.Get(session, libspotify.sp_album_artist(albumPtr));
+                        artist = SpotifyLib.Artist.Get(session, SPAlbum.artist(albumPtr));
 
                 return artist;
             }
@@ -185,7 +186,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.ImageIdToString(libspotify.sp_album_cover(albumPtr, ImageSize.Normal));
+                    return libspotify.ImageIdToString(SPAlbum.cover(albumPtr, (int)ImageSize.Normal));
             }
         }
 
@@ -195,7 +196,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_album_name(albumPtr);
+                    return SPAlbum.name(albumPtr);
             }
         }
 
@@ -205,7 +206,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_album_year(albumPtr);
+                    return SPAlbum.year(albumPtr);
             }
         }
 
@@ -215,7 +216,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_album_type(albumPtr);
+                    return (AlbumType)SPAlbum.type(albumPtr);
             }
         }
 
@@ -233,7 +234,7 @@ namespace SpotiFire.SpotifyLib
 
         public IAlbumBrowse Browse() {
             lock (libspotify.Mutex) {
-                IntPtr albumBrowsePtr = libspotify.sp_albumbrowse_create(session.sessionPtr, albumPtr,
+                IntPtr albumBrowsePtr = SpotiFire.Albumbrowse.create(session.sessionPtr, albumPtr,
                     System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(SpotifyLib.AlbumBrowse.albumbrowse_complete), IntPtr.Zero);
                 return albumBrowsePtr != IntPtr.Zero ? SpotifyLib.AlbumBrowse.Get(session, albumBrowsePtr) : null;
             }
@@ -247,7 +248,7 @@ namespace SpotiFire.SpotifyLib
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
             if(!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_album_release(albumPtr);
+                    SPAlbum.release(albumPtr);
 
             albumPtr = IntPtr.Zero;
         }

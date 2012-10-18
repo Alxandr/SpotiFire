@@ -8,6 +8,12 @@ using namespace System::Runtime::InteropServices;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 int SpotiFire::Playlistcontainer::add_callbacks(IntPtr pcPtr, IntPtr callbacksPtr, IntPtr userDataPtr)
 {
 	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
@@ -68,7 +74,7 @@ String^ SpotiFire::Playlistcontainer::playlist_folder_name(IntPtr pcPtr, Int32 i
 		sp_playlistcontainer_playlist_folder_name(pc, index, buffer, length);
 	}
 
-	String^ ret = gcnew String(buffer);
+	String^ ret = UTF8(buffer);
 	delete buffer;
 	return ret;
 }

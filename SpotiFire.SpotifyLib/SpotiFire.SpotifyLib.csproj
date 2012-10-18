@@ -76,7 +76,6 @@
     <Compile Include="LibSpotify\libspotify.tracks.cs" />
     <Compile Include="LibSpotify\libspotify.links.cs" />
     <Compile Include="LibSpotify\libspotify.error.cs" />
-    <Compile Include="LibSpotify\libspotify.helpers.cs" />
     <Compile Include="LibSpotify\libspotify.session.cs" />
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />

@@ -4,11 +4,17 @@
 #include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 String^ SpotiFire::Artist::name(IntPtr artistPtr)
 {
 	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
 
-	return gcnew String(sp_artist_name(artist));
+	return UTF8(sp_artist_name(artist));
 }
 
 Boolean SpotiFire::Artist::is_loaded(IntPtr artistPtr)

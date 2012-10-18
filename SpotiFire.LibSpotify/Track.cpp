@@ -8,6 +8,12 @@ using namespace System::Runtime::InteropServices;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 int SpotiFire::Track::add_ref(IntPtr trackPtr)
 {
 	sp_track* track = SP_TYPE(sp_track, trackPtr);
@@ -125,7 +131,7 @@ String^ SpotiFire::Track::name(IntPtr trackPtr)
 {
 	sp_track* track = SP_TYPE(sp_track, trackPtr);
 
-	return gcnew String(sp_track_name(track));
+	return UTF8(sp_track_name(track));
 }
 
 Int32 SpotiFire::Track::duration(IntPtr trackPtr)

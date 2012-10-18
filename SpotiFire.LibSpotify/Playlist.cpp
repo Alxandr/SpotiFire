@@ -2,11 +2,20 @@
 
 #include "Playlist.h"
 #include "include\libspotify\api.h"
+#include <string.h>
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
 using namespace System::Runtime::InteropServices;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
+
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	if(!text)
+		return nullptr;
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
 
 int SpotiFire::Playlist::subscribers_free(IntPtr subsPtr)
 {
@@ -131,14 +140,14 @@ String^ SpotiFire::Playlist::track_message(IntPtr plPtr, Int32 index)
 {
 	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
 
-	return gcnew String(sp_playlist_track_message(pl, index));
+	return UTF8(sp_playlist_track_message(pl, index));
 }
 
 String^ SpotiFire::Playlist::name(IntPtr plPtr)
 {
 	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return gcnew String(sp_playlist_name(pl));
+	
+	return UTF8(sp_playlist_name(pl));
 }
 
 int SpotiFire::Playlist::rename(IntPtr plPtr, String^ newName)
@@ -183,7 +192,7 @@ String^ SpotiFire::Playlist::get_description(IntPtr plPtr)
 {
 	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
 
-	return gcnew String(sp_playlist_get_description(pl));
+	return UTF8(sp_playlist_get_description(pl));
 }
 
 Boolean SpotiFire::Playlist::get_image(IntPtr plPtr, IntPtr imageIdPtr)
@@ -201,7 +210,7 @@ Boolean SpotiFire::Playlist::has_pending_changes(IntPtr plPtr)
 	return (Boolean)sp_playlist_has_pending_changes(pl);
 }
 
-int SpotiFire::Playlist::add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int32 numTracks, Int32 position, IntPtr sessionPtr)
+int SpotiFire::Playlist::add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int32 position, IntPtr sessionPtr)
 {
 	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
 	sp_track** tracks = new sp_track*[trackPtrs->Length];
@@ -209,27 +218,27 @@ int SpotiFire::Playlist::add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int3
 		tracks[i] = SP_TYPE(sp_track, trackPtrs[i]);
 	sp_session* session = SP_TYPE(sp_session, sessionPtr);
 
-	return (int)sp_playlist_add_tracks(pl, tracks, numTracks, position, session);
+	return (int)sp_playlist_add_tracks(pl, tracks, trackPtrs->Length, position, session);
 }
 
-int SpotiFire::Playlist::remove_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 numTracks)
+int SpotiFire::Playlist::remove_tracks(IntPtr plPtr, array<Int32>^ trackIndexs)
 {
 	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
 	int* trackIndexes = new int[trackIndexs->Length];
 	for(int i = 0, l = trackIndexs->Length; i < l; i++)
 		trackIndexes[i] = trackIndexs[i];
 
-	return (int)sp_playlist_remove_tracks(pl, trackIndexes, numTracks);
+	return (int)sp_playlist_remove_tracks(pl, trackIndexes, trackIndexs->Length);
 }
 
-int SpotiFire::Playlist::reorder_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 numTracks, Int32 newPosition)
+int SpotiFire::Playlist::reorder_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 newPosition)
 {
 	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
 	int* trackIndexes = new int[trackIndexs->Length];
 	for(int i = 0, l = trackIndexs->Length; i < l; i++)
 		trackIndexes[i] = trackIndexs[i];
 
-	return (int)sp_playlist_reorder_tracks(pl, trackIndexes, numTracks, newPosition);
+	return (int)sp_playlist_reorder_tracks(pl, trackIndexes, trackIndexs->Length, newPosition);
 }
 
 UInt32 SpotiFire::Playlist::num_subscribers(IntPtr plPtr)

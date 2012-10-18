@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using SPAlbumbrowse = SpotiFire.Albumbrowse;
 
 namespace SpotiFire.SpotifyLib {
 
@@ -144,21 +145,21 @@ namespace SpotiFire.SpotifyLib {
             this.copyrights = new DelegateArray<string>(() => {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_albumbrowse_num_copyrights(albumBrowsePtr);
+                    return SPAlbumbrowse.num_copyrights(albumBrowsePtr);
             }, (index) => {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_albumbrowse_copyright(albumBrowsePtr, index);
+                    return SPAlbumbrowse.copyright(albumBrowsePtr, index);
             });
 
             this.tracks = new DelegateArray<ITrack>(() => {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_albumbrowse_num_tracks(albumBrowsePtr);
+                    return SPAlbumbrowse.num_tracks(albumBrowsePtr);
             }, (index) => {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Track.Get(session, libspotify.sp_albumbrowse_track(albumBrowsePtr, index));
+                    return Track.Get(session, SPAlbumbrowse.track(albumBrowsePtr, index));
             });
 
             _Complete += new albumbrowse_complete_cb(AlbumBrowse__Complete);
@@ -186,7 +187,7 @@ namespace SpotiFire.SpotifyLib {
             get {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_albumbrowse_error(albumBrowsePtr);
+                    return (Error)SPAlbumbrowse.error(albumBrowsePtr);
             }
         }
 
@@ -195,7 +196,7 @@ namespace SpotiFire.SpotifyLib {
                 if (album == null) {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        album = SpotifyLib.Album.Get(session, libspotify.sp_albumbrowse_album(albumBrowsePtr));
+                        album = SpotifyLib.Album.Get(session, SPAlbumbrowse.album(albumBrowsePtr));
                 }
                 return album;
             }
@@ -206,7 +207,7 @@ namespace SpotiFire.SpotifyLib {
                 if (album == null) {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        artist = SpotifyLib.Artist.Get(session, libspotify.sp_albumbrowse_artist(albumBrowsePtr));
+                        artist = SpotifyLib.Artist.Get(session, SPAlbumbrowse.artist(albumBrowsePtr));
                 }
                 return artist;
             }
@@ -229,7 +230,7 @@ namespace SpotiFire.SpotifyLib {
                 if (review == null) {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        review = libspotify.sp_albumbrowse_review(albumBrowsePtr);
+                        review = SPAlbumbrowse.review(albumBrowsePtr);
                 }
                 return review;
             }
@@ -279,7 +280,7 @@ namespace SpotiFire.SpotifyLib {
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_albumbrowse_release(albumBrowsePtr);
+                    SPAlbumbrowse.release(albumBrowsePtr);
 
             albumBrowsePtr = IntPtr.Zero;
         }

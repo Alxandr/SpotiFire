@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using SPPlaylistcontainer = SpotiFire.Playlistcontainer;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -143,7 +144,7 @@ namespace SpotiFire.SpotifyLib
         private Session session;
 
         private PlaylistContainerCallbacks callbacks;
-        //private IntPtr callbacksPtr;
+        private IntPtr callbacksPtr;
         private playlist_added_delegate playlist_added;
         private playlist_removed_delegate playlist_removed;
         private playlist_moved_delegate playlist_moved;
@@ -178,10 +179,12 @@ namespace SpotiFire.SpotifyLib
             };
 
             int size = Marshal.SizeOf(this.callbacks);
+            this.callbacksPtr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(callbacks, callbacksPtr, true);
 
             lock (libspotify.Mutex)
             {
-                libspotify.sp_playlistcontainer_add_callbacks(pcPtr, ref callbacks, IntPtr.Zero);
+                SPPlaylistcontainer.add_callbacks(pcPtr, callbacksPtr, IntPtr.Zero);
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
@@ -191,14 +194,14 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return libspotify.sp_playlistcontainer_num_playlists(pcPtr);
+                        return SPPlaylistcontainer.num_playlists(pcPtr);
                 },
                 (index) =>
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return ContainerPlaylist.Get(session, this, libspotify.sp_playlistcontainer_playlist(pcPtr, index),
-                            libspotify.sp_playlistcontainer_playlist_folder_id(pcPtr, index), libspotify.sp_playlistcontainer_playlist_type(pcPtr, index));
+                        return ContainerPlaylist.Get(session, this, SPPlaylistcontainer.playlist(pcPtr, index),
+                            SPPlaylistcontainer.playlist_folder_id(pcPtr, index), (PlaylistType)SPPlaylistcontainer.playlist_type(pcPtr, index));
                 },
                 (playlist, index) =>
                 {
@@ -207,18 +210,18 @@ namespace SpotiFire.SpotifyLib
                     int newIndex = 0;
                     lock (libspotify.Mutex)
                     {
-                        playlistPtr = libspotify.sp_playlistcontainer_add_new_playlist(pcPtr, playlist.Name);
-                        newIndex = libspotify.sp_playlistcontainer_num_playlists(pcPtr);
+                        playlistPtr = SPPlaylistcontainer.add_new_playlist(pcPtr, playlist.Name);
+                        newIndex = SPPlaylistcontainer.num_playlists(pcPtr);
                     }
                     if (playlistPtr != IntPtr.Zero)
                         lock (libspotify.Mutex)
-                            libspotify.sp_playlistcontainer_move_playlist(pcPtr, newIndex, index, false);
+                            SPPlaylistcontainer.move_playlist(pcPtr, newIndex, index, false);
                 },
                 (index) =>
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        libspotify.sp_playlistcontainer_remove_playlist(pcPtr, index);
+                        SPPlaylistcontainer.remove_playlist(pcPtr, index);
                 },
                 () => false,
                 (name) =>
@@ -228,8 +231,8 @@ namespace SpotiFire.SpotifyLib
                     int index;
                     lock (libspotify.Mutex)
                     {
-                        playlistPtr = libspotify.sp_playlistcontainer_add_new_playlist(pcPtr, name);
-                        index = playlistPtr == IntPtr.Zero ? -1 : libspotify.sp_playlistcontainer_num_playlists(pcPtr) - 1;
+                        playlistPtr = SPPlaylistcontainer.add_new_playlist(pcPtr, name);
+                        index = playlistPtr == IntPtr.Zero ? -1 : SPPlaylistcontainer.num_playlists(pcPtr) - 1;
                     }
                     return index == -1 ? null : playlists[index];
                 }
@@ -328,28 +331,7 @@ namespace SpotiFire.SpotifyLib
         internal string GetFolderName(ContainerPlaylist playlist)
         {
             int index = playlists.IndexOf(playlist);
-            int bufferSize = libspotify.STRINGBUFFER_SIZE;
-            IntPtr bufferPtr = IntPtr.Zero;
-            try
-            {
-                bufferPtr = Marshal.AllocHGlobal(bufferSize);
-                Error error;
-                lock (libspotify.Mutex)
-                    error = libspotify.sp_playlistcontainer_playlist_folder_name(pcPtr, index, bufferPtr, bufferSize);
-
-                if (error == Error.OK)
-                {
-                    return libspotify.GetString(bufferPtr, String.Empty);
-                }
-                else
-                    return String.Empty;
-            }
-            finally
-            {
-                if (bufferPtr != IntPtr.Zero)
-                    try { Marshal.FreeHGlobal(bufferPtr); }
-                    catch { }
-            }
+            return SPPlaylistcontainer.playlist_folder_name(pcPtr, index);
         }
         #endregion
 
@@ -369,7 +351,7 @@ namespace SpotiFire.SpotifyLib
             {
                 lock (libspotify.Mutex)
                 {
-                    libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, ref callbacks, IntPtr.Zero);
+                    SPPlaylistcontainer.remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero);
                 }
             }
             pcPtr = IntPtr.Zero;

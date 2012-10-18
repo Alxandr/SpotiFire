@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using SPTrack = SpotiFire.Track;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -150,18 +151,18 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
             this.trackPtr = trackPtr;
             lock (libspotify.Mutex)
-                libspotify.sp_track_add_ref(trackPtr);
+                SPTrack.add_ref(trackPtr);
 
             this.artists = new DelegateArray<IArtist>(() =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_num_artists(trackPtr);
+                    return SPTrack.num_artists(trackPtr);
             }, (index) =>
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return Artist.Get(session, libspotify.sp_track_artist(trackPtr, index));
+                    return Artist.Get(session, SPTrack.artist(trackPtr, index));
             });
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
@@ -180,7 +181,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_is_loaded(trackPtr);
+                    return SPTrack.is_loaded(trackPtr);
             }
         }
 
@@ -190,7 +191,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_get_availability(session.sessionPtr, trackPtr);
+                    return (TrackAvailability)SPTrack.get_availability(session.sessionPtr, trackPtr);
             }
         }
 
@@ -200,7 +201,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_error(trackPtr);
+                    return (Error)SPTrack.error(trackPtr);
             }
         }
 
@@ -211,7 +212,7 @@ namespace SpotiFire.SpotifyLib
                 IsAlive(true);
                 if (album == null)
                     lock (libspotify.Mutex)
-                        album = SpotifyLib.Album.Get(session, libspotify.sp_track_album(trackPtr));
+                        album = SpotifyLib.Album.Get(session, SPTrack.album(trackPtr));
 
                 return album;
             }
@@ -232,7 +233,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_track_name(trackPtr));
+                    return SPTrack.name(trackPtr);
             }
         }
 
@@ -242,7 +243,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return TimeSpan.FromMilliseconds(libspotify.sp_track_duration(trackPtr));
+                    return TimeSpan.FromMilliseconds(SPTrack.duration(trackPtr));
             }
         }
 
@@ -252,7 +253,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_popularity(trackPtr);
+                    return SPTrack.popularity(trackPtr);
             }
         }
 
@@ -272,19 +273,8 @@ namespace SpotiFire.SpotifyLib
             set
             {
                 IsAlive(true);
-                IntPtr arrayPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
-                IntPtr[] ptrArray = new IntPtr[] { trackPtr };
-                try
-                {
-                    Marshal.Copy(ptrArray, 0, arrayPtr, 1);
-                    lock (libspotify.Mutex)
-                        libspotify.sp_track_set_starred(session.sessionPtr, arrayPtr, 1, value);
-                }
-                finally
-                {
-                    try { Marshal.FreeHGlobal(arrayPtr); }
-                    catch { }
-                }
+                lock (libspotify.Mutex)
+                    SPTrack.set_starred(session.sessionPtr, new[] { trackPtr }, value);
             }
         }
 
@@ -294,7 +284,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_disc(trackPtr);
+                    return SPTrack.disc(trackPtr);
             }
         }
 
@@ -304,7 +294,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_track_index(trackPtr);
+                    return SPTrack.index(trackPtr);
             }
         }
 
@@ -325,7 +315,7 @@ namespace SpotiFire.SpotifyLib
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    libspotify.sp_track_release(trackPtr);
+                    SPTrack.release(trackPtr);
 
             trackPtr = IntPtr.Zero;
         }

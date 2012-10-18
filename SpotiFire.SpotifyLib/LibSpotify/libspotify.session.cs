@@ -115,23 +115,23 @@ namespace SpotiFire.SpotifyLib
             get { return _count; }
         }
 
-        /// <summary>
-        /// Array of canonical usernames.
-        /// </summary>
-        public string[] Subscribers
-        {
-            get
-            {
-                string[] ret = new string[_count];
-                IntPtr current = _subscribers;
-                for (var i = 0; i < _count; i++)
-                {
-                    ret[i] = libspotify.GetString(current);
-                    current = IntPtr.Add(current, IntPtr.Size);
-                }
-                return ret;
-            }
-        }
+        ///// <summary>
+        ///// Array of canonical usernames.
+        ///// </summary>
+        //public string[] Subscribers
+        //{
+        //    get
+        //    {
+        //        string[] ret = new string[_count];
+        //        IntPtr current = _subscribers;
+        //        for (var i = 0; i < _count; i++)
+        //        {
+        //            ret[i] = libspotify.GetString(current);
+        //            current = IntPtr.Add(current, IntPtr.Size);
+        //        }
+        //        return ret;
+        //    }
+        //}
     }
 
     /// <summary>
@@ -575,397 +575,50 @@ namespace SpotiFire.SpotifyLib
     }
     #endregion
 
-    static partial class libspotify
+    static class libspotify
     {
-        #region Defines
-        internal const int SPOTIFY_API_VERSION = 12;
-        internal static readonly object Mutex = new object();
-        #endregion
+        static internal readonly object Mutex = new object();
 
-        /// <summary>
-        /// Initialize a session. The session returned will be initialized,
-        /// but you will need to log in before you can perform any other operation.
-        /// Currently it is not supported to have multiple active sessions,
-        /// and it's recommended to only call this once per process.
-        /// </summary>
-        /// <param name="configPtr">The configuration to use for the session.</param>
-        /// <param name="sessionPtrPtr">If successful, a new session - otherwise IntPtr.Null.</param>
-        /// <returns>One of the following errors, from Error Error_OK Error_BAD_API_VERSION
-        /// Error_BAD_USER_AGENT Error_BAD_APPLICATION_KEY Error_API_INITIALIZATION_FAILED Error_INVALID_DEVICE_ID</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_create(ref SessionConfig configPtr, out IntPtr sessionPtr);
+        internal static string ImageIdToString(IntPtr idPtr)
+        {
+            if (idPtr == IntPtr.Zero)
+                return string.Empty;
 
-        /// <summary>
-        /// Release the session. This will clean up all data and connections associated with the session.
-        /// </summary>
-        /// <param name="sessionPtr">Session object returned from sp_session_create()</param>
-        /// <returns>One of the following errors, from Error Error_OK</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_release(IntPtr sessionPtr);
+            byte[] id = new byte[20];
+            Marshal.Copy(idPtr, id, 0, 20);
 
-        /// <summary>
-        /// Logs in the specified username/password combo. This initiates the login in the background. A callback is called when login is complete.
-        /// An application MUST NEVER store the user's password in clear text. If automatic relogin is required, use sp_session_relogin().
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="username">The username to log in.</param>
-        /// <param name="password">The password for the specified username.</param>
-        /// <param name="rememberMe">If set, the username / password will be remembered by libspotify.</param>
-        /// <param name="blob">If you have received a blob in the credentials_blob_updated you can pas this here instead of password.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_login(IntPtr sessionPtr, string username, string password, bool rememberMe, string blob);
+            return ImageIdToString(id);
+        }
 
-        /// <summary>
-        /// Log in the remembered user if last user that logged in logged in with remember_me set. If no credentials are stored, this will return Error_NO_CREDENTIALS.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>One of the following errors, from Error Error_OK Error_NO_CREDENTIALS.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_relogin(IntPtr sessionPtr);
+        private static string ImageIdToString(byte[] id)
+        {
+            if (id == null)
+                return string.Empty;
 
-        /// <summary>
-        /// Get username of the user that will be logged in via sp_session_relogin().
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="charBufferPtr">The buffer to hold the username.</param>
-        /// <param name="bufferSize">The max size of the buffer that will hold the username. The resulting string is guaranteed to always be null terminated if buffer_size > 0.</param>
-        /// <returns>The number of characters in the username. If value is greater or equal than buffer_size, output was truncated.
-        /// If returned value is -1 no credentials are stored in libspotify.</returns>
-        [DllImport("libspotify")]
-        static internal extern int sp_session_remembered_user(IntPtr sessionPtr, IntPtr charBufferPtr, int bufferSize);
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            foreach (byte b in id)
+                sb.Append(b.ToString("x2"));
 
-        /// <summary>
-        /// Get a pointer to a string representing the user's login username.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>A string representing the login username.</returns>
-        [DllImport("libspotify")]
-        static internal extern string sp_session_user_name(IntPtr sessionPtr);
+            return sb.ToString();
+        }
 
-        /// <summary>
-        /// Remove stored credentials in libspotify. If no credentials are currently stored, nothing will happen.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_forget_me(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Fetches the currently logged in user.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>The logged in user (or NULL if not logged in).</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_user(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Logs out the currently logged in user.
-        /// 
-        /// Always call this before terminating the application and libspotify is currently logged in. Otherwise, the settings and cache may be lost.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_logout(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Flush the caches.
-        /// 
-        /// This will make libspotify write all data that is meant to be stored on disk to the disk immediately.
-        /// libspotify does this periodically by itself and also on logout. So under normal conditions this should never need to be used.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_flush_caches(IntPtr sessionPtr);
-
-        /// <summary>
-        /// The connection state of the specified session.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>The connection state - see the <see cref="SpotiFire.SpotifyLib.ConnectionState"/> enum for possible values</returns>
-        [DllImport("libspotify")]
-        static internal extern ConnectionState sp_session_connectionstate(IntPtr sessionPtr);
-
-        /// <summary>
-        /// The userdata associated with the session.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>The userdata that was passed in on session creation.</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_userdata(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Set maximum cache size.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="size">Maximum cache size in megabytes. Setting it to 0 (the default) will let libspotify automatically resize the cache (10% of disk free space).</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_cache_size(IntPtr sessionPtr, int size);
-
-        /// <summary>
-        /// Make the specified session process any pending events.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="nextTimeout">Stores the time (in milliseconds) until you should call this function again.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_process_events(IntPtr sessionPtr, out int nextTimeout);
-
-        /// <summary>
-        /// Loads the specified track.
-        /// 
-        /// After successfully loading the track, you have the option of running sp_session_player_play() directly,
-        /// or using sp_session_player_seek() first.
-        /// When this call returns, the track will have been loaded, unless an error occurred.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="trackPtr">The track to be loaded.</param>
-        /// <returns>One of the following errors, from Error Error_OK Error_MISSING_CALLBACK Error_TRACK_NOT_PLAYABLE.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_player_load(IntPtr sessionPtr, IntPtr trackPtr);
-
-        /// <summary>
-        /// Seek to position in the currently loaded track.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="offset">Track position, in milliseconds.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_player_seek(IntPtr sessionPtr, int offset);
-
-        /// <summary>
-        /// Play or pause the currently loaded track.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="play">If set to true, playback will occur. If set to false, the playback will be paused.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_player_play(IntPtr sessionPtr, bool play);
-
-        /// <summary>
-        /// Stops the currently playing track.
-        /// 
-        /// This frees some resources held by libspotify to identify the currently playing track.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_player_unload(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Prefetch a track.
-        /// 
-        /// Instruct libspotify to start loading of a track into its cache. This could be done by an application just before the current track ends.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="trackPtr">The track to be prefetched.</param>
-        /// <returns>One of the following errors, from Error Error_NO_CACHE Error_OK.</returns>
-        /// <remarks>Prefetching is only possible if a cache is configured.</remarks>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_player_prefetch(IntPtr sessionPtr, IntPtr trackPtr);
-
-        /// <summary>
-        /// Returns the playlist container for the currently logged in user.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <returns>Playlist container object, NULL if not logged in.</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_playlistcontainer(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Returns an inbox playlist for the currently logged in user.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>A playlist or NULL if no user is logged in.</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_inbox_create(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Returns the starred list for the current user.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>A playlist or NULL if no user is logged in.</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_starred_create(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Returns the starred list for a user.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="canonicalUsername">Canonical username.</param>
-        /// <returns>A playlist or NULL if no user is logged in.</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_starred_for_user_create(IntPtr sessionPtr, string canonicalUsername);
-
-        /// <summary>
-        /// Return the published container for a given <paramref name="canonicalUsername"/>, or the currently logged in user if canonical_username is null.
-        /// </summary>
-        /// <param name="sessionPtr">Your session object.</param>
-        /// <param name="canonicalUsername">The canonical username, or null.</param>
-        /// <returns>Playlist container object, NULL if not logged in.</returns>
-        [DllImport("libspotify")]
-        static internal extern IntPtr sp_session_publishedcontainer_for_user_create(IntPtr sessionPtr, string canonicalUsername);
-
-        /// <summary>
-        /// Set preferred bitrate for music streaming.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="bitrate">Preferred bitrate, see sp_bitrate for possible values.</param>
-        /// <returns>One of the following errors, from Error Error_OK Error_INVALID_ARGUMENT.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_preferred_bitrate(IntPtr sessionPtr, BitRate bitrate);
-
-        /// <summary>
-        /// Set preferred bitrate for offline sync.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="bitrate">Preferred bitrate, see sp_bitrate for possible values.</param>
-        /// <param name="allowResync">Set to true if libspotify should resynchronize already synchronized tracks. Usually you should set this to false.</param>
-        /// <returns>One of the following errors, from Error Error_OK Error_INVALID_ARGUMENT.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_preferred_offline_bitrate(IntPtr sessionPtr, BitRate bitrate, bool allowResync);
-
-        /// <summary>
-        /// Return status of volume normalization.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>true iff volume normalization is enabled.</returns>
-        [DllImport("libspotify")]
-        static internal extern bool sp_session_get_volume_normalization(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Set volume normalization.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="on">True iff volume normalization should be enabled.</param>
-        /// <returns>One of the following errors, from Error Error_OK.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_volume_normalization(IntPtr sessionPtr, bool on);
-
-        /// <summary>
-        /// Set if private session is enabled. This disables sharing what the user is
-        /// listening to to services such as Spotify Social, Facebook and LastFM.
-        /// The private session will last for a time, and then libspotify will
-        /// revert to the normal state. The private session is prolonged by user activity.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="enabled">True iff private session should be enabled.</param>
-        /// <returns>One of the following errors, from Error Error_OK</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_private_session(IntPtr sessionPtr, bool enabled);
-
-        /// <summary>
-        /// Return True if private session is enabled.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>True if private session is enabled.</returns>
-        [DllImport("libspotify")]
-        static internal extern bool sp_session_is_private_session(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Set if scrobbling is enabled. This api allows setting local overrides of the global scrobbling settings.
-        /// Changing the global settings are currently not supported.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="provider">The scrobbling provider referred to.</param>
-        /// <param name="state">The state to set the provider to.</param>
-        /// <returns>Error code.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_scrobbling(IntPtr sessionPtr, SocialProvider provider, ScrobblingState state);
-
-        /// <summary>
-        /// Return the scrobbling state. This makes it possible to find out if scrobbling is locally overrided or if the global setting is used.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="provider">The scrobbling provider referred to.</param>
-        /// <param name="state">The output variable receiving the sp_scrobbling_state state.</param>
-        /// <returns>Error code.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_is_scrobbling(IntPtr sessionPtr, SocialProvider provider, out ScrobblingState state);
-
-        /// <summary>
-        /// Return True if scrobbling settings should be shown to the user. Currently this setting is relevant only to the facebook provider.
-        /// The returned value may be false if the user is not connected to facebook, or if the user has opted out from facebook social graph.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="provider">The scrobbling provider referred to.</param>
-        /// <param name="isPossible">True iff scrobbling is possible.</param>
-        /// <returns>Error code.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_is_scrobbling_possible(IntPtr sessionPtr, SocialProvider provider, out bool isPossible);
-
-        /// <summary>
-        /// Set the user's credentials with a social provider. Currently this is only relevant for LastFm.
-        /// Call sp_session_set_scrobbling to force an authentication attempt with the LastFm server. If authentication fails a scrobble_error callback will be sent.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="provider">The scrobbling provider referred to.</param>
-        /// <param name="username">The user name.</param>
-        /// <param name="password">The password.</param>
-        /// <returns>Error code.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_social_credentials(IntPtr sessionPtr, SocialProvider provider, string username, string password);
-
-        /// <summary>
-        /// Set to true if the connection is currently routed over a roamed connectivity.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="type">Connection type.</param>
-        /// <returns>Used in conjunction with sp_session_set_connection_rules() to control how libspotify should behave in respect to network activity and offline synchronization.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_connection_type(IntPtr sessionPtr, ConnectionType type);
-
-        /// <summary>
-        /// Set rules for how libspotify connects to Spotify servers and synchronizes offline content.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="rules">Connection rules.</param>
-        /// <returns>Used in conjunction with sp_session_set_connection_type() to control how libspotify should behave in respect to network activity and offline synchronization.</returns>
-        [DllImport("libspotify")]
-        static internal extern Error sp_session_set_connection_rules(IntPtr sessionPtr, ConnectionRules rules);
-
-        /// <summary>
-        /// Get total number of tracks that needs download before everything from all playlists that is marked for offline is fully synchronized.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>Number of tracks.</returns>
-        [DllImport("libspotify")]
-        static internal extern int sp_offline_tracks_to_sync(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Return number of playlisys that is marked for offline synchronization.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>Number of playlists.</returns>
-        [DllImport("libspotify")]
-        static internal extern int sp_offline_num_playlists(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Return offline synchronization status. When the internal status is updated the offline_status_updated() callback will be invoked.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <param name="status">Status object that will be filled with info.</param>
-        /// <returns>False if no synching is in progress (in which case the contents of status is undefined).</returns>
-        [DllImport("libspotify")]
-        static internal extern bool sp_offline_sync_get_status(IntPtr sessionPtr, out OfflineSyncStatus status);
-
-        /// <summary>
-        /// Return remaining time (in seconds) until the offline key store expires and the user is required to relogin.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>Seconds until expiration.</returns>
-        [DllImport("libspotify")]
-        static internal extern int sp_offline_time_left(IntPtr sessionPtr);
-
-        /// <summary>
-        /// Get currently logged in users country updated the offline_status_updated() callback will be invoked.
-        /// </summary>
-        /// <param name="sessionPtr">Session object.</param>
-        /// <returns>Country encoded in an integer 'SE' = 'S' &lt;&lt; 8 | 'E'</returns>
-        [DllImport("libspotify")]
-        static internal extern int sp_session_user_country(IntPtr sessionPtr);
+        internal static byte[] StringToImageId(string id)
+        {
+            if (string.IsNullOrEmpty(id) || id.Length != 40)
+                return null;
+            byte[] ret = new byte[20];
+            try
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    ret[i] = byte.Parse(id.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber);
+                }
+                return ret;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

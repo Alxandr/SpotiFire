@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using SPImage = SpotiFire.Image;
 
 namespace SpotiFire.SpotifyLib
 {
@@ -133,8 +134,8 @@ namespace SpotiFire.SpotifyLib
             this.imageLoadedPtr = Marshal.GetFunctionPointerForDelegate(this.image_loaded);
             lock (libspotify.Mutex)
             {
-                libspotify.sp_image_add_ref(imagePtr);
-                libspotify.sp_image_add_load_callback(imagePtr, this.imageLoadedPtr, IntPtr.Zero);
+                SPImage.add_ref(imagePtr);
+                SPImage.add_load_callback(imagePtr, this.imageLoadedPtr, IntPtr.Zero);
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
@@ -153,7 +154,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_image_is_loaded(imagePtr);
+                    return SPImage.is_loaded(imagePtr);
             }
         }
 
@@ -163,7 +164,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_image_error(imagePtr);
+                    return (Error)SPImage.error(imagePtr);
             }
         }
 
@@ -173,7 +174,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.sp_image_format(imagePtr);
+                    return (ImageFormat)SPImage.format(imagePtr);
             }
         }
 
@@ -187,7 +188,7 @@ namespace SpotiFire.SpotifyLib
                     int length = 0;
                     IntPtr dataPtr = IntPtr.Zero;
                     lock (libspotify.Mutex)
-                        dataPtr = libspotify.sp_image_data(imagePtr, out length);
+                        dataPtr = SPImage.data(imagePtr, out length);
 
                     if (dataPtr == IntPtr.Zero)
                         return null;
@@ -211,7 +212,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.ImageIdToString(libspotify.sp_image_image_id(imagePtr));
+                    return libspotify.ImageIdToString(SPImage.image_id(imagePtr));
             }
         }
 
@@ -257,8 +258,8 @@ namespace SpotiFire.SpotifyLib
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
                 {
-                    libspotify.sp_image_remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero);
-                    libspotify.sp_image_release(imagePtr);
+                    SPImage.remove_load_callback(imagePtr, imageLoadedPtr, IntPtr.Zero);
+                    SPImage.release(imagePtr);
                 }
 
             imageLoadedPtr = IntPtr.Zero;
@@ -293,12 +294,12 @@ namespace SpotiFire.SpotifyLib
                 Marshal.Copy(idArray, 0, idPtr, idArray.Length);
 
                 lock (libspotify.Mutex)
-                    imagePtr = libspotify.sp_image_create(((Session)session).sessionPtr, idPtr);
+                    imagePtr = SPImage.create(((Session)session).sessionPtr, idPtr);
 
                 image = Image.Get((Session)session, imagePtr);
 
                 lock (libspotify.Mutex)
-                    libspotify.sp_image_release(imagePtr);
+                    SPImage.release(imagePtr);
 
                 return image;
             }
@@ -308,7 +309,7 @@ namespace SpotiFire.SpotifyLib
                     try
                     {
                         lock (libspotify.Mutex)
-                            libspotify.sp_image_release(imagePtr);
+                            SPImage.release(imagePtr);
                     }
                     catch { }
                 return null;

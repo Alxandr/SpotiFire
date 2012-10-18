@@ -4,6 +4,12 @@
 #include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#include <string.h>
+static __forceinline String^ UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+
 IntPtr SpotiFire::Image::create(IntPtr sessionPtr, IntPtr imageIdArr)
 {
 	sp_session* session = SP_TYPE(sp_session, sessionPtr);
@@ -59,10 +65,10 @@ int SpotiFire::Image::format(IntPtr imagePtr)
 	return (int)sp_image_format(image);
 }
 
-IntPtr SpotiFire::Image::data(IntPtr imagePtr, Int32& dataSize)
+IntPtr SpotiFire::Image::data(IntPtr imagePtr, [System::Runtime::InteropServices::Out]int %dataSize)
 {
 	sp_image* image = SP_TYPE(sp_image, imagePtr);
-	size_t* size = SP_TYPE(size_t, &dataSize);
+	size_t* size = SP_TYPE(size_t, dataSize);
 
 	return (IntPtr)(void *)sp_image_data(image, size);
 }
