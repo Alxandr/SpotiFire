@@ -42,7 +42,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return track.Duration; }
             }
 
-            public sp_error Error
+            public Error Error
             {
                 get { IsAlive(true); return track.Error; }
             }
@@ -194,7 +194,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public sp_error Error
+        public Error Error
         {
             get
             {
@@ -232,7 +232,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_track_name(trackPtr), String.Empty);
+                    return libspotify.GetString(libspotify.sp_track_name(trackPtr));
             }
         }
 
@@ -261,8 +261,11 @@ namespace SpotiFire.SpotifyLib
             get
             {
                 IsAlive(true);
-                lock (libspotify.Mutex)
-                    return libspotify.sp_track_is_starred(session.sessionPtr, trackPtr);
+
+                //lock (libspotify.Mutex)
+                //    libspotify.sp_track_is_starred(session.sessionPtr, trackPtr);
+
+                return SpotiFire.Track.is_starred(session.sessionPtr, trackPtr);
 
                 //return session.Starred.Tracks.Any(t => Track.GetPointer(t) == this.trackPtr);
             }

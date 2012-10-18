@@ -7,7 +7,7 @@ namespace SpotiFire.SpotifyLib
         IArray<IArtist> Artists { get; }
         int Disc { get; }
         TimeSpan Duration { get; }
-        sp_error Error { get; }
+        Error Error { get; }
         int Index { get; }
         TrackAvailability Availability { get; }
         bool IsStarred { get; set; }

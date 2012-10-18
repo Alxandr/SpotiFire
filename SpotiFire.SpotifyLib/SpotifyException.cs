@@ -7,15 +7,15 @@ namespace SpotiFire.SpotifyLib
 {
     public class SpotifyException : Exception
     {
-        private sp_error res;
+        private Error res;
 
-        public SpotifyException(sp_error res)
+        public SpotifyException(Error res)
         {
             // TODO: Complete member initialization
             this.res = res;
         }
 
-        public sp_error SpotifyError
+        public Error SpotifyError
         {
             get { return res; }
         }

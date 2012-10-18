@@ -42,7 +42,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return artist.Session; }
             }
 
-            public IArtistBrowse Browse(sp_artistbrowse_type type = sp_artistbrowse_type.FULL)
+            public IArtistBrowse Browse(ArtistBrowseType type = ArtistBrowseType.NoTracks)
             {
                 return IsAlive() ? artist.Browse(type) : null;
             }
@@ -134,7 +134,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_artist_name(artistPtr), String.Empty);
+                    return libspotify.GetString(libspotify.sp_artist_name(artistPtr));
             }
         }
 
@@ -150,7 +150,7 @@ namespace SpotiFire.SpotifyLib
 
         #region Public methods
 
-        public IArtistBrowse Browse(sp_artistbrowse_type type = sp_artistbrowse_type.FULL)
+        public IArtistBrowse Browse(ArtistBrowseType type = ArtistBrowseType.NoTracks)
         {
             lock (libspotify.Mutex)
             {

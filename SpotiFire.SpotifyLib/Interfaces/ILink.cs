@@ -2,7 +2,7 @@
 {
     public interface ILink : ISpotifyObject
     {
-        sp_linktype Type { get; }
+        LinkType Type { get; }
         object Object { get; }
     }
 

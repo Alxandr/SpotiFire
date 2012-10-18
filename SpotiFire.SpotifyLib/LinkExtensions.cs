@@ -36,7 +36,7 @@ namespace SpotiFire.SpotifyLib
             IntPtr linkPtr, trackPtr;
             trackPtr = Track.GetPointer(track);
             lock (libspotify.Mutex)
-                linkPtr = libspotify.sp_link_create_from_track(trackPtr);
+                linkPtr = libspotify.sp_link_create_from_track(trackPtr, 0);
 
             ILink<ITrack> link = (ILink<ITrack>)Link.Get((Session)track.Session, linkPtr);
             lock (libspotify.Mutex)
@@ -49,17 +49,17 @@ namespace SpotiFire.SpotifyLib
         {
             switch (link.Type)
             {
-                case sp_linktype.SP_LINKTYPE_TRACK:
+                case LinkType.Track:
                     if (typeof(T) == typeof(ITrack)) return (T)((ILink<ITrackAndOffset>)link).Object.Track;
                     if (typeof(T) == typeof(ITrackAndOffset)) return (T)((ILink<ITrackAndOffset>)link).Object;
                     break;
-                case sp_linktype.SP_LINKTYPE_ALBUM:
+                case LinkType.Album:
                     if (typeof(T) == typeof(IAlbum)) return (T)((ILink<IAlbum>)link).Object;
                     break;
-                case sp_linktype.SP_LINKTYPE_ARTIST:
+                case LinkType.Artist:
                     if (typeof(T) == typeof(IArtist)) return (T)((ILink<IArtist>)link).Object;
                     break;
-                case sp_linktype.SP_LINKTYPE_PLAYLIST:
+                case LinkType.Playlist:
                     if (typeof(T) == typeof(IPlaylist)) return (T)((ILink<IPlaylist>)link).Object;
                     break;
             }

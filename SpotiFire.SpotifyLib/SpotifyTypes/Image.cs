@@ -37,12 +37,12 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return image.Data; }
             }
 
-            public sp_error Error
+            public Error Error
             {
                 get { IsAlive(true); return image.Error; }
             }
 
-            public sp_imageformat Format
+            public ImageFormat Format
             {
                 get { IsAlive(true); return image.Format; }
             }
@@ -157,7 +157,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public sp_error Error
+        public Error Error
         {
             get
             {
@@ -167,7 +167,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public sp_imageformat Format
+        public ImageFormat Format
         {
             get
             {
@@ -184,12 +184,10 @@ namespace SpotiFire.SpotifyLib
                 IsAlive(true);
                 try
                 {
-                    IntPtr lengthPtr = IntPtr.Zero;
+                    int length = 0;
                     IntPtr dataPtr = IntPtr.Zero;
                     lock (libspotify.Mutex)
-                        dataPtr = libspotify.sp_image_data(imagePtr, out lengthPtr);
-
-                    int length = lengthPtr.ToInt32();
+                        dataPtr = libspotify.sp_image_data(imagePtr, out length);
 
                     if (dataPtr == IntPtr.Zero)
                         return null;

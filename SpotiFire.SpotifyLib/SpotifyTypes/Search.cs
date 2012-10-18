@@ -50,7 +50,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return search.DidYouMean; }
             }
 
-            public sp_error Error
+            public Error Error
             {
                 get { IsAlive(true); return search.Error; }
             }
@@ -235,7 +235,7 @@ namespace SpotiFire.SpotifyLib
         #region Properties
         public ISession Session { get { IsAlive(true); return session; } }
 
-        public sp_error Error
+        public Error Error
         {
             get
             {
@@ -278,7 +278,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_search_query(searchPtr), String.Empty);
+                    return libspotify.sp_search_query(searchPtr);
             }
         }
 
@@ -288,7 +288,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_search_did_you_mean(searchPtr), String.Empty);
+                    return libspotify.sp_search_did_you_mean(searchPtr);
             }
         }
 

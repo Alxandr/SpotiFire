@@ -8,7 +8,7 @@ namespace SpotiFire.SpotifyLib
         bool IsAvailable { get; }
         bool IsLoaded { get; }
         string Name { get; }
-        sp_albumtype Type { get; }
+        AlbumType Type { get; }
         int Year { get; }
         IAlbumBrowse Browse();
     }

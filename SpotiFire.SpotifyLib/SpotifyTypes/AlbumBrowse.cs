@@ -31,7 +31,7 @@ namespace SpotiFire.SpotifyLib {
                 albumBrowse = null;
             }
 
-            public sp_error Error {
+            public Error Error {
                 get { IsAlive(true); return albumBrowse.Error; }
             }
 
@@ -148,7 +148,7 @@ namespace SpotiFire.SpotifyLib {
             }, (index) => {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.ImageIdToString(libspotify.sp_albumbrowse_copyright(albumBrowsePtr, index));
+                    return libspotify.sp_albumbrowse_copyright(albumBrowsePtr, index);
             });
 
             this.tracks = new DelegateArray<ITrack>(() => {
@@ -182,7 +182,7 @@ namespace SpotiFire.SpotifyLib {
 
         #region Properties
 
-        public sp_error Error {
+        public Error Error {
             get {
                 IsAlive(true);
                 lock (libspotify.Mutex)
@@ -229,7 +229,7 @@ namespace SpotiFire.SpotifyLib {
                 if (review == null) {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        review = libspotify.GetString(libspotify.sp_albumbrowse_review(albumBrowsePtr), String.Empty);
+                        review = libspotify.sp_albumbrowse_review(albumBrowsePtr);
                 }
                 return review;
             }

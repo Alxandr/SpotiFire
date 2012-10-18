@@ -53,7 +53,7 @@ namespace SpotiFire.SpotifyLib
                 get { IsAlive(true); return album.Name; }
             }
 
-            public sp_albumtype Type
+            public AlbumType Type
             {
                 get { IsAlive(true); return album.Type; }
             }
@@ -185,7 +185,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.ImageIdToString(libspotify.sp_album_cover(albumPtr));
+                    return libspotify.ImageIdToString(libspotify.sp_album_cover(albumPtr, ImageSize.Normal));
             }
         }
 
@@ -195,7 +195,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_album_name(albumPtr), String.Empty);
+                    return libspotify.sp_album_name(albumPtr);
             }
         }
 
@@ -209,7 +209,7 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public sp_albumtype Type
+        public AlbumType Type
         {
             get
             {

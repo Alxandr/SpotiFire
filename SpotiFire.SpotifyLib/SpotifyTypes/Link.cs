@@ -5,21 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace SpotiFire.SpotifyLib
 {
-    #region Enums
-    public enum sp_linktype
-    {
-        SP_LINKTYPE_INVALID = 0,
-        SP_LINKTYPE_TRACK = 1,
-        SP_LINKTYPE_ALBUM = 2,
-        SP_LINKTYPE_ARTIST = 3,
-        SP_LINKTYPE_SEARCH = 4,
-        SP_LINKTYPE_PLAYLIST = 5,
-        SP_LINKTYPE_PROFILE = 6,
-        SP_LINKTYPE_STARRED = 7,
-        SP_LINKTYPE_LOCALTRACK = 8
-    }
-    #endregion
-
     internal abstract class Link : CountedDisposeableSpotifyObject, ILink
     {
         #region Wrapper
@@ -40,7 +25,7 @@ namespace SpotiFire.SpotifyLib
                 }
             }
 
-            public sp_linktype Type
+            public LinkType Type
             {
                 get
                 {
@@ -118,28 +103,28 @@ namespace SpotiFire.SpotifyLib
 
         private static Link Create(Session session, IntPtr linkPtr)
         {
-            sp_linktype type;
+            LinkType type;
             lock (libspotify.Mutex)
                 type = libspotify.sp_link_type(linkPtr);
 
             switch (type)
             {
-                case sp_linktype.SP_LINKTYPE_TRACK:
+                case LinkType.Track:
                     return new TrackLink(session, linkPtr);
-                case sp_linktype.SP_LINKTYPE_ALBUM:
+                case LinkType.Album:
                     return new AlbumLink(session, linkPtr);
-                case sp_linktype.SP_LINKTYPE_ARTIST:
+                case LinkType.Artist:
                     return new ArtistLink(session, linkPtr);
-                case sp_linktype.SP_LINKTYPE_SEARCH:
+                case LinkType.Search:
                     throw new ArgumentException("Search not supported.");
-                case sp_linktype.SP_LINKTYPE_PLAYLIST:
+                case LinkType.Playlist:
                     return new PlaylistLink(session, linkPtr);
-                case sp_linktype.SP_LINKTYPE_PROFILE:
+                case LinkType.Profile:
                     //x return new ProfileLink(session, linkPtr);
                     throw new NotImplementedException("User not implemented");
-                case sp_linktype.SP_LINKTYPE_STARRED:
+                case LinkType.Starred:
                     return new PlaylistLink(session, linkPtr);
-                case sp_linktype.SP_LINKTYPE_LOCALTRACK:
+                case LinkType.Localtrack:
                     return new TrackLink(session, linkPtr);
                 default:
                     throw new ArgumentException("Invalid link.");
@@ -151,22 +136,22 @@ namespace SpotiFire.SpotifyLib
             var type = link.Type;
             switch (type)
             {
-                case sp_linktype.SP_LINKTYPE_TRACK:
+                case LinkType.Track:
                     return new LinkWrapper<ITrackAndOffset>(link);
-                case sp_linktype.SP_LINKTYPE_ALBUM:
+                case LinkType.Album:
                     return new LinkWrapper<IAlbum>(link);
-                case sp_linktype.SP_LINKTYPE_ARTIST:
+                case LinkType.Artist:
                     return new LinkWrapper<IArtist>(link);
-                case sp_linktype.SP_LINKTYPE_SEARCH:
+                case LinkType.Search:
                     throw new ArgumentException("Search not supported.");
-                case sp_linktype.SP_LINKTYPE_PLAYLIST:
+                case LinkType.Playlist:
                     return new LinkWrapper<IPlaylist>(link);
-                case sp_linktype.SP_LINKTYPE_PROFILE:
+                case LinkType.Profile:
                     //x return new LinkWrapper<IUser>(link);
                     throw new NotImplementedException("User not implemented");
-                case sp_linktype.SP_LINKTYPE_STARRED:
+                case LinkType.Starred:
                     return new LinkWrapper<IPlaylist>(link);
-                case sp_linktype.SP_LINKTYPE_LOCALTRACK:
+                case LinkType.Localtrack:
                     return new LinkWrapper<ITrackAndOffset>(link);
                 default:
                     throw new ArgumentException("Invalid link.");
@@ -203,7 +188,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public sp_linktype Type
+        public LinkType Type
         {
             get
             {
@@ -233,10 +218,20 @@ namespace SpotiFire.SpotifyLib
             IntPtr bufferPtr = IntPtr.Zero;
             try
             {
-                int size = libspotify.STRINGBUFFER_SIZE;
+                int size = libspotify.STRINGBUFFER_SIZE,
+                    tSize;
                 bufferPtr = Marshal.AllocHGlobal(size);
                 lock (libspotify.Mutex)
-                    libspotify.sp_link_as_string(linkPtr, bufferPtr, size);
+                    tSize = libspotify.sp_link_as_string(linkPtr, bufferPtr, size);
+
+                if (tSize >= size)
+                {
+                    size = tSize + 1;
+                    Marshal.FreeHGlobal(bufferPtr);
+                    bufferPtr = Marshal.AllocHGlobal(size);
+                    lock (libspotify.Mutex)
+                        libspotify.sp_link_as_string(linkPtr, bufferPtr, size);
+                }
 
                 return libspotify.GetString(bufferPtr, String.Empty);
             }

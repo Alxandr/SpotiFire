@@ -18,7 +18,7 @@ namespace SpotiFire.SpotifyLib
 
         #region Static declarations
         private static Dictionary<IntPtr, Session> sessions = new Dictionary<IntPtr, Session>();
-        private static libspotify.sp_session_callbacks callbacks;
+        private static SessionCallbacks callbacks;
         #endregion
 
         #region Declarations
@@ -34,30 +34,6 @@ namespace SpotiFire.SpotifyLib
 
         private IPlaylistContainer playlistContainer = null;
 
-        #endregion
-
-        #region Delegates
-        private delegate void logged_in_delegate(IntPtr sessionPtr, sp_error error);
-        private delegate void logged_out_delegate(IntPtr sessionPtr);
-        private delegate void metadata_updated_delegate(IntPtr sessionPtr);
-        private delegate void connection_error_delegate(IntPtr sessionPtr, sp_error error);
-        private delegate void message_to_user_delegate(IntPtr sessionPtr, string message);
-        private delegate void notify_main_thread_delegate(IntPtr sessionPtr);
-        private delegate int music_delivery_delegate(IntPtr sessionPtr, IntPtr formatPtr, IntPtr framesPtr, int num_frames);
-        private delegate void play_token_lost_delegate(IntPtr sessionPtr);
-        private delegate void log_message_delegate(IntPtr sessionPtr, string data);
-        private delegate void end_of_track_delegate(IntPtr sessionPtr);
-        private delegate void streaming_error_delegate(IntPtr sessionPtr, sp_error error);
-        private delegate void userinfo_updated_delegate(IntPtr sessionPtr);
-        private delegate void start_playback_delegate(IntPtr sessionPtr);
-        private delegate void stop_playback_delegate(IntPtr sessionPtr);
-        private delegate void get_audio_buffer_stats_delegate(IntPtr sessionPtr, IntPtr statsPtr);
-        private delegate void offline_status_updated_delegate(IntPtr sessionPtr);
-        private delegate void offline_error_delegate(IntPtr sessionPtr, sp_error error);
-        private delegate void credentials_blob_updated_delegate(IntPtr sessionPtr, string blob);
-        private delegate void connectionstate_updated_delegate(IntPtr sessionPtr);
-        private delegate void scrobble_error_delegate(IntPtr sessionPtr, sp_error error);
-        private delegate void private_session_mode_changed_delegate(IntPtr sessionPtr, bool is_private);
         #endregion
 
         #region Spotify Event Handlers
@@ -104,7 +80,7 @@ namespace SpotiFire.SpotifyLib
         private Session(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
             ProcExit = false;
-            libspotify.sp_session_config config = new libspotify.sp_session_config();
+            SessionConfig config = new SessionConfig();
 
             config.api_version = libspotify.SPOTIFY_API_VERSION;
             config.cache_location = cacheLocation;
@@ -130,9 +106,9 @@ namespace SpotiFire.SpotifyLib
 
                 logger.Debug("Creating session");
                 sessionPtr = IntPtr.Zero;
-                sp_error res = libspotify.sp_session_create(ref config, out sessionPtr);
+                Error res = libspotify.sp_session_create(ref config, out sessionPtr);
 
-                if (res != sp_error.OK)
+                if (res != Error.OK)
                     throw new SpotifyException(res);
 
                 mainThread = new Thread(new ThreadStart(MainThread));
@@ -161,7 +137,7 @@ namespace SpotiFire.SpotifyLib
         {
             lock (libspotify.Mutex)
             {
-                callbacks = new libspotify.sp_session_callbacks();
+                callbacks = new SessionCallbacks();
                 callbacks.logged_in = Marshal.GetFunctionPointerForDelegate(logged_in);
                 callbacks.logged_out = Marshal.GetFunctionPointerForDelegate(logged_out);
                 callbacks.metadata_updated = Marshal.GetFunctionPointerForDelegate(metadata_updated);
@@ -272,14 +248,14 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Spotify Event Handler Functions
-        private static void LoggedInCallback(IntPtr sessionPtr, sp_error error)
+        private static void LoggedInCallback(IntPtr sessionPtr, Error error)
         {
             logger.Trace("LoggedInCallback: {0}", error);
             Session s = GetSession(sessionPtr);
             if (s == null)
                 return;
 
-            if ((s.ConnectionState == sp_connectionstate.LOGGED_IN || s.ConnectionState == sp_connectionstate.OFFLINE) && error == sp_error.OK)
+            if ((s.ConnectionState == ConnectionState.LoggedIn || s.ConnectionState == ConnectionState.Offline) && error == Error.OK)
                 s.playlistContainer = SpotifyLib.PlaylistContainer.Get(s, libspotify.sp_session_playlistcontainer(sessionPtr));
 
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnLoginComplete, s), new SessionEventArgs(error)));
@@ -311,7 +287,7 @@ namespace SpotiFire.SpotifyLib
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnMetadataUpdated, s), new SessionEventArgs()));
         }
 
-        private static void ConnectionErrorCallback(IntPtr sessionPtr, sp_error error)
+        private static void ConnectionErrorCallback(IntPtr sessionPtr, Error error)
         {
             logger.Trace("ConnectionErrorCallback: {0}", error);
             Session s = GetSession(sessionPtr);
@@ -351,17 +327,17 @@ namespace SpotiFire.SpotifyLib
                 return 0;
 
             byte[] samplesBytes = null;
-            libspotify.sp_audioformat format = (libspotify.sp_audioformat)Marshal.PtrToStructure(formatPtr, typeof(libspotify.sp_audioformat));
+            AudioFormat format = (AudioFormat)Marshal.PtrToStructure(formatPtr, typeof(AudioFormat));
 
             if (num_frames > 0)
             {
-                samplesBytes = new byte[num_frames * format.channels * 2];
+                samplesBytes = new byte[num_frames * format.Channels * 2];
                 Marshal.Copy(framesPtr, samplesBytes, 0, samplesBytes.Length);
             }
             else
                 samplesBytes = new byte[0];
 
-            MusicDeliveryEventArgs e = new MusicDeliveryEventArgs(format.channels, format.sample_rate, samplesBytes, num_frames);
+            MusicDeliveryEventArgs e = new MusicDeliveryEventArgs(format.Channels, format.SampleRate, samplesBytes, num_frames);
             s.OnMusicDelivery(e);
 
             return e.ConsumedFrames;
@@ -399,7 +375,7 @@ namespace SpotiFire.SpotifyLib
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnEndOfTrack, s), new SessionEventArgs()));
         }
 
-        private static void StreamingErrorCallback(IntPtr sessionPtr, sp_error error)
+        private static void StreamingErrorCallback(IntPtr sessionPtr, Error error)
         {
             logger.Trace("StreamingErrorCallback: {0}", error);
             Session s = GetSession(sessionPtr);
@@ -453,7 +429,7 @@ namespace SpotiFire.SpotifyLib
             // TODO: Implement
         }
 
-        private static void OfflineErrorCallback(IntPtr sessionPtr, sp_error error)
+        private static void OfflineErrorCallback(IntPtr sessionPtr, Error error)
         {
             logger.Trace("OfflineErrorCallback: {0}", error);
             Session s = GetSession(sessionPtr);
@@ -474,7 +450,7 @@ namespace SpotiFire.SpotifyLib
             // TODO: Implement
         }
 
-        private static void ScrobbleErrorCallback(IntPtr sessionPtr, sp_error error)
+        private static void ScrobbleErrorCallback(IntPtr sessionPtr, Error error)
         {
             logger.Trace("ScrobbleErrorCallback: {0}", error);
             Session s = GetSession(sessionPtr);
@@ -594,7 +570,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public sp_connectionstate ConnectionState
+        public ConnectionState ConnectionState
         {
             get
             {
@@ -604,10 +580,10 @@ namespace SpotiFire.SpotifyLib
                         lock (libspotify.Mutex)
                             return libspotify.sp_session_connectionstate(sessionPtr);
                     else
-                        return sp_connectionstate.UNDEFINED;
+                        return ConnectionState.Undefined;
                 }
                 catch { }
-                return sp_connectionstate.UNDEFINED;
+                return ConnectionState.Undefined;
             }
         }
         #endregion
@@ -622,7 +598,7 @@ namespace SpotiFire.SpotifyLib
             {
                 logger.Trace("Async login completed");
                 LoginComplete -= handler;
-                tcs.SetResult(e.Status == sp_error.OK);
+                tcs.SetResult(e.Status == Error.OK);
             };
             LoginComplete += handler;
             // TODO: Implement blob
@@ -652,7 +628,7 @@ namespace SpotiFire.SpotifyLib
             return tcs.Task;
         }
 
-        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, int playlistOffset, int playlistCount, sp_search_type type)
+        public ISearch Search(string query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, int playlistOffset, int playlistCount, SearchType type)
         {
             logger.Trace("Search for {0}. Tracks: {1}-{2}, Albums: {3}-{4}, Artists: {5}-{6}, Playlists: {7}-{8}", query,
                 trackOffset, trackOffset + trackCount,
@@ -667,40 +643,40 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        public sp_error PlayerLoad(ITrack track)
+        public Error PlayerLoad(ITrack track)
         {
             logger.Trace("PlayerLoad");
             //PlayerUnload();
 
-            sp_error ret;
+            Error ret;
             lock (libspotify.Mutex)
                 ret = libspotify.sp_session_player_load(sessionPtr, Track.GetPointer(track));
 
             return ret;
         }
 
-        public sp_error PlayerPlay()
+        public Error PlayerPlay()
         {
             logger.Trace("PlayerPlay");
             lock (libspotify.Mutex)
                 return libspotify.sp_session_player_play(sessionPtr, true);
         }
 
-        public sp_error PlayerPause()
+        public Error PlayerPause()
         {
             logger.Trace("PlayerPause");
             lock (libspotify.Mutex)
                 return libspotify.sp_session_player_play(sessionPtr, false);
         }
 
-        public sp_error PlayerSeek(int offset)
+        public Error PlayerSeek(int offset)
         {
             logger.Trace("PlayerSeek");
             lock (libspotify.Mutex)
                 return libspotify.sp_session_player_seek(sessionPtr, offset);
         }
 
-        public sp_error PlayerSeek(TimeSpan offset)
+        public Error PlayerSeek(TimeSpan offset)
         {
             return this.PlayerSeek((int)offset.TotalMilliseconds);
         }
@@ -712,7 +688,7 @@ namespace SpotiFire.SpotifyLib
                 libspotify.sp_session_player_unload(sessionPtr);
         }
 
-        public void SetPrefferedBitrate(sp_bitrate bitrate)
+        public void SetPrefferedBitrate(BitRate bitrate)
         {
             logger.Trace("SetPrefferedBitrate: {0}", bitrate);
             lock (libspotify.Mutex)
@@ -745,7 +721,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     if (sessionPtr != IntPtr.Zero && !ProcExit)
                     {
-                        if (ConnectionState == sp_connectionstate.LOGGED_IN)
+                        if (ConnectionState == ConnectionState.LoggedIn)
                             try { libspotify.sp_session_logout(sessionPtr); }
                             catch { }
                         libspotify.sp_session_release(sessionPtr);

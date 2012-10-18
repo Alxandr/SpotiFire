@@ -51,7 +51,7 @@ namespace SpotiFire.TestClient
             session.MusicDeliver += session_MusicDeliver;
 
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
-            session.SetPrefferedBitrate(sp_bitrate.BITRATE_320k);
+            session.SetPrefferedBitrate(BitRate.Bitrate320k);
 
             await session.PlaylistContainer;
             var playlist = await session.PlaylistContainer[0];

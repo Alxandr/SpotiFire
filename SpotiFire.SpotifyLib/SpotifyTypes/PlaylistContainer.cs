@@ -138,33 +138,16 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        #region Structs
-        private struct sp_playlistcontainer_callbacks
-        {
-            internal IntPtr playlist_added;
-            internal IntPtr playlist_removed;
-            internal IntPtr playlist_moved;
-            internal IntPtr container_loaded;
-        }
-        #endregion
-
-        #region Delegates
-        private delegate void playlist_added_cb(IntPtr pcPtr, IntPtr playlistPtr, int position, IntPtr userdataPtr);
-        private delegate void playlist_removed_cb(IntPtr pcPtr, IntPtr playlistPtr, int position, IntPtr userdataPtr);
-        private delegate void playlist_moved_cb(IntPtr pcPtr, IntPtr playlistPtr, int position, int newPosition, IntPtr userdataPtr);
-        private delegate void container_loaded_cb(IntPtr pcPtr, IntPtr userdataPtr);
-        #endregion
-
         #region Declarations
         IntPtr pcPtr = IntPtr.Zero;
         private Session session;
 
-        private sp_playlistcontainer_callbacks callbacks;
-        private IntPtr callbacksPtr;
-        private playlist_added_cb playlist_added;
-        private playlist_removed_cb playlist_removed;
-        private playlist_moved_cb playlist_moved;
-        private container_loaded_cb container_loaded;
+        private PlaylistContainerCallbacks callbacks;
+        //private IntPtr callbacksPtr;
+        private playlist_added_delegate playlist_added;
+        private playlist_removed_delegate playlist_removed;
+        private playlist_moved_delegate playlist_moved;
+        private container_loaded_delegate container_loaded;
 
         private PlaylistList playlists;
         private bool loaded;
@@ -182,11 +165,11 @@ namespace SpotiFire.SpotifyLib
             this.session = session;
             this.pcPtr = pcPtr;
 
-            this.playlist_added = new playlist_added_cb(PlaylistAddedCallback);
-            this.playlist_removed = new playlist_removed_cb(PlaylistRemovedCallback);
-            this.playlist_moved = new playlist_moved_cb(PlaylistMovedCallback);
-            this.container_loaded = new container_loaded_cb(ContainerLoadedCallback);
-            this.callbacks = new sp_playlistcontainer_callbacks
+            this.playlist_added = new playlist_added_delegate(PlaylistAddedCallback);
+            this.playlist_removed = new playlist_removed_delegate(PlaylistRemovedCallback);
+            this.playlist_moved = new playlist_moved_delegate(PlaylistMovedCallback);
+            this.container_loaded = new container_loaded_delegate(ContainerLoadedCallback);
+            this.callbacks = new PlaylistContainerCallbacks
             {
                 playlist_added = Marshal.GetFunctionPointerForDelegate(playlist_added),
                 playlist_removed = Marshal.GetFunctionPointerForDelegate(playlist_removed),
@@ -195,12 +178,10 @@ namespace SpotiFire.SpotifyLib
             };
 
             int size = Marshal.SizeOf(this.callbacks);
-            this.callbacksPtr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(this.callbacks, this.callbacksPtr, true);
 
             lock (libspotify.Mutex)
             {
-                libspotify.sp_playlistcontainer_add_callbacks(pcPtr, callbacksPtr, IntPtr.Zero);
+                libspotify.sp_playlistcontainer_add_callbacks(pcPtr, ref callbacks, IntPtr.Zero);
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
@@ -231,7 +212,7 @@ namespace SpotiFire.SpotifyLib
                     }
                     if (playlistPtr != IntPtr.Zero)
                         lock (libspotify.Mutex)
-                            libspotify.sp_playlistcontainer_move_playlist(pcPtr, newIndex, index);
+                            libspotify.sp_playlistcontainer_move_playlist(pcPtr, newIndex, index, false);
                 },
                 (index) =>
                 {
@@ -352,11 +333,11 @@ namespace SpotiFire.SpotifyLib
             try
             {
                 bufferPtr = Marshal.AllocHGlobal(bufferSize);
-                sp_error error;
+                Error error;
                 lock (libspotify.Mutex)
                     error = libspotify.sp_playlistcontainer_playlist_folder_name(pcPtr, index, bufferPtr, bufferSize);
 
-                if (error == sp_error.OK)
+                if (error == Error.OK)
                 {
                     return libspotify.GetString(bufferPtr, String.Empty);
                 }
@@ -385,14 +366,12 @@ namespace SpotiFire.SpotifyLib
             session.DisposeAll -= new SessionEventHandler(session_DisposeAll);
 
             if (!session.ProcExit)
+            {
                 lock (libspotify.Mutex)
                 {
-                    try { libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, callbacksPtr, IntPtr.Zero); }
-                    catch { }
+                    libspotify.sp_playlistcontainer_remove_callbacks(pcPtr, ref callbacks, IntPtr.Zero);
                 }
-            try { Marshal.FreeHGlobal(callbacksPtr); }
-            catch { }
-            callbacksPtr = IntPtr.Zero;
+            }
             pcPtr = IntPtr.Zero;
         }
         #endregion

@@ -9,7 +9,7 @@ namespace SpotiFire.SpotifyLib
         event SearchEventHandler Complete;
         bool IsComplete { get; }
         string DidYouMean { get; }
-        sp_error Error { get; }
+        Error Error { get; }
         string Query { get; }
         int TotalAlbums { get; }
         int TotalArtists { get; }

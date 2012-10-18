@@ -241,50 +241,18 @@ namespace SpotiFire.SpotifyLib
         }
         #endregion
 
-        #region Spotify Delegates
-        #region Struct
-        private struct sp_playlist_callbacks
-        {
-            internal IntPtr tracks_added;
-            internal IntPtr tracks_removed;
-            internal IntPtr tracks_moved;
-            internal IntPtr playlist_renamed;
-            internal IntPtr playlist_state_changed;
-            internal IntPtr playlist_update_in_progress;
-            internal IntPtr playlist_metadata_updated;
-            internal IntPtr track_created_changed;
-            internal IntPtr track_seen_changed;
-            internal IntPtr description_changed;
-            internal IntPtr image_changed;
-            internal IntPtr track_message_changed; //TODO: Implement
-            internal IntPtr subscribers_changed; // TODO: Implement
-        }
-        #endregion
-        private delegate void tracks_added_cb(IntPtr playlistPtr, IntPtr tracksPtr, int num_tracks, int position, IntPtr userdataPtr);
-        private delegate void tracks_removed_cb(IntPtr playlistPtr, IntPtr trackIndicesPtr, int num_tracks, IntPtr userdataPtr);
-        private delegate void tracks_moved_cd(IntPtr playlistPtr, IntPtr trackIndicesPtr, int num_tracks, int new_position, IntPtr userdataPtr);
-        private delegate void playlist_renamed_cb(IntPtr playlistPtr, IntPtr userdataPtr);
-        private delegate void playlist_state_changed_cb(IntPtr playlistPtr, IntPtr userdataPtr);
-        private delegate void playlist_update_in_progress_cb(IntPtr playlistPtr, bool done, IntPtr userdataPtr);
-        private delegate void playlist_metadata_updated_cb(IntPtr playlistPtr, IntPtr userdataPtr);
-        private delegate void track_created_changed_cb(IntPtr playlistPtr, int position, IntPtr userPtr, int when, IntPtr userdataPtr);
-        private delegate void track_seen_changed_cb(IntPtr playlistPtr, int position, bool seen, IntPtr userdataPtr);
-        private delegate void description_changed_cb(IntPtr playlistPtr, IntPtr descPtr, IntPtr userdataPtr);
-        private delegate void image_changed_cb(IntPtr playlistPtr, IntPtr imgIdPtr, IntPtr userdataPtr);
-        #endregion
-
         #region Spotify Callbacks
-        private tracks_added_cb tracks_added;
-        private tracks_removed_cb tracks_removed;
-        private tracks_moved_cd tracks_moved;
-        private playlist_renamed_cb playlist_renamed;
-        private playlist_state_changed_cb playlist_state_changed;
-        private playlist_update_in_progress_cb playlist_update_in_progress;
-        private playlist_metadata_updated_cb playlist_metadata_updated;
-        private track_created_changed_cb track_created_changed;
-        private track_seen_changed_cb track_seen_changed;
-        private description_changed_cb description_changed;
-        private image_changed_cb image_changed;
+        private tracks_added_delegate tracks_added;
+        private tracks_removed_delegate tracks_removed;
+        private tracks_moved_delegate tracks_moved;
+        private playlist_renamed_delegate playlist_renamed;
+        private playlist_state_changed_delegate playlist_state_changed;
+        private playlist_update_in_progress_delegate playlist_update_in_progress;
+        private playlist_metadata_updated_delegate playlist_metadata_updated;
+        private track_created_changed_delegate track_created_changed;
+        private track_seen_changed_delegate track_seen_changed;
+        private description_changed_delegate description_changed;
+        private image_changed_delegate image_changed;
         #endregion
 
         #region Spotify Callback Implementations
@@ -379,11 +347,10 @@ namespace SpotiFire.SpotifyLib
             }
         }
 
-        private void DescriptionChangedCallback(IntPtr playlistPtr, IntPtr descriptionPtr, IntPtr userdataPtr)
+        private void DescriptionChangedCallback(IntPtr playlistPtr, string description, IntPtr userdataPtr)
         {
             if (playlistPtr == this.playlistPtr)
             {
-                string description = libspotify.GetString(descriptionPtr, String.Empty);
                 session.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<DescriptionEventArgs>(p => p.OnDescriptionChanged, this), new DescriptionEventArgs(description)));
             }
         }
@@ -476,7 +443,8 @@ namespace SpotiFire.SpotifyLib
         #region Declarations
         internal IntPtr playlistPtr = IntPtr.Zero;
         private Session session;
-        private IntPtr callbacksPtr = IntPtr.Zero;
+        private PlaylistCallbacks callbacks;
+        //private IntPtr callbacksPtr = IntPtr.Zero;
         private bool registerCallbacks;
 
         private IPlaylistTrackList tracks;
@@ -497,18 +465,18 @@ namespace SpotiFire.SpotifyLib
 
             if (registerCallbacks)
             {
-                tracks_added = new tracks_added_cb(TracksAddedCallback);
-                tracks_removed = new tracks_removed_cb(TracksRemovedCallback);
-                tracks_moved = new tracks_moved_cd(TracksMovedCallback);
-                playlist_renamed = new playlist_renamed_cb(RenamedCallback);
-                playlist_state_changed = new playlist_state_changed_cb(StateChangedCallback);
-                playlist_update_in_progress = new playlist_update_in_progress_cb(UpdateInProgressCallback);
-                playlist_metadata_updated = new playlist_metadata_updated_cb(MetadataUpdatedCallback);
-                track_created_changed = new track_created_changed_cb(TrackCreatedChangedCallback);
-                track_seen_changed = new track_seen_changed_cb(TrackSeenChangedCallback);
-                description_changed = new description_changed_cb(DescriptionChangedCallback);
-                image_changed = new image_changed_cb(ImageChangedCallback);
-                sp_playlist_callbacks callbacks = new sp_playlist_callbacks
+                tracks_added = new tracks_added_delegate(TracksAddedCallback);
+                tracks_removed = new tracks_removed_delegate(TracksRemovedCallback);
+                tracks_moved = new tracks_moved_delegate(TracksMovedCallback);
+                playlist_renamed = new playlist_renamed_delegate(RenamedCallback);
+                playlist_state_changed = new playlist_state_changed_delegate(StateChangedCallback);
+                playlist_update_in_progress = new playlist_update_in_progress_delegate(UpdateInProgressCallback);
+                playlist_metadata_updated = new playlist_metadata_updated_delegate(MetadataUpdatedCallback);
+                track_created_changed = new track_created_changed_delegate(TrackCreatedChangedCallback);
+                track_seen_changed = new track_seen_changed_delegate(TrackSeenChangedCallback);
+                description_changed = new description_changed_delegate(DescriptionChangedCallback);
+                image_changed = new image_changed_delegate(ImageChangedCallback);
+                callbacks = new PlaylistCallbacks
                 {
                     tracks_added = Marshal.GetFunctionPointerForDelegate(tracks_added),
                     tracks_removed = Marshal.GetFunctionPointerForDelegate(tracks_removed),
@@ -522,16 +490,13 @@ namespace SpotiFire.SpotifyLib
                     description_changed = Marshal.GetFunctionPointerForDelegate(description_changed),
                     image_changed = Marshal.GetFunctionPointerForDelegate(image_changed)
                 };
-
-                callbacksPtr = Marshal.AllocHGlobal(Marshal.SizeOf(callbacks));
-                Marshal.StructureToPtr(callbacks, callbacksPtr, true);
             }
 
             lock (libspotify.Mutex)
             {
                 libspotify.sp_playlist_add_ref(playlistPtr);
                 if (registerCallbacks)
-                    libspotify.sp_playlist_add_callbacks(playlistPtr, callbacksPtr, IntPtr.Zero);
+                    libspotify.sp_playlist_add_callbacks(playlistPtr, ref callbacks, IntPtr.Zero);
             }
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
@@ -574,8 +539,20 @@ namespace SpotiFire.SpotifyLib
                 (index) =>
                 {
                     IsAlive(true);
-                    lock (libspotify.Mutex)
-                        libspotify.sp_playlist_remove_tracks(playlistPtr, new int[] { index }, 1);
+                    IntPtr trackIndexArray = IntPtr.Zero;
+                    try
+                    {
+                        trackIndexArray = Marshal.AllocHGlobal(sizeof(int));
+                        Marshal.Copy(new[] { index }, 0, trackIndexArray, 1);
+
+                        lock (libspotify.Mutex)
+                            libspotify.sp_playlist_remove_tracks(playlistPtr, trackIndexArray, 1);
+                    }
+                    finally
+                    {
+                        if (trackIndexArray != IntPtr.Zero)
+                            Marshal.FreeHGlobal(trackIndexArray);
+                    }
                 },
                 () => false
             );
@@ -635,7 +612,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_playlist_name(playlistPtr), String.Empty);
+                    return libspotify.GetString(libspotify.sp_playlist_name(playlistPtr));
             }
             set
             {
@@ -714,7 +691,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return libspotify.GetString(libspotify.sp_playlist_get_description(playlistPtr), String.Empty);
+                    return libspotify.sp_playlist_get_description(playlistPtr);
             }
         }
 
@@ -744,14 +721,12 @@ namespace SpotiFire.SpotifyLib
                 {
                     if (registerCallbacks)
                     {
-                        try { libspotify.sp_playlist_remove_callbacks(playlistPtr, callbacksPtr, IntPtr.Zero); }
-                        finally { Marshal.FreeHGlobal(callbacksPtr); }
+                        libspotify.sp_playlist_remove_callbacks(playlistPtr, ref callbacks, IntPtr.Zero);
                     }
                     libspotify.sp_playlist_release(playlistPtr);
                 }
 
             playlistPtr = IntPtr.Zero;
-            callbacksPtr = IntPtr.Zero;
         }
         #endregion
 

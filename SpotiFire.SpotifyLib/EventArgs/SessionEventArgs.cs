@@ -7,7 +7,7 @@ namespace SpotiFire.SpotifyLib
 {
     public class SessionEventArgs : EventArgs
     {
-        sp_error error = sp_error.OK;
+        Error error = Error.OK;
         string message = string.Empty;
 
         internal SessionEventArgs()
@@ -15,7 +15,7 @@ namespace SpotiFire.SpotifyLib
 
         }
 
-        internal SessionEventArgs(sp_error error)
+        internal SessionEventArgs(Error error)
         {
             this.error = error;
         }
@@ -25,7 +25,7 @@ namespace SpotiFire.SpotifyLib
             this.message = message;
         }
 
-        public sp_error Status
+        public Error Status
         {
             get
             {

@@ -36,7 +36,7 @@ namespace SpotiFire.SpotifyLib
                 artistBrowse = null;
             }
 
-            public sp_error Error
+            public Error Error
             {
                 get { IsAlive(true); return artistBrowse.Error; }
             }
@@ -235,7 +235,7 @@ namespace SpotiFire.SpotifyLib
 
         #region Properties
 
-        public sp_error Error
+        public Error Error
         {
             get
             {
@@ -291,7 +291,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        biography = libspotify.GetString(libspotify.sp_artistbrowse_biography(artistBrowsePtr), String.Empty);
+                        biography = libspotify.sp_artistbrowse_biography(artistBrowsePtr);
                 }
                 return biography;
             }

@@ -62,6 +62,22 @@
     <Compile Include="Interfaces\IPlaylistTrackList.cs" />
     <Compile Include="Interfaces\ISpotifyAwaitable.cs" />
     <Compile Include="Interfaces\ISpotifyAwaiter.cs" />
+    <Compile Include="LibSpotify\libspotify.inbox.cs" />
+    <Compile Include="LibSpotify\libspotify.toplist.cs" />
+    <Compile Include="LibSpotify\libspotify.user.cs" />
+    <Compile Include="LibSpotify\libspotify.playlistcontainer.cs" />
+    <Compile Include="LibSpotify\libspotify.playlist.cs" />
+    <Compile Include="LibSpotify\libspotify.search.cs" />
+    <Compile Include="LibSpotify\libspotify.image.cs" />
+    <Compile Include="LibSpotify\libspotify.artist.browsing.cs" />
+    <Compile Include="LibSpotify\libspotify.album.browsing.cs" />
+    <Compile Include="LibSpotify\libspotify.artist.cs" />
+    <Compile Include="LibSpotify\libspotify.album.cs" />
+    <Compile Include="LibSpotify\libspotify.tracks.cs" />
+    <Compile Include="LibSpotify\libspotify.links.cs" />
+    <Compile Include="LibSpotify\libspotify.error.cs" />
+    <Compile Include="LibSpotify\libspotify.helpers.cs" />
+    <Compile Include="LibSpotify\libspotify.session.cs" />
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />
     <Compile Include="PlaylistList.cs" />
@@ -92,7 +108,6 @@
     <Compile Include="Interfaces\ISearch.cs" />
     <Compile Include="Interfaces\ISpotifyObject.cs" />
     <Compile Include="Interfaces\ITrack.cs" />
-    <Compile Include="libspotify.cs" />
     <Compile Include="EventArgs\MusicDeliveryEventArgs.cs" />
     <Compile Include="EventArgs\ImageEventArgs.cs" />
     <Compile Include="Interfaces\ISession.cs" />
@@ -124,7 +139,17 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SpotiFire.LibSpotify\SpotiFire.LibSpotify.vcxproj">
+      <Project>{3a193712-4ae2-4b7a-9adf-139d3213e34b}</Project>
+      <Name>SpotiFire.LibSpotify</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -24,7 +24,7 @@ namespace SpotiFire.SpotifyLib
             if (!image.IsLoaded)
                 throw new InvalidOperationException("Can't convert to Image before data is loaded.");
 
-            if (image.Format != sp_imageformat.SP_IMAGE_FORMAT_JPEG)
+            if (image.Format != ImageFormat.JPEG)
                 throw new InvalidOperationException("Can only parse Jpeg image data.");
 
             return System.Drawing.Image.FromStream(new MemoryStream(image.Data));
@@ -52,19 +52,19 @@ namespace SpotiFire.SpotifyLib
 
         public static ISearch SearchTracks(this ISession session, string query, int trackOffset, int trackCount)
         {
-            return session.Search(query, trackOffset, trackCount, 0, 0, 0, 0, 0, 0, sp_search_type.STANDARD);
+            return session.Search(query, trackOffset, trackCount, 0, 0, 0, 0, 0, 0, SearchType.Standard);
         }
         public static ISearch SearchAlbums(this ISession session, string query, int albumOffset, int albumCount)
         {
-            return session.Search(query, 0, 0, albumOffset, albumCount, 0, 0, 0, 0, sp_search_type.STANDARD);
+            return session.Search(query, 0, 0, albumOffset, albumCount, 0, 0, 0, 0, SearchType.Standard);
         }
         public static ISearch SearchArtists(this ISession session, string query, int artistOffset, int artistCount)
         {
-            return session.Search(query, 0, 0, 0, 0, artistOffset, artistCount, 0, 0, sp_search_type.STANDARD);
+            return session.Search(query, 0, 0, 0, 0, artistOffset, artistCount, 0, 0, SearchType.Standard);
         }
         public static ISearch SearchPlaylist(this ISession session, string query, int playlistOffset, int playlistCount)
         {
-            return session.Search(query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, sp_search_type.STANDARD);
+            return session.Search(query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, SearchType.Standard);
         }
 
         // ArtistBrowse methods made Synchronously

@@ -6,9 +6,9 @@ namespace SpotiFire.SpotifyLib
     internal class ContainerPlaylist : Playlist, IContainerPlaylist
     {
         #region KeyGen
-        private class KeyGen : Tuple<IntPtr, IntPtr, sp_playlist_type>
+        private class KeyGen : Tuple<IntPtr, ulong, PlaylistType>
         {
-            public KeyGen(IntPtr playlistPtr, IntPtr folderId, sp_playlist_type type)
+            public KeyGen(IntPtr playlistPtr, ulong folderId, PlaylistType type)
                 : base(playlistPtr, folderId, type)
             {
             }
@@ -29,7 +29,7 @@ namespace SpotiFire.SpotifyLib
                 ContainerPlaylist.Delete(playlist.playlistPtr, ((ContainerPlaylist)playlist).folderId, ((ContainerPlaylist)playlist).type);
             }
 
-            public sp_playlist_type Type
+            public PlaylistType Type
             {
                 get { IsAlive(true); return ((ContainerPlaylist)playlist).Type; }
             }
@@ -50,7 +50,7 @@ namespace SpotiFire.SpotifyLib
         private static Dictionary<KeyGen, ContainerPlaylist> playlists = new Dictionary<KeyGen, ContainerPlaylist>();
         private static readonly object playlistsLock = new object();
 
-        internal static IContainerPlaylist Get(Session session, PlaylistContainer container, IntPtr playlistPtr, IntPtr folderId, sp_playlist_type type)
+        internal static IContainerPlaylist Get(Session session, PlaylistContainer container, IntPtr playlistPtr, ulong folderId, PlaylistType type)
         {
             KeyGen key = new KeyGen(playlistPtr, folderId, type);
             ContainerPlaylist playlist;
@@ -66,7 +66,7 @@ namespace SpotiFire.SpotifyLib
             return new ContainerPlaylistWrapper(playlist);
         }
 
-        internal static void Delete(IntPtr playlistPtr, IntPtr folderId, sp_playlist_type type)
+        internal static void Delete(IntPtr playlistPtr, ulong folderId, PlaylistType type)
         {
             lock (playlistsLock)
             {
@@ -80,13 +80,13 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Fields
-        private IntPtr folderId = IntPtr.Zero;
+        private ulong folderId = 0;
         private PlaylistContainer container;
-        private sp_playlist_type type;
+        private PlaylistType type;
         #endregion
 
         #region Constructor
-        protected ContainerPlaylist(Session session, PlaylistContainer container, IntPtr playlistPtr, IntPtr folderId, sp_playlist_type type)
+        protected ContainerPlaylist(Session session, PlaylistContainer container, IntPtr playlistPtr, ulong folderId, PlaylistType type)
             : base(session, playlistPtr, true)
         {
             this.folderId = folderId;
@@ -96,7 +96,7 @@ namespace SpotiFire.SpotifyLib
         #endregion
 
         #region Properties
-        public sp_playlist_type Type
+        public PlaylistType Type
         {
             get
             {
@@ -109,15 +109,15 @@ namespace SpotiFire.SpotifyLib
         {
             get
             {
-                if (Type == sp_playlist_type.SP_PLAYLIST_TYPE_PLAYLIST)
+                if (Type == PlaylistType.Playlist)
                     return base.Name;
-                if (Type == sp_playlist_type.SP_PLAYLIST_TYPE_START_FOLDER)
+                if (Type == PlaylistType.StartFolder)
                     return container.GetFolderName(this);
                 return null;
             }
             set
             {
-                if (Type == sp_playlist_type.SP_PLAYLIST_TYPE_PLAYLIST)
+                if (Type == PlaylistType.Playlist)
                     base.Name = value;
                 throw new InvalidOperationException("Can't set the name of folders.");
             }

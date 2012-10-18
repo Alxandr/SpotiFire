@@ -6,7 +6,7 @@ using System.Text;
 namespace SpotiFire.SpotifyLib {
 
     public interface IAlbumBrowse : ISpotifyObject, IDisposable {
-        sp_error Error { get; }
+        Error Error { get; }
         IAlbum Album { get; }
         IArtist Artist { get; }
         event AlbumBrowseEventHandler Complete;
