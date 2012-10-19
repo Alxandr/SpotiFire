@@ -1,0 +1,3416 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        spotifire
+    </assembly>
+    <members>
+        <member name="M:UTF8(System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ @file   api.h    Public API for libspotify
+
+ @note   All input strings are expected to be in UTF-8
+ @note   All output strings are in UTF-8.
+
+ @note   All usernames are valid XMPP nodeprep identifiers:
+         http://tools.ietf.org/html/rfc3920#appendix-A
+         If you need to store user data, we strongly advise you
+         to use the canonical form of the username.
+
+ @example browse.c
+
+ The browse.c example shows how you can use the album, artist, and browse functions.
+ The example also include some rudimentary playlist browsing.
+ It is part of the spshell program
+
+ @example search.c
+
+ The search.c example shows how you can use search functions.
+ It is part of the spshell program
+
+ @example toplist.c
+
+ The toplist.c example shows how you can use toplist functions.
+ It is part of the spshell program
+
+ @example jukebox.c
+
+ The jukebox.c example shows how you can use playback and playlist functions.
+
+</member>
+        <member name="M:sp_build_id">
+@} 
+ Return the libspotify build ID
+
+ This might be useful to have available for display somewhere in your
+ user interface.
+
+</member>
+        <member name="M:sp_inbox_release(sp_inbox*)">
+ Decrease the reference count of a inbox result
+
+ @param[in]   inbox    The inbox result object
+ @return               One of the following errors, from ::sp_error
+                       SP_ERROR_OK
+
+</member>
+        <member name="M:sp_inbox_add_ref(sp_inbox*)">
+ Increase the reference count of a inbox result
+
+ @param[in]   inbox    The inbox result object
+ @return               One of the following errors, from ::sp_error
+                       SP_ERROR_OK
+
+</member>
+        <member name="M:sp_inbox_error(sp_inbox*)">
+ Check if inbox operation returned an error code.
+
+ @param[in]   inbox      Inbox object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_OTHER_TRANSIENT
+                         SP_ERROR_PERMISSION_DENIED
+                         SP_ERROR_INVALID_INDATA
+                         SP_ERROR_INBOX_IS_FULL
+                         SP_ERROR_NO_SUCH_USER
+                         SP_ERROR_OTHER_PERMANENT
+
+</member>
+        <member name="M:sp_inbox_post_tracks(sp_session*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,sp_track*!System.Runtime.CompilerServices.IsConst*,System.Int32,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_inbox*,System.Void*),System.Void*)">
+ Add to inbox
+
+ @param[in]  session    Session object
+ @param[in]  user       Canonical username of recipient
+ @param[in]  tracks     Array of tracks to post
+ @param[in]  num_tracks Number of tracks in \p tracks
+ @param[in]  message    Message to attach to tracks. UTF-8
+ @param[in]  callback   Callback to be invoked when the request has completed
+ @param[in]  userdata   Userdata passed to callback
+
+ @return                sp_inbox object if the request has been sent, NULL if request failed to initialize
+
+</member>
+        <member name="D:inboxpost_complete_cb">
+@} 
+@defgroup inbox Inbox subsystem
+@{
+
+ The type of a callback used in sp_inbox_post()
+
+ When this callback is called, the sp_track_is_loaded(), sp_album_is_loaded(),
+ and sp_artist_is_loaded() functions will return non-zero for the objects
+ contained in the search result.
+
+ @param[in]   result          The same pointer returned by sp_search_create()
+ @param[in]   userdata        The opaque pointer given to sp_search_create()
+
+</member>
+        <member name="M:sp_toplistbrowse_backend_request_duration(sp_toplistbrowse*)">
+ Return the time (in ms) that was spent waiting for the Spotify backend to serve the request
+
+ @param[in]  tlb        Toplist object
+
+ @return                -1 if the request was served from the local cache
+                        If the result is not yet loaded the return value is undefined
+
+</member>
+        <member name="M:sp_toplistbrowse_track(sp_toplistbrowse*,System.Int32)">
+ Return the track at the given index in the given toplist browse object
+
+ @param[in]  tlb        Toplist object
+ @param[in]  index      Index of the wanted track. Should be in the interval [0, sp_toplistbrowse_num_tracks() - 1]
+
+ @return                The track at the given index in the given toplist browse object
+
+</member>
+        <member name="M:sp_toplistbrowse_num_tracks(sp_toplistbrowse*)">
+ Given an toplist browse object, return number of tracks
+
+ @param[in]   tlb         Toplist browse object
+
+ @return                  Number of tracks on toplist
+
+</member>
+        <member name="M:sp_toplistbrowse_album(sp_toplistbrowse*,System.Int32)">
+ Return the album at the given index in the given toplist browse object
+
+ @param[in]  tlb        Toplist object
+ @param[in]  index      Index of the wanted album. Should be in the interval [0, sp_toplistbrowse_num_albums() - 1]
+
+ @return                The album at the given index in the given toplist browse object
+
+</member>
+        <member name="M:sp_toplistbrowse_num_albums(sp_toplistbrowse*)">
+ Given an toplist browse object, return number of albums
+
+ @param[in]   tlb         Toplist browse object
+
+ @return                  Number of albums on toplist
+
+</member>
+        <member name="M:sp_toplistbrowse_artist(sp_toplistbrowse*,System.Int32)">
+ Return the artist at the given index in the given toplist browse object
+
+ @param[in]  tlb        Toplist object
+ @param[in]  index      Index of the wanted artist. Should be in the interval [0, sp_toplistbrowse_num_artists() - 1]
+
+ @return                The artist at the given index in the given toplist browse object
+
+</member>
+        <member name="M:sp_toplistbrowse_num_artists(sp_toplistbrowse*)">
+ Given an toplist browse object, return number of artists
+
+ @param[in]   tlb         Toplist browse object
+
+ @return                  Number of artists on toplist
+
+</member>
+        <member name="M:sp_toplistbrowse_release(sp_toplistbrowse*)">
+ Decrease the reference count of an toplist browse result
+
+ @param[in]   tlb       The toplist browse result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_toplistbrowse_add_ref(sp_toplistbrowse*)">
+ Increase the reference count of an toplist browse result
+
+ @param[in]   tlb       The toplist browse result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_toplistbrowse_error(sp_toplistbrowse*)">
+ Check if browsing returned an error code.
+
+ @param[in]   tlb        Toplist browse object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_IS_LOADING
+                         SP_ERROR_OTHER_PERMANENT
+                         SP_ERROR_OTHER_TRANSIENT
+
+</member>
+        <member name="M:sp_toplistbrowse_is_loaded(sp_toplistbrowse*)">
+ Check if an toplist browse request is completed
+
+ @param[in]   tlb        Toplist browse object
+
+ @return                 True if browsing is completed, false if not
+
+</member>
+        <member name="D:toplistbrowse_complete_cb">
+ The type of a callback used in sp_toplistbrowse_create()
+
+ When the callback is called, the metadata of all tracks belonging to it will have
+ been loaded, so sp_track_is_loaded() will return non-zero. The same goes for the
+ similar toplist data.
+
+ @param[in]   result          The same pointer returned by sp_toplistbrowse_create()
+ @param[in]   userdata        The opaque pointer given to sp_toplistbrowse_create()
+
+</member>
+        <member name="M:sp_user_release(sp_user*)">
+ Decrease the reference count of an user
+
+ @param[in]   user       The user object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_user_add_ref(sp_user*)">
+ Increase the reference count of an user
+
+ @param[in]   user       The user object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_user_is_loaded(sp_user*)">
+ Get load status for a user object. Before it is loaded, only the user's canonical username
+ is known.
+
+ @param[in]   user         Spotify user object
+
+ @return                   True if user object is loaded, otherwise false
+
+</member>
+        <member name="M:sp_user_display_name(sp_user*)">
+ Get a pointer to a string representing the user's displayable username.
+ If there is no difference between the canonical username and the display name,
+ or if the library does not know about the display name yet, the canonical username will
+ be returned.
+
+ @param[in]   user         The Spotify user whose displayable username you would like a string representation of
+
+ @return                   A string
+
+</member>
+        <member name="M:sp_user_canonical_name(sp_user*)">
+ Get a pointer to a string representing the user's canonical username.
+
+ @param[in]   user         The Spotify user whose canonical username you would like a string representation of
+
+ @return                   A string representing the canonical username.
+
+</member>
+        <member name="T:sp_relation_type">
+@} 
+@defgroup user User handling
+@{
+
+User relation type
+
+</member>
+        <member name="M:sp_playlistcontainer_clear_unseen_tracks(sp_playlistcontainer*,sp_playlist*)">
+ Clears a playlist from unseen tracks, so that next call to sp_playlistcontainer_get_unseen_tracks() will return 0 until a new track is added to the \p playslist.
+
+ @param[in]  pc       Playlist container.
+ @param[in]  playlist   Playlist object.
+ @return     Returns 0 on success and -1 on failure.
+
+</member>
+        <member name="M:sp_playlistcontainer_get_unseen_tracks(sp_playlistcontainer*,sp_playlist*,sp_track**,System.Int32)">
+ Get the number of new tracks in a playlist since the corresponding
+ function sp_playlistcontainer_clear_unseen_tracks() was called. The
+ function always returns the number of new tracks, and fills the
+ \p tracks array with the new tracks, but not more than specified in
+ \p num_tracks. The function will return a negative value on failure.
+
+ @param[in]  pc         Playlist container.
+ @param[in]  playlist   Playlist object.
+ @param[out] tracks     Array of pointer to new tracks (maybe NULL)
+ @param[in]  num_tracks Size of tracks array
+ @return     Returns the number of unseen tracks
+
+</member>
+        <member name="M:sp_playlistcontainer_release(sp_playlistcontainer*)">
+ Release reference count on playlistconatiner object
+
+ @param[in]  pc   Playlist container.
+ @return          One of the following errors, from ::sp_error
+                  SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlistcontainer_add_ref(sp_playlistcontainer*)">
+ Increase reference count on playlistconatiner object
+
+ @param[in]  pc   Playlist container.
+ @return          One of the following errors, from ::sp_error
+                  SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlistcontainer_owner(sp_playlistcontainer*)">
+ Return a pointer to the user object of the owner.
+
+ @param[in]  pc   Playlist container.
+ @return          The user object or NULL if unknown or none.
+
+</member>
+        <member name="M:sp_playlistcontainer_add_folder(sp_playlistcontainer*,System.Int32,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ * Add a playlist folder
+ *
+ * @param[in]  pc           Playlist container
+ * @param[in]  index        Position of SP_PLAYLIST_TYPE_START_FOLDER entry
+ * @param[in]  name         Name of group
+
+ * @return     error        One of the following errors, from ::sp_error
+ *                          SP_ERROR_OK
+ *                          SP_ERROR_INDEX_OUT_OF_RANGE
+ *
+ * @note This operation will actually create two playlists. One of
+ * type SP_PLAYLIST_TYPE_START_FOLDER and immediately following a
+ * SP_PLAYLIST_TYPE_END_FOLDER one.
+ *
+ * To remove a playlist folder both of these must be deleted or the list
+ * will be left in an inconsistant state.
+ *
+ * There is no way to rename a playlist folder. Instead you need to remove
+ * the folder and recreate it again.
+
+</member>
+        <member name="M:sp_playlistcontainer_move_playlist(sp_playlistcontainer*,System.Int32,System.Int32,System.Boolean)">
+ * Move a playlist in the playlist container
+ *
+ * @param[in]  pc           Playlist container
+ * @param[in]  index        Index of playlist to be moved
+ * @param[in]  new_position New position for the playlist
+ * @param[in]  dry_run      Do not execute the move, only check if it possible
+
+ * @return     error        One of the following errors, from ::sp_error
+ *                          SP_ERROR_OK
+ *                          SP_ERROR_INDEX_OUT_OF_RANGE
+ *                          SP_ERROR_INVALID_INDATA - If trying to move a folder into itself
+
+</member>
+        <member name="M:sp_playlistcontainer_remove_playlist(sp_playlistcontainer*,System.Int32)">
+ Remove playlist at index from the given playlist container
+
+ @param[in]  pc        Playlist container
+ @param[in]  index     Index of playlist to be removed
+
+ @return     error     One of the following errors, from ::sp_error
+                       SP_ERROR_OK
+                       SP_ERROR_INDEX_OUT_OF_RANGE
+
+</member>
+        <member name="M:sp_playlistcontainer_add_playlist(sp_playlistcontainer*,sp_link*)">
+ Add an existing playlist at the end of the given playlist container
+
+ @param[in]  pc        Playlist container
+ @param[in]  link      Link object pointing to a playlist
+
+ @return               Pointer to the new playlist. Will be NULL if the playlist already exists.
+
+</member>
+        <member name="M:sp_playlistcontainer_add_new_playlist(sp_playlistcontainer*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ Add an empty playlist at the end of the playlist container.
+ The name must not consist of only spaces and it must be shorter than 256 characters.
+
+ @param[in]  pc        Playlist container
+ @param[in]  name      Name of new playlist
+
+ @return               Pointer to the new playlist. Can be NULL if the operation fails.
+
+</member>
+        <member name="M:sp_playlistcontainer_playlist_folder_id(sp_playlistcontainer*,System.Int32)">
+ Return the folder id at @a index
+
+ @param[in]  pc        Playlist container
+ @param[in]  index     Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1]
+
+ @return               The group ID of the folder. Returns 0 on index out of range, pc being NULL or indexed item not being a folder
+
+ @sa sp_session_playlistcontainer()
+
+</member>
+        <member name="M:sp_playlistcontainer_playlist_folder_name(sp_playlistcontainer*,System.Int32,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.Int32)">
+ Return the folder name at @a index
+
+ @param[in]  pc           Playlist container
+ @param[in]  index        Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1].
+                          Index should point at a start-folder entry, otherwise the empty string is written to buffer.
+ @param[in]  buffer       Pointer to char[] where to store folder name
+ @param[in]  buffer_size  Size of array
+
+ @return                  One of the following errors, from ::sp_error
+                          SP_ERROR_OK
+                          SP_ERROR_INDEX_OUT_OF_RANGE
+
+ @sa sp_session_playlistcontainer()
+
+</member>
+        <member name="M:sp_playlistcontainer_playlist_type(sp_playlistcontainer*,System.Int32)">
+ Return the type of the playlist at a @a index
+
+ @param[in]  pc        Playlist container
+ @param[in]  index     Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1]
+
+ @return               Type of the playlist, @see sp_playlist_type
+
+ @sa sp_session_playlistcontainer()
+
+</member>
+        <member name="M:sp_playlistcontainer_playlist(sp_playlistcontainer*,System.Int32)">
+ Return a pointer to the playlist at a specific index
+
+ @param[in]  pc        Playlist container
+ @param[in]  index     Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1]
+
+ @return               The playlist object
+
+ @sa sp_session_playlistcontainer()
+
+</member>
+        <member name="M:sp_playlistcontainer_is_loaded(sp_playlistcontainer*)">
+ Return true if the playlistcontainer is fully loaded
+
+ @param[in]  pc        Playlist container
+
+ @return               True if container is loaded
+
+ @note The container_loaded callback will be invoked when this flips to true
+
+</member>
+        <member name="M:sp_playlistcontainer_num_playlists(sp_playlistcontainer*)">
+ Return the number of playlists in the given playlist container
+
+ @param[in]  pc        Playlist container
+
+ @return               Number of playlists, -1 if undefined
+
+ @sa sp_session_playlistcontainer()
+
+</member>
+        <member name="M:sp_playlistcontainer_remove_callbacks(sp_playlistcontainer*,sp_playlistcontainer_callbacks*,System.Void*)">
+ Unregister interest in changes to a playlist container
+
+ @param[in]  pc        Playlist container
+ @param[in]  callbacks Callbacks, see sp_playlistcontainer_callbacks
+ @param[in]  userdata  Opaque value passed to callbacks.
+
+ @sa sp_session_playlistcontainer()
+ @sa sp_playlistcontainer_add_callbacks
+ @return              One of the following errors, from ::sp_error
+                      SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlistcontainer_add_callbacks(sp_playlistcontainer*,sp_playlistcontainer_callbacks*,System.Void*)">
+ Register interest in changes to a playlist container
+
+ @param[in]  pc        Playlist container
+ @param[in]  callbacks Callbacks, see sp_playlistcontainer_callbacks
+ @param[in]  userdata  Opaque value passed to callbacks.
+
+ @note Every sp_playlistcontainer_add_callbacks() needs to be paired with a corresponding
+       sp_playlistcontainer_remove_callbacks() that is invoked before releasing the
+       last reference you own for the container. In other words, you must make sure
+       to have removed all the callbacks before the container gets destroyed.
+
+ @sa sp_session_playlistcontainer()
+ @sa sp_playlistcontainer_remove_callbacks
+ @return              One of the following errors, from ::sp_error
+                      SP_ERROR_OK
+
+</member>
+        <member name="F:sp_playlistcontainer_callbacks.container_loaded">
+ Called when the playlist container is loaded
+
+ @param[in]  pc         Playlist container
+ @param[in]  userdata   Userdata as set in sp_playlistcontainer_add_callbacks()
+
+</member>
+        <member name="F:sp_playlistcontainer_callbacks.playlist_moved">
+ Called when a playlist has been moved in the playlist container
+
+ @param[in]  pc         Playlist container
+ @param[in]  playlist   Playlist object.
+ @param[in]  position   Previous position in playlist container list
+ @param[in]  new_position   New position in playlist container list
+ @param[in]  userdata   Userdata as set in sp_playlistcontainer_add_callbacks()
+
+</member>
+        <member name="F:sp_playlistcontainer_callbacks.playlist_removed">
+ Called when a new playlist has been removed from playlist container
+
+ @param[in]  pc         Playlist container
+ @param[in]  playlist   Playlist object.
+ @param[in]  position   Position in list
+ @param[in]  userdata   Userdata as set in sp_playlistcontainer_add_callbacks()
+
+</member>
+        <member name="F:sp_playlistcontainer_callbacks.playlist_added">
+ Called when a new playlist has been added to the playlist container.
+
+ @param[in]  pc         Playlist container
+ @param[in]  playlist   Playlist object.
+ @param[in]  position   Position in list
+ @param[in]  userdata   Userdata as set in sp_playlistcontainer_add_callbacks()
+
+</member>
+        <member name="T:sp_playlistcontainer_callbacks">
+ Playlist container callbacks.
+ If some callbacks should not be of interest, set them to NULL.
+
+ @see sp_playlistcontainer_add_callbacks
+ @see sp_playlistcontainer_remove_callbacks
+
+</member>
+        <member name="M:sp_playlist_release(sp_playlist*)">
+ Decrease the reference count of a playlist
+
+ @param[in]   playlist       The playlist object
+ @return                     One of the following errors, from ::sp_error
+                             SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_add_ref(sp_playlist*)">
+ Increase the reference count of a playlist
+
+ @param[in]   playlist       The playlist object
+ @return                     One of the following errors, from ::sp_error
+                             SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_get_offline_download_completed(sp_session*,sp_playlist*)">
+ Get download progress for an offline playlist
+
+ @param[in]  session        Session object
+ @param[in]  playlist       Playlist object
+
+ @return Value from 0 - 100 that indicates amount of playlist that is downloaded
+ or 0 if the playlist is not in the SP_PLAYLIST_OFFLINE_STATUS_DOWNLOADING mode.
+
+ @see sp_playlist_offline_status()
+
+</member>
+        <member name="M:sp_playlist_get_offline_status(sp_session*,sp_playlist*)">
+ Get offline status for a playlist
+
+ @param[in]  session        Session object
+ @param[in]  playlist       Playlist object
+
+ @return sp_playlist_offline_status
+
+ @see When in SP_PLAYLIST_OFFLINE_STATUS_DOWNLOADING mode the
+      sp_playlist_get_offline_download_completed() method can be used to query
+      progress of the download
+
+</member>
+        <member name="M:sp_playlist_set_offline_mode(sp_session*,sp_playlist*,System.Boolean)">
+ Mark a playlist to be synchronized for offline playback.
+ The playlist must be in the users playlistcontainer
+
+ @param[in]  session        Session object
+ @param[in]  playlist       Playlist object
+ @param[in]  offline        True iff playlist should be offline, false otherwise
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_create(sp_session*,sp_link*)">
+ Load an already existing playlist without adding it to a playlistcontainer.
+
+ @param[in]  session        Session object
+ @param[in]  link           Link object referring to a playlist
+
+ @return     A playlist. The reference is owned by the caller and should be released with sp_playlist_release()
+
+
+</member>
+        <member name="M:sp_playlist_set_in_ram(sp_session*,sp_playlist*,System.Boolean)">
+ Return whether a playlist is loaded in RAM (as opposed to only
+ stored on disk)
+
+ @param[in]  session        Session object
+ @param[in]  playlist       Playlist object
+ @param[in]  in_ram         Controls whether or not to keep the list in RAM
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_is_in_ram(sp_session*,sp_playlist*)">
+ Return whether a playlist is loaded in RAM (as opposed to only
+ stored on disk)
+
+ @param[in]  session        Session object
+ @param[in]  playlist       Playlist object
+
+ @return True iff playlist is in RAM, False otherwise
+
+ @note       When a playlist is no longer in RAM it will appear empty.
+             However, libspotify will retain information about the
+             list metadata  (owner, title, picture, etc) in RAM.
+             There is one caveat tough: If libspotify has never seen the
+             playlist before this metadata will also be unset.
+             In order for libspotify to get the metadata the playlist
+             needs to be loaded at least once.
+             In order words, if libspotify starts with an empty playlist
+             cache and the application has set 'initially_unload_playlists'
+             config parameter to True all playlists will be empty.
+             It will not be possible to generate URI's to the playlists
+             nor extract playlist title until the application calls
+             sp_playlist_set_in_ram(..., true). So an application
+             that needs to stay within a low memory profile would need to
+             cycle thru all new playlists in order to extract metadata.
+
+             The easiest way to detect this case is when
+             sp_playlist_is_in_ram() returns false and
+             sp_link_create_from_playlist() returns NULL
+
+</member>
+        <member name="M:sp_playlist_update_subscribers(sp_session*,sp_playlist*)">
+ Ask library to update the subscription count for a playlist
+
+ When the subscription info has been fetched from the Spotify backend
+ the playlist subscribers_changed() callback will be invoked.
+ In that callback use sp_playlist_num_subscribers() and/or
+ sp_playlist_subscribers() to get information about the subscribers.
+ You can call those two functions anytime you want but the information
+ might not be up to date in such cases
+
+ @param[in]  session        Session object
+ @param[in]  playlist       Playlist object
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_subscribers_free(sp_subscribers*)">
+ Free object returned from sp_playlist_subscribers()
+
+ @param[in] subscribers   Subscribers object
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_subscribers(sp_playlist*)">
+ Return subscribers for a playlist
+
+ @param[in]  playlist       Playlist object
+
+ @return     sp_subscribers struct with array of canonical usernames.
+             This object should be free'd using sp_playlist_subscribers_free()
+
+ @note       The count returned for this function may be less than those
+             returned by sp_playlist_num_subscribers(). Spotify does not
+             track each user subscribed to a playlist for playlist with
+             many (&gt;500) subscribers.
+
+</member>
+        <member name="M:sp_playlist_num_subscribers(sp_playlist*)">
+ Return number of subscribers for a given playlist
+
+ @param[in]  playlist       Playlist object
+
+ @return     Number of subscribers
+
+
+</member>
+        <member name="M:sp_playlist_reorder_tracks(sp_playlist*,System.Int32!System.Runtime.CompilerServices.IsConst*,System.Int32,System.Int32)">
+ Move tracks in playlist
+
+ @param[in]  playlist       Playlist object
+ @param[in]  tracks         Array of pointer to track indices to be moved.
+                            A certain track index should be present at most once, e.g. [0, 1, 2] is valid indata,
+                            whereas [0, 1, 1] is invalid.
+ @param[in]  num_tracks     Length of \p tracks array
+ @param[in]  new_position   New position for tracks
+
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+                            SP_ERROR_INVALID_INDATA - position is &gt; current playlist length
+                            SP_ERROR_PERMISSION_DENIED
+
+</member>
+        <member name="M:sp_playlist_remove_tracks(sp_playlist*,System.Int32!System.Runtime.CompilerServices.IsConst*,System.Int32)">
+ Remove tracks from a playlist
+
+ @param[in]  playlist       Playlist object
+ @param[in]  tracks         Array of pointer to track indices.
+                            A certain track index should be present at most once, e.g. [0, 1, 2] is valid indata,
+                            whereas [0, 1, 1] is invalid.
+ @param[in]  num_tracks     Length of \p tracks array
+
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+                            SP_ERROR_PERMISSION_DENIED
+
+</member>
+        <member name="M:sp_playlist_add_tracks(sp_playlist*,sp_track*!System.Runtime.CompilerServices.IsConst*,System.Int32,System.Int32,sp_session*)">
+ Add tracks to a playlist
+
+ @param[in]  playlist       Playlist object
+ @param[in]  tracks         Array of pointer to tracks.
+ @param[in]  num_tracks     Length of \p tracks array
+ @param[in]  position       Start position in playlist where to insert the tracks
+ @param[in]  session        Your session object
+
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+                        SP_ERROR_INVALID_INDATA - position is &gt; current playlist length
+                        SP_ERROR_PERMISSION_DENIED
+
+</member>
+        <member name="M:sp_playlist_has_pending_changes(sp_playlist*)">
+ Check if a playlist has pending changes
+
+ Pending changes are local changes that have not yet been acknowledged by the server.
+
+ @param[in]  playlist       Playlist object
+
+ @return                    A flag representing if there are pending changes or not
+
+</member>
+        <member name="M:sp_playlist_get_image(sp_playlist*,System.Byte*)">
+ * Get description for a playlist
+ *
+ * @param[in]  playlist       Playlist object
+ * @param[out] image          20 byte image id
+
+ * @return                    TRUE if playlist has an image, FALSE if not
+ *
+
+</member>
+        <member name="M:sp_playlist_get_description(sp_playlist*)">
+ Get description for a playlist
+
+ @param[in]  playlist       Playlist object
+
+ @return                    Playlist description or NULL if unset
+
+
+</member>
+        <member name="M:sp_playlist_set_autolink_tracks(sp_playlist*,System.Boolean)">
+ Set autolinking state for a playlist.
+
+ If a playlist is autolinked, unplayable tracks will be made playable
+ by linking them to other Spotify tracks, where possible.
+
+ @param[in]  playlist       Playlist object
+ @param[in]  link           True or false
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_set_collaborative(sp_playlist*,System.Boolean)">
+ Set collaborative status for a playlist.
+
+ A playlist in collaborative state can be modified by all users, not only the user owning the list
+
+ @param[in]  playlist       Playlist object
+ @param[in]  collaborative  True or false
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_playlist_is_collaborative(sp_playlist*)">
+ Return collaborative status for a playlist.
+
+ A playlist in collaborative state can be modifed by all users, not only the user owning the list
+
+ @param[in]  playlist   Playlist object
+
+ @return                true if playlist is collaborative, otherwise false
+
+</member>
+        <member name="M:sp_playlist_owner(sp_playlist*)">
+ Return a pointer to the user for the given playlist
+
+ @param[in]  playlist   Playlist object
+
+ @return                User object
+
+</member>
+        <member name="M:sp_playlist_rename(sp_playlist*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ Rename the given playlist
+ The name must not consist of only spaces and it must be shorter than 256 characters.
+
+ @param[in]  playlist   Playlist object
+ @param[in]  new_name   New name for playlist
+
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+                        SP_ERROR_INVALID_INDATA
+                        SP_ERROR_PERMISSION_DENIED
+
+</member>
+        <member name="M:sp_playlist_name(sp_playlist*)">
+ Return name of given playlist
+
+ @param[in]  playlist   Playlist object
+
+ @return                The name of the given playlist
+
+</member>
+        <member name="M:sp_playlist_track_message(sp_playlist*,System.Int32)">
+ Return a message attached to a playlist item. Typically used on inbox.
+
+ @param[in]  playlist   Playlist object
+ @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+
+ @return                UTF-8 encoded message, or NULL if no message is present
+
+</member>
+        <member name="M:sp_playlist_track_set_seen(sp_playlist*,System.Int32,System.Boolean)">
+ Set seen status of a playlist entry
+
+ @param[in]  playlist   Playlist object
+ @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+ @param[in]  seen       Seen status to be set
+
+ @return     error     One of the following errors, from ::sp_error
+                       SP_ERROR_OK
+                       SP_ERROR_INDEX_OUT_OF_RANGE
+
+</member>
+        <member name="M:sp_playlist_track_seen(sp_playlist*,System.Int32)">
+ Return if a playlist entry is marked as seen or not
+
+ @param[in]  playlist   Playlist object
+ @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+
+ @return                Seen state
+
+</member>
+        <member name="M:sp_playlist_track_creator(sp_playlist*,System.Int32)">
+ Return user that added the given index in the playlist
+
+ @param[in]  playlist   Playlist object
+ @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+
+ @return                User object
+
+</member>
+        <member name="M:sp_playlist_track_create_time(sp_playlist*,System.Int32)">
+ Return when the given index was added to the playlist
+
+ @param[in]  playlist   Playlist object
+ @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+
+ @return                Time, Seconds since unix epoch.
+
+</member>
+        <member name="M:sp_playlist_track(sp_playlist*,System.Int32)">
+ Return the track at the given index in a playlist
+
+ @param[in]  playlist   Playlist object
+ @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+
+ @return                The track at the given index
+
+</member>
+        <member name="M:sp_playlist_num_tracks(sp_playlist*)">
+ Return number of tracks in the given playlist
+
+ @param[in]  playlist   Playlist object
+
+ @return                The number of tracks in the playlist
+
+</member>
+        <member name="M:sp_playlist_remove_callbacks(sp_playlist*,sp_playlist_callbacks*,System.Void*)">
+ Unregister interest in the given playlist
+
+ The combination of (\p callbacks, \p userdata) is used to find the entry to be removed
+
+ Here is a snippet from \c jukebox.c:
+ @dontinclude jukebox.c
+ @skipline sp_playlist_remove_callbacks
+
+ @param[in]  playlist   Playlist object
+ @param[in]  callbacks  Callbacks, see #sp_playlist_callbacks
+ @param[in]  userdata   Userdata to be passed to callbacks
+ @sa sp_playlist_add_callbacks
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+
+</member>
+        <member name="M:sp_playlist_add_callbacks(sp_playlist*,sp_playlist_callbacks*,System.Void*)">
+ Register interest in the given playlist
+
+ Here is a snippet from \c jukebox.c:
+ @dontinclude jukebox.c
+ @skipline sp_playlist_add_callbacks
+
+ @param[in]  playlist   Playlist object
+ @param[in]  callbacks  Callbacks, see #sp_playlist_callbacks
+ @param[in]  userdata   Userdata to be passed to callbacks
+ @sa sp_playlist_remove_callbacks
+
+
+</member>
+        <member name="M:sp_playlist_is_loaded(sp_playlist*)">
+ Get load status for the specified playlist. If it's false, you have to wait until
+ playlist_state_changed happens, and check again if is_loaded has changed
+
+ @param[in]  playlist   Playlist object
+
+ @return                True if playlist is loaded, otherwise false
+
+</member>
+        <member name="F:sp_playlist_callbacks.subscribers_changed">
+ Called when playlist subscribers changes (count or list of names)
+
+ @param[in]  pl         Playlist object
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.track_message_changed">
+ Called when message attribute for a playlist entry changes.
+
+ @param[in]  pl         Playlist object
+ @param[in]  position   Position in playlist
+ @param[in]  message    UTF-8 encoded message
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.image_changed">
+ Called when playlist image has changed
+
+ @param[in]  pl         Playlist object
+ @param[in]  image      New image
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.description_changed">
+ Called when playlist description has changed
+
+ @param[in]  pl         Playlist object
+ @param[in]  desc       New description
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.track_seen_changed">
+ Called when seen attribute for a playlist entry changes.
+
+ @param[in]  pl         Playlist object
+ @param[in]  position   Position in playlist
+ @param[in]  seen       Set if entry it marked as seen
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.track_created_changed">
+ Called when create time and/or creator for a playlist entry changes
+
+ @param[in]  pl         Playlist object
+ @param[in]  position   Position in playlist
+ @param[in]  user       User object
+ @param[in]  time       When entry was created, seconds since the unix epoch.
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.playlist_metadata_updated">
+ Called when metadata for one or more tracks in a playlist has been updated.
+
+ @param[in]  pl         Playlist object
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.playlist_update_in_progress">
+ Called when a playlist is updating or is done updating
+
+ This is called before and after a series of changes are applied to the
+ playlist. It allows e.g. the user interface to defer updating until the
+ entire operation is complete.
+
+ @param[in]  pl         Playlist object
+ @param[in]  done       True iff the update is completed
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.playlist_state_changed">
+ Called when state changed for a playlist.
+
+ There are three states that trigger this callback:
+ - Collaboration for this playlist has been turned on or off
+ - The playlist started having pending changes, or all pending changes have now been committed
+ - The playlist started loading, or finished loading
+
+ @param[in]  pl         Playlist object
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+ @sa sp_playlist_is_collaborative
+ @sa sp_playlist_has_pending_changes
+ @sa sp_playlist_is_loaded
+
+</member>
+        <member name="F:sp_playlist_callbacks.playlist_renamed">
+ Called when a playlist has been renamed. sp_playlist_name() can be used to find out the new name
+
+ @param[in]  pl         Playlist object
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.tracks_moved">
+ Called when one or more tracks have been moved within a playlist
+
+ @param[in]  pl         Playlist object
+ @param[in]  tracks     Array of positions representing the tracks that were moved
+ @param[in]  num_tracks Number of entries in \p tracks
+ @param[in]  position   New position in the playlist for the first track.
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.tracks_removed">
+ Called when one or more tracks have been removed from a playlist
+
+ @param[in]  pl         Playlist object
+ @param[in]  tracks     Array of positions representing the tracks that were removed
+ @param[in]  num_tracks Number of entries in \p tracks
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="F:sp_playlist_callbacks.tracks_added">
+ Called when one or more tracks have been added to a playlist
+
+ @param[in]  pl         Playlist object
+ @param[in]  tracks     Array of pointers to track objects
+ @param[in]  num_tracks Number of entries in \p tracks
+ @param[in]  position   Position in the playlist for the first track.
+ @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+
+</member>
+        <member name="T:sp_playlist_callbacks">
+@} 
+ @defgroup playlist Playlist subsystem
+
+ The playlist subsystem handles playlists and playlist containers (list of playlists).
+
+ The playlist container functions are always valid, but your playlists are not
+ guaranteed to be loaded until the sp_session_callbacks#logged_in callback has
+ been issued.
+
+ @{
+
+ Playlist callbacks
+
+ Used to get notifications when playlists are updated.
+ If some callbacks should not be of interest, set them to NULL.
+
+</member>
+        <member name="M:sp_search_release(sp_search*)">
+ Decrease the reference count of a search result
+
+ @param[in]   search    The search result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_search_add_ref(sp_search*)">
+ Increase the reference count of a search result
+
+ @param[in]   search    The search result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_search_total_playlists(sp_search*)">
+ Return the total number of playlists for the search query - regardless of the interval requested at creation.
+ If this value is larger than the interval specified at creation of the search object, more search results are available.
+ To fetch these, create a new search object with a new interval.
+
+ @param[in]  search     Search object
+
+ @return                The total number of playlists matching the original query
+
+</member>
+        <member name="M:sp_search_total_artists(sp_search*)">
+ Return the total number of artists for the search query - regardless of the interval requested at creation.
+ If this value is larger than the interval specified at creation of the search object, more search results are available.
+ To fetch these, create a new search object with a new interval.
+
+ @param[in]  search     Search object
+
+ @return                The total number of artists matching the original query
+
+</member>
+        <member name="M:sp_search_total_albums(sp_search*)">
+ Return the total number of albums for the search query - regardless of the interval requested at creation.
+ If this value is larger than the interval specified at creation of the search object, more search results are available.
+ To fetch these, create a new search object with a new interval.
+
+ @param[in]  search     Search object
+
+ @return                The total number of albums matching the original query
+
+</member>
+        <member name="M:sp_search_total_tracks(sp_search*)">
+ Return the total number of tracks for the search query - regardless of the interval requested at creation.
+ If this value is larger than the interval specified at creation of the search object, more search results are available.
+ To fetch these, create a new search object with a new interval.
+
+ @param[in]  search     Search object
+
+ @return                The total number of tracks matching the original query
+
+</member>
+        <member name="M:sp_search_did_you_mean(sp_search*)">
+ Return the "Did you mean" query for the given search object
+
+ @param[in]  search     Search object
+
+ @return                The "Did you mean" query for the given search object, or the empty string if no such info is available
+
+</member>
+        <member name="M:sp_search_query(sp_search*)">
+ Return the search query for the given search object
+
+ @param[in]  search     Search object
+
+ @return                The search query for the given search object
+
+</member>
+        <member name="M:sp_search_artist(sp_search*,System.Int32)">
+ Return the artist at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted artist. Should be in the interval [0, sp_search_num_artists() - 1]
+
+ @return                The artist at the given index in the given search object
+
+</member>
+        <member name="M:sp_search_num_artists(sp_search*)">
+ Get the number of artists for the specified search
+
+ @param[in]  search   Search object
+
+ @return              The number of artists for the specified search
+
+</member>
+        <member name="M:sp_search_playlist_image_uri(sp_search*,System.Int32)">
+ Return the image_uri of a playlist at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted playlist. Should be in the interval [0, sp_search_num_playlists() - 1]
+
+ @return                The playlist image_uri at the given index in the given search object
+
+</member>
+        <member name="M:sp_search_playlist_uri(sp_search*,System.Int32)">
+ Return the uri of a playlist at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted playlist. Should be in the interval [0, sp_search_num_playlists() - 1]
+
+ @return                The playlist uri at the given index in the given search object
+
+</member>
+        <member name="M:sp_search_playlist_name(sp_search*,System.Int32)">
+ Return the playlist at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted playlist. Should be in the interval [0, sp_search_num_playlists() - 1]
+
+ @return                The playlist name at the given index in the given search object
+
+</member>
+        <member name="M:sp_search_playlist(sp_search*,System.Int32)">
+ Load the playlist at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted playlist. Should be in the interval [0, sp_search_num_playlists() - 1]
+
+ @return                A playlist object. This reference is owned by the caller and should be released with sp_playlist_release()
+
+</member>
+        <member name="M:sp_search_num_playlists(sp_search*)">
+ Get the number of playlists for the specified search
+
+ @param[in]  search   Search object
+
+ @return              The number of playlists for the specified search
+
+</member>
+        <member name="M:sp_search_album(sp_search*,System.Int32)">
+ Return the album at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted album. Should be in the interval [0, sp_search_num_albums() - 1]
+
+ @return                The album at the given index in the given search object
+
+</member>
+        <member name="M:sp_search_num_albums(sp_search*)">
+ Get the number of albums for the specified search
+
+ @param[in]  search   Search object
+
+ @return              The number of albums for the specified search
+
+</member>
+        <member name="M:sp_search_track(sp_search*,System.Int32)">
+ Return the track at the given index in the given search object
+
+ @param[in]  search     Search object
+ @param[in]  index      Index of the wanted track. Should be in the interval [0, sp_search_num_tracks() - 1]
+
+ @return                The track at the given index in the given search object
+
+</member>
+        <member name="M:sp_search_num_tracks(sp_search*)">
+ Get the number of tracks for the specified search
+
+ @param[in]  search   Search object
+
+ @return              The number of tracks for the specified search
+
+</member>
+        <member name="M:sp_search_error(sp_search*)">
+ Check if search returned an error code.
+
+ @param[in]   search     Search object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_IS_LOADING
+                         SP_ERROR_OTHER_PERMANENT
+                         SP_ERROR_OTHER_TRANSIENT
+
+</member>
+        <member name="M:sp_search_is_loaded(sp_search*)">
+ Get load status for the specified search. Before it is loaded, it will behave as an empty search result.
+
+ @param[in]  search   Search object
+
+ @return              True if search is loaded, otherwise false
+
+</member>
+        <member name="M:sp_search_create(sp_session*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,sp_search_type,=FUNC:System.Void(sp_search*,System.Void*),System.Void*)">
+ Create a search object from the given query
+
+ @param[in]  session    Session
+ @param[in]  query      Query search string, e.g. 'The Rolling Stones' or 'album:"The Black Album"'
+ @param[in]  track_offset     The offset among the tracks of the result
+ @param[in]  track_count      The number of tracks to ask for
+ @param[in]  album_offset     The offset among the albums of the result
+ @param[in]  album_count      The number of albums to ask for
+ @param[in]  artist_offset    The offset among the artists of the result
+ @param[in]  artist_count     The number of artists to ask for
+ @param[in]  playlist_offset  The offset among the playlists of the result
+ @param[in]  playlist_count   The number of playlists to ask for
+ @param[in]  search_type      Type of search, can be used for suggest searches
+ @param[in]  callback   Callback that will be called once the search operation is complete. Pass NULL if you are not interested in this event.
+ @param[in]  userdata   Opaque pointer passed to \p callback
+
+ @return                Pointer to a search object. To free the object, use sp_search_release()
+
+</member>
+        <member name="D:search_complete_cb">
+@} 
+@defgroup search Search subsystem
+@{
+
+ The type of a callback used in sp_search_create()
+
+ When this callback is called, the sp_track_is_loaded(), sp_album_is_loaded(),
+ and sp_artist_is_loaded() functions will return non-zero for the objects
+ contained in the search result.
+
+ @param[in]   result          The same pointer returned by sp_search_create()
+ @param[in]   userdata        The opaque pointer given to sp_search_create()
+
+</member>
+        <member name="M:sp_image_release(sp_image*)">
+ Decrease the reference count of an image
+
+ @param[in]   image     The image object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_image_add_ref(sp_image*)">
+ Increase the reference count of an image
+
+ @param[in]   image     The image object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_image_image_id(sp_image*)">
+ Get image ID
+
+ @param[in]  image      Image object
+
+ @return                Image ID
+
+</member>
+        <member name="M:sp_image_data(sp_image*,System.UInt32*)">
+ Get image data
+
+ @param[in]  image      Image object
+ @param[out] data_size  Size of raw image data
+
+ @return                Pointer to raw image data
+
+</member>
+        <member name="M:sp_image_format(sp_image*)">
+ Get image format
+
+ @param[in]  image      Image object
+
+ @return                Image format as described by sp_imageformat
+
+</member>
+        <member name="M:sp_image_error(sp_image*)">
+ Check if image retrieval returned an error code.
+
+ @param[in]   image      Image object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_IS_LOADING
+                         SP_ERROR_OTHER_PERMANENT
+                         SP_ERROR_OTHER_TRANSIENT
+
+</member>
+        <member name="M:sp_image_is_loaded(sp_image*)">
+ Check if an image is loaded. Before the image is loaded, the rest of the
+ methods will behave as if the image is empty.
+
+ @param[in]  image      Image object
+
+ @return                True if image is loaded, false otherwise
+
+</member>
+        <member name="M:sp_image_remove_load_callback(sp_image*,=FUNC:System.Void(sp_image*,System.Void*),System.Void*)">
+ Remove an image load callback previously added with sp_image_add_load_callback()
+
+ @param[in]  image      Image object
+ @param[in]  callback   Callback that will not be called when image has been
+                        fetched.
+ @param[in]  userdata   Opaque pointer passed to \p callback
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_image_add_load_callback(sp_image*,=FUNC:System.Void(sp_image*,System.Void*),System.Void*)">
+ Add a callback that will be invoked when the image is loaded
+
+ If an image is loaded, and loading fails, the image will behave like an
+ empty image.
+
+ @param[in]  image      Image object
+ @param[in]  callback   Callback that will be called when image has been
+                        fetched.
+ @param[in]  userdata   Opaque pointer passed to \p callback
+
+
+</member>
+        <member name="M:sp_image_create_from_link(sp_session*,sp_link*)">
+ Create an image object from a link
+
+ @param[in]  session    Session
+ @param[in]  l          Spotify link object. This must be of SP_LINKTYPE_IMAGE type
+
+ @return                Pointer to an image object. To free the object, use
+                        sp_image_release()
+
+ @see sp_image_create
+
+</member>
+        <member name="M:sp_image_create(sp_session*,System.Byte!System.Runtime.CompilerServices.IsConst*)">
+ Create an image object
+
+ @param[in]  session    Session
+ @param[in]  image_id   Spotify image ID
+
+ @return                Pointer to an image object. To free the object, use
+                        sp_image_release()
+
+ @see sp_album_cover
+ @see sp_artistbrowse_portrait
+
+</member>
+        <member name="D:image_loaded_cb">
+The type of a callback used to notify the application that an image
+is done loading.
+
+</member>
+        <member name="M:sp_artistbrowse_release(sp_artistbrowse*)">
+ Decrease the reference count of an artist browse result
+
+ @param[in]   arb       The artist browse result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_artistbrowse_add_ref(sp_artistbrowse*)">
+ Increase the reference count of an artist browse result
+
+ @param[in]   arb       The artist browse result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_artistbrowse_backend_request_duration(sp_artistbrowse*)">
+ Return the time (in ms) that was spent waiting for the Spotify backend to serve the request
+
+ @param[in] arb         Artist browse object
+
+ @return                -1 if the request was served from the local cache
+                        If the result is not yet loaded the return value is undefined
+
+</member>
+        <member name="M:sp_artistbrowse_biography(sp_artistbrowse*)">
+ Given an artist browse object, return the artists biography
+
+ @note This function must be called from the same thread that did sp_session_create()
+ @param[in] arb             Artist browse object
+
+ @return                    Biography string in UTF-8 format.
+                            Returned string is valid as long as the album object stays allocated
+                            and no longer than the next call to sp_session_process_events()
+
+</member>
+        <member name="M:sp_artistbrowse_similar_artist(sp_artistbrowse*,System.Int32)">
+ Given an artist browse object, return a similar artist by index
+
+ @param[in] arb             Album browse object
+ @param[in] index           The index for the artist. Should be in the interval [0, sp_artistbrowse_num_similar_artists() - 1]
+
+ @return                    A pointer to an artist object.
+
+ @see artist
+
+</member>
+        <member name="M:sp_artistbrowse_num_similar_artists(sp_artistbrowse*)">
+ Given an artist browse object, return number of similar artists
+
+ @param[in] arb             Artist browse object
+
+ @return                    Number of similar artists for given artist
+
+</member>
+        <member name="M:sp_artistbrowse_album(sp_artistbrowse*,System.Int32)">
+ Given an artist browse object, return one of its albums
+
+ @param[in] arb             Album browse object
+ @param[in] index           The index for the album. Should be in the interval [0, sp_artistbrowse_num_albums() - 1]
+
+ @return                    A album object, or NULL if the index is out of range.
+
+ @see album
+
+</member>
+        <member name="M:sp_artistbrowse_num_albums(sp_artistbrowse*)">
+ Given an artist browse object, return number of albums
+
+ @param[in] arb             Artist browse object
+
+ @return                    Number of albums for given artist
+
+</member>
+        <member name="M:sp_artistbrowse_tophit_track(sp_artistbrowse*,System.Int32)">
+ Given an artist browse object, return one of its tophit tracks
+ This is a set of tracks for the artist with highest popularity
+
+ @param[in] arb             Album browse object
+ @param[in] index           The index for the track. Should be in the interval [0, sp_artistbrowse_num_tophit_tracks() - 1]
+
+ @return                    A track object, or NULL if the index is out of range.
+
+ @see track
+
+</member>
+        <member name="M:sp_artistbrowse_num_tophit_tracks(sp_artistbrowse*)">
+ Given an artist browse object, return number of tophit tracks
+ This is a set of tracks for the artist with highest popularity
+
+ @param[in] arb             Artist browse object
+
+ @return                    Number of tophit tracks for given artist
+
+</member>
+        <member name="M:sp_artistbrowse_track(sp_artistbrowse*,System.Int32)">
+ Given an artist browse object, return one of its tracks
+
+ @param[in] arb             Album browse object
+ @param[in] index           The index for the track. Should be in the interval [0, sp_artistbrowse_num_tracks() - 1]
+
+ @return                    A track object, or NULL if the index is out of range.
+
+ @see track
+
+</member>
+        <member name="M:sp_artistbrowse_num_tracks(sp_artistbrowse*)">
+ Given an artist browse object, return number of tracks
+
+ @param[in] arb             Artist browse object
+
+ @return                    Number of tracks for given artist
+
+</member>
+        <member name="M:sp_artistbrowse_portrait(sp_artistbrowse*,System.Int32)">
+ Return image ID representing a portrait of the artist
+
+ @param[in] arb             Artist object
+ @param[in] index           The index of the portrait. Should be in the interval [0, sp_artistbrowse_num_portraits() - 1]
+
+ @return                    ID byte sequence that can be passed to sp_image_create()
+
+ @see sp_image_create
+
+</member>
+        <member name="M:sp_artistbrowse_num_portraits(sp_artistbrowse*)">
+ Given an artist browse object, return number of portraits available
+
+ @param[in]   arb        Artist browse object
+
+ @return                 Number of portraits for given artist
+
+</member>
+        <member name="M:sp_artistbrowse_artist(sp_artistbrowse*)">
+ Given an artist browse object, return a pointer to its artist object
+
+ @param[in]   arb        Artist browse object
+
+ @return                 Artist object
+
+</member>
+        <member name="M:sp_artistbrowse_error(sp_artistbrowse*)">
+ Check if browsing returned an error code.
+
+ @param[in]   arb        Artist browse object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_IS_LOADING
+                         SP_ERROR_OTHER_PERMANENT
+                         SP_ERROR_OTHER_TRANSIENT
+
+</member>
+        <member name="M:sp_artistbrowse_is_loaded(sp_artistbrowse*)">
+ Check if an artist browse request is completed
+
+ @param[in]   arb        Artist browse object
+
+ @return                 True if browsing is completed, false if not
+
+</member>
+        <member name="M:sp_artistbrowse_create(sp_session*,sp_artist*,sp_artistbrowse_type,=FUNC:System.Void(sp_artistbrowse*,System.Void*),System.Void*)">
+ Initiate a request for browsing an artist
+
+ The user is responsible for freeing the returned artist browse using sp_artistbrowse_release(). This can be done in the callback.
+
+ @param[in] session         Session object
+ @param[in] artist          Artist to be browsed. The artist metadata does not have to be loaded
+ @param[in] type            Type of data requested, see the sp_artistbrowse_type enum for details
+ @param[in] callback        Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.
+ @param[in] userdata        Userdata passed to callback.
+
+ @return                    Artist browse object
+
+ @see ::artistbrowse_complete_cb
+
+</member>
+        <member name="D:artistbrowse_complete_cb">
+@} 
+ @defgroup artistbrowse Artist browsing
+
+ Artist browsing initiates the fetching of information for a certain artist.
+
+ @note   There is currently no built-in functionality available for getting the albums belonging
+         to an artist. For now, just iterate over all tracks and note the album to build a list of all albums.
+         This feature will be added in a future version of the library.
+
+ @{
+
+ The type of a callback used in sp_artistbrowse_create()
+
+ When the callback is called, the metadata of all tracks belonging to it will have
+ been loaded, so sp_track_is_loaded() will return non-zero. The same goes for the
+ similar artist data.
+
+ @param[in]   result          The same pointer returned by sp_artistbrowse_create()
+ @param[in]   userdata        The opaque pointer given to sp_artistbrowse_create()
+
+</member>
+        <member name="M:sp_albumbrowse_release(sp_albumbrowse*)">
+ Decrease the reference count of an album browse result
+
+ @param[in]   alb       The album browse result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_albumbrowse_add_ref(sp_albumbrowse*)">
+ Increase the reference count of an album browse result
+
+ @param[in]   alb       The album browse result object
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_albumbrowse_backend_request_duration(sp_albumbrowse*)">
+ Return the time (in ms) that was spent waiting for the Spotify backend to serve the request
+
+ @param[in] alb         Album browse object
+
+ @return                -1 if the request was served from the local cache
+                        If the result is not yet loaded the return value is undefined
+
+</member>
+        <member name="M:sp_albumbrowse_review(sp_albumbrowse*)">
+ Given an album browse object, return its review
+
+ @param[in]   alb        Album browse object
+
+ @return                 Review string in UTF-8 format.
+                         Returned string is valid as long as the album object stays allocated
+                         and no longer than the next call to sp_session_process_events()
+
+</member>
+        <member name="M:sp_albumbrowse_track(sp_albumbrowse*,System.Int32)">
+ Given an album browse object, return a pointer to one of its tracks
+
+ @param[in]   alb        Album browse object
+ @param[in]   index      The index for the track. Should be in the interval [0, sp_albumbrowse_num_tracks() - 1]
+
+ @return                 A track.
+
+ @see track
+
+</member>
+        <member name="M:sp_albumbrowse_num_tracks(sp_albumbrowse*)">
+ Given an album browse object, return number of tracks
+
+ @param[in]   alb         Album browse object
+
+ @return                  Number of tracks on album
+
+</member>
+        <member name="M:sp_albumbrowse_copyright(sp_albumbrowse*,System.Int32)">
+ Given an album browse object, return one of its copyright strings
+
+ @param[in]   alb           Album browse object
+ @param[in]   index         The index for the copyright string. Should be in the interval [0, sp_albumbrowse_num_copyrights() - 1]
+
+ @return                    Copyright string in UTF-8 format, or NULL if the index is invalid.
+                            Returned string is valid as long as the album object stays allocated
+                            and no longer than the next call to sp_session_process_events()
+
+</member>
+        <member name="M:sp_albumbrowse_num_copyrights(sp_albumbrowse*)">
+ Given an album browse object, return number of copyright strings
+
+ @param[in]   alb        Album browse object
+
+ @return                 Number of copyright strings available, 0 if unknown
+
+</member>
+        <member name="M:sp_albumbrowse_artist(sp_albumbrowse*)">
+ Given an album browse object, return the pointer to its artist object
+
+ @param[in]   alb        Album browse object
+
+ @return                 Artist object
+
+</member>
+        <member name="M:sp_albumbrowse_album(sp_albumbrowse*)">
+ Given an album browse object, return the pointer to its album object
+
+ @param[in]   alb        Album browse object
+
+ @return                 Album object
+
+</member>
+        <member name="M:sp_albumbrowse_error(sp_albumbrowse*)">
+ Check if browsing returned an error code.
+
+ @param[in]   alb        Album browse object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_IS_LOADING
+                         SP_ERROR_OTHER_PERMANENT
+                         SP_ERROR_OTHER_TRANSIENT
+
+</member>
+        <member name="M:sp_albumbrowse_is_loaded(sp_albumbrowse*)">
+ Check if an album browse request is completed
+
+ @param[in]   alb        Album browse object
+
+ @return                 True if browsing is completed, false if not
+
+</member>
+        <member name="M:sp_albumbrowse_create(sp_session*,sp_album*,=FUNC:System.Void(sp_albumbrowse*,System.Void*),System.Void*)">
+ Initiate a request for browsing an album
+
+ The user is responsible for freeing the returned album browse using sp_albumbrowse_release(). This can be done in the callback.
+
+ @param[in]   session         Session object
+ @param[in]   album           Album to be browsed. The album metadata does not have to be loaded
+ @param[in]   callback        Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.
+ @param[in]   userdata        Userdata passed to callback.
+
+ @return                      Album browse object
+
+ @see ::albumbrowse_complete_cb
+
+</member>
+        <member name="D:albumbrowse_complete_cb">
+@} 
+ @defgroup albumbrowse Album browsing
+
+ Browsing adds additional information to what an ::sp_album holds. It retrieves
+ copyrights, reviews and tracks of the album.
+
+ @{
+
+ The type of a callback used in sp_albumbrowse_create()
+
+ When the callback is called, the metadata of all tracks belonging to it will have
+ been loaded, so sp_track_is_loaded() will return non-zero. The ::sp_artist of the
+ album will also have been fully loaded.
+
+ @param[in]   result          The same pointer returned by sp_albumbrowse_create()
+ @param[in]   userdata        The opaque pointer given to sp_albumbrowse_create()
+
+</member>
+        <member name="M:sp_artist_release(sp_artist*)">
+ Decrease the reference count of a artist
+
+ @param[in]   artist       The artist object
+ @return                   One of the following errors, from ::sp_error
+                           SP_ERROR_OK
+
+</member>
+        <member name="M:sp_artist_add_ref(sp_artist*)">
+ Increase the reference count of a artist
+
+ @param[in]   artist       The artist object
+ @return                   One of the following errors, from ::sp_error
+                           SP_ERROR_OK
+
+</member>
+        <member name="M:sp_artist_portrait(sp_artist*,sp_image_size)">
+ Return portrait for artist
+
+ @param[in]   artist     The artist object
+ @param[in]   size       The desired size of the image
+
+ @return                 ID byte sequence that can be passed to sp_image_create()
+                         If the artist has no image or the metadata for the album is not
+                         loaded yet, this function returns NULL.
+
+
+</member>
+        <member name="M:sp_artist_is_loaded(sp_artist*)">
+ Check if the artist object is populated with data
+
+ @param[in]   artist     An artist object
+
+ @return                 True if metadata is present, false if not
+
+
+</member>
+        <member name="M:sp_artist_name(sp_artist*)">
+@} 
+@defgroup artist Artist subsystem
+@{
+
+ Return name of artist
+
+ @param[in]   artist     Artist object
+
+ @return                 Name of artist.
+                         Returned string is valid as long as the artist object stays allocated
+                         and no longer than the next call to sp_session_process_events()
+
+</member>
+        <member name="M:sp_album_release(sp_album*)">
+ Decrease the reference count of an album
+
+ @param[in]   album       The album object
+ @return                  One of the following errors, from ::sp_error
+                          SP_ERROR_OK
+
+</member>
+        <member name="M:sp_album_add_ref(sp_album*)">
+ Increase the reference count of an album
+
+ @param[in]   album       The album object
+ @return                  One of the following errors, from ::sp_error
+                          SP_ERROR_OK
+
+</member>
+        <member name="M:sp_album_type(sp_album*)">
+ Return type of specified album
+
+ @param[in]   album      Album object
+
+ @return                 sp_albumtype
+
+</member>
+        <member name="M:sp_album_year(sp_album*)">
+ Return release year of specified album
+
+ @param[in]   album      Album object
+
+ @return                 Release year
+
+</member>
+        <member name="M:sp_album_name(sp_album*)">
+ Return name of album
+
+ @param[in]   album      Album object
+
+ @return                 Name of album.
+                         Returned string is valid as long as the album object stays allocated
+                         and no longer than the next call to sp_session_process_events()
+
+</member>
+        <member name="M:sp_album_cover(sp_album*,sp_image_size)">
+ Return image ID representing the album's coverart.
+
+ @param[in]   album      Album object
+ @param[in]   size       The desired size of the image
+
+ @return                 ID byte sequence that can be passed to sp_image_create()
+                         If the album has no image or the metadata for the album is not
+                         loaded yet, this function returns NULL.
+
+ @see sp_image_create
+
+</member>
+        <member name="M:sp_album_artist(sp_album*)">
+ Get the artist associated with the given album
+
+ @param[in]  album       Album object
+ @return A reference to the artist. NULL if the metadata has not been loaded yet
+
+</member>
+        <member name="M:sp_album_is_available(sp_album*)">
+ Return true if the album is available in the current region.
+
+ @param[in]   album      The album
+
+ @return                 True if album is available for playback, otherwise false.
+
+ @note The album must be loaded or this function will always return false.
+ @see sp_album_is_loaded()
+
+</member>
+        <member name="M:sp_album_is_loaded(sp_album*)">
+ Check if the album object is populated with data
+
+ @param[in]  album       Album object
+ @return True if metadata is present, false if not
+
+</member>
+        <member name="M:sp_track_release(sp_track*)">
+ Decrease the reference count of a track
+
+ @param[in]   track       The track object
+ @return                  One of the following errors, from ::sp_error
+                          SP_ERROR_OK
+
+</member>
+        <member name="M:sp_track_add_ref(sp_track*)">
+ Increase the reference count of a track
+
+ @param[in]   track       The track object
+ @return                  One of the following errors, from ::sp_error
+                          SP_ERROR_OK
+
+</member>
+        <member name="M:sp_localtrack_create(System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.Int32)">
+ Returns the newly created local track
+
+ @param[in]   artist     Name of the artist
+ @param[in]   title      Song title
+ @param[in]   album      Name of the album, or an empty string if not available
+ @param[in]   length      Length in MS, or -1 if not available.
+
+ @return                 A track.
+
+</member>
+        <member name="M:sp_track_index(sp_track*)">
+ Returns the position of a track on its disc
+
+ @param[in]   track      A track object
+
+ @return                 Track position, starts at 1 (relative the corresponding disc)
+                         This function returns valid data only for tracks appearing in a browse
+                         artist or browse album result (otherwise returns 0).
+
+</member>
+        <member name="M:sp_track_disc(sp_track*)">
+ Returns the disc number for a track
+
+ @param[in]   track      A track object
+
+ @return                 Disc index. Possible values are [1, total number of discs on album]
+                         This function returns valid data only for tracks appearing in a browse
+                         artist or browse album result (otherwise returns 0).
+
+</member>
+        <member name="M:sp_track_popularity(sp_track*)">
+ Returns popularity for track
+
+ @param[in]   track      A track object
+
+ @return                 Popularity in range 0 to 100, 0 if undefined.
+                         If no metadata is available for the track yet, this function returns 0.
+
+</member>
+        <member name="M:sp_track_duration(sp_track*)">
+ The duration, in milliseconds, of the specified track
+
+ @param[in]   track      A track object
+
+ @return                 The duration of the specified track, in milliseconds
+                         If no metadata is available for the track yet, this function returns 0.
+
+</member>
+        <member name="M:sp_track_name(sp_track*)">
+ The string representation of the specified track's name
+
+ @param[in]   track      A track object
+
+ @return                 The string representation of the specified track's name.
+                         Returned string is valid as long as the album object stays allocated
+                         and no longer than the next call to sp_session_process_events()
+                         If no metadata is available for the track yet, this function returns empty string.
+
+</member>
+        <member name="M:sp_track_album(sp_track*)">
+ The album of the specified track
+
+ @param[in]   track      A track object
+
+ @return                 The album of the given track. You need to increase the refcount
+                         if you want to keep the pointer around.
+                         If no metadata is available for the track yet, this function returns 0.
+
+</member>
+        <member name="M:sp_track_artist(sp_track*,System.Int32)">
+ The artist matching the specified index performing on the current track.
+
+ @param[in]   track      The track whose participating artist you are interested in
+ @param[in]   index      The index for the participating artist. Should be in the interval [0, sp_track_num_artists() - 1]
+
+ @return                 The participating artist, or NULL if invalid index
+
+</member>
+        <member name="M:sp_track_num_artists(sp_track*)">
+ The number of artists performing on the specified track
+
+ @param[in]   track     The track whose number of participating artists you are interested in
+
+ @return                The number of artists performing on the specified track.
+                        If no metadata is available for the track yet, this function returns 0.
+
+</member>
+        <member name="M:sp_track_set_starred(sp_session*,sp_track*!System.Runtime.CompilerServices.IsConst*,System.Int32,System.Boolean)">
+ Star/Unstar the specified track
+
+ @param[in]   session    Session
+ @param[in]   tracks     Array of pointer to tracks.
+ @param[in]   num_tracks Length of \p tracks array
+ @param[in]   star       Starred status of the track
+
+ @note This will fail silently if playlists are disabled.
+ @see sp_set_playlists_enabled()
+
+</member>
+        <member name="M:sp_track_is_starred(sp_session*,sp_track*)">
+ Return true if the track is starred by the currently logged in user.
+
+ @param[in]   session    Session
+ @param[in]   track      The track
+
+ @return                 True if track is starred.
+
+ @note The track must be loaded or this function will always return false.
+ @see sp_track_is_loaded()
+
+</member>
+        <member name="M:sp_track_is_placeholder(sp_track*)">
+ Return true if the track is a placeholder. Placeholder tracks are used
+ to store other objects than tracks in the playlist. Currently this is
+ used in the inbox to store artists, albums and playlists.
+
+ Use sp_link_create_from_track() to get a link object that points
+ to the real object this "track" points to.
+
+ @param[in]   track      The track
+
+ @return                 True if track is a placeholder
+
+ @note Contrary to most functions the track does not have to be
+       loaded for this function to return correct value
+
+</member>
+        <member name="M:sp_track_get_playable(sp_session*,sp_track*)">
+ Return the actual track that will be played if the given track is played
+
+ @param[in]   session    Session
+ @param[in]   track      The track
+
+ @return                 A track
+
+
+</member>
+        <member name="M:sp_track_is_autolinked(sp_session*,sp_track*)">
+ Return true if the track is autolinked to another track.
+
+ @param[in]   session    Session
+ @param[in]   track      The track
+
+ @return                 True if track is autolinked.
+
+ @note The track must be loaded or this function will always return false.
+ @see sp_track_is_loaded()
+
+</member>
+        <member name="M:sp_track_is_local(sp_session*,sp_track*)">
+ Return true if the track is a local file.
+
+ @param[in]   session    Session
+ @param[in]   track      The track
+
+ @return                 True if track is a local file.
+
+ @note The track must be loaded or this function will always return false.
+ @see sp_track_is_loaded()
+
+</member>
+        <member name="M:sp_track_get_availability(sp_session*,sp_track*)">
+ Return availability for a track
+
+ @param[in]   session    Session
+ @param[in]   track      The track
+
+ @return                 Availability status, see ::sp_track_availability
+
+ @note The track must be loaded or this function will always SP_TRACK_AVAILABILITY_UNAVAILABLE
+ @see sp_track_is_loaded()
+
+</member>
+        <member name="M:sp_track_offline_get_status(sp_track*)">
+ Return offline status for a track. sp_session_callbacks::metadata_updated() will be invoked when
+ offline status of a track changes
+
+ @param[in]   track      The track
+
+ @return                 Stats as described by ::sp_track_offline_status
+
+
+</member>
+        <member name="M:sp_track_error(sp_track*)">
+ Return an error code associated with a track. For example if it could not load
+
+ @param[in]   track      The track
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_IS_LOADING
+                         SP_ERROR_OTHER_PERMANENT
+
+</member>
+        <member name="M:sp_track_is_loaded(sp_track*)">
+@} 
+@defgroup track Track subsystem
+@{
+
+ Return whether or not the track metadata is loaded.
+
+ @param[in]   track      The track
+
+ @return                 True if track is loaded
+
+ @note  This is equivalent to checking if sp_track_error() not returns SP_ERROR_IS_LOADING.
+
+</member>
+        <member name="M:sp_link_release(sp_link*)">
+ Decrease the reference count of a link
+
+ @param[in]   link       The link object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_link_add_ref(sp_link*)">
+ Increase the reference count of a link
+
+ @param[in]   link       The link object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_link_as_user(sp_link*)">
+ The user representation for the given link
+
+ @param[in]   link       The Spotify link whose user you are interested in
+
+ @return                 The user representation of the given link
+                         If the link is not of user type then NULL is returned
+
+</member>
+        <member name="M:sp_link_as_artist(sp_link*)">
+ The artist representation for the given link
+
+ @param[in]   link       The Spotify link whose artist you are interested in
+
+ @return                 The artist representation of the given link
+                         If the link is not of artist type then NULL is returned
+
+</member>
+        <member name="M:sp_link_as_album(sp_link*)">
+ The album representation for the given link
+
+ @param[in]   link       The Spotify link whose album you are interested in
+
+ @return                 The album representation of the given album link
+                         If the link is not of album type then NULL is returned
+
+</member>
+        <member name="M:sp_link_as_track_and_offset(sp_link*,System.Int32*)">
+ The track and offset into track representation for the given link
+
+ @param[in]   link       The Spotify link whose track you are interested in
+ @param[out]  offset     Pointer to offset into track (in milliseconds). If the link
+                         does not contain an offset this will be set to 0.
+
+ @return                 The track representation of the given track link
+                         If the link is not of track type then NULL is returned.
+
+</member>
+        <member name="M:sp_link_as_track(sp_link*)">
+ The track representation for the given link
+
+ @param[in]   link       The Spotify link whose track you are interested in
+
+ @return                 The track representation of the given track link
+                         If the link is not of track type then NULL is returned.
+
+</member>
+        <member name="M:sp_link_type(sp_link*)">
+ The link type of the specified link
+
+ @param[in]   link       The Spotify link whose type you are interested in
+
+ @return                 The link type of the specified link - see the sp_linktype enum for possible values
+
+</member>
+        <member name="M:sp_link_as_string(sp_link*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.Int32)">
+ Create a string representation of the given Spotify link
+
+ @param[in]   link         The Spotify link whose string representation you are interested in
+ @param[out]  buffer       The buffer to hold the string representation of link
+ @param[in]   buffer_size  The max size of the buffer that will hold the string representation
+                           The resulting string is guaranteed to always be null terminated if
+                           buffer_size &gt; 0
+
+ @return                   The number of characters in the string representation of the link. If this
+                           value is greater or equal than \p buffer_size, output was truncated.
+
+</member>
+        <member name="M:sp_link_create_from_image(sp_image*)">
+ Create a link object representing the given image
+
+ @param[in]  image          Image object
+
+ @return                    A link representing the image.
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_user(sp_user*)">
+ Create a link object representing the given playlist
+
+ @param[in]  user       User object
+
+ @return                    A link representing the profile.
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_playlist(sp_playlist*)">
+ Create a link object representing the given playlist
+
+ @param[in]  playlist       Playlist object
+
+ @return                    A link representing the playlist
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+ @note Due to reasons in the playlist backend design and the Spotify URI
+ scheme you need to wait for the playlist to be loaded before you can
+ successfully construct an URI. If sp_link_create_from_playlist() returns
+ NULL, try again after teh playlist_state_changed callback has fired.
+
+</member>
+        <member name="M:sp_link_create_from_search(sp_search*)">
+ Generate a link object representing the current search
+
+ @param[in]  search       Search object
+
+ @return                  A link representing the search
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_artistbrowse_portrait(sp_artistbrowse*,System.Int32)">
+ Creates a link object from an artist portrait
+
+ @param[in]   arb        Artist browse object
+ @param[in]   index      The index of the portrait. Should be in the interval [0, sp_artistbrowse_num_portraits() - 1]
+
+ @return                 A link object representing an image
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+ @see sp_artistbrowse_num_portraits()
+
+ @note The difference from sp_link_create_from_artist_portrait() is
+ that the artist browse object may contain multiple portraits.
+
+
+</member>
+        <member name="M:sp_link_create_from_artist_portrait(sp_artist*,sp_image_size)">
+ Creates a link object pointing to an artist portrait
+
+ @param[in]   artist     Artist browse object
+ @param[in]   size       The desired size of the image
+
+ @return                 A link object representing an image
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+ @see sp_artistbrowse_num_portraits()
+
+</member>
+        <member name="M:sp_link_create_from_artist(sp_artist*)">
+ Creates a link object from an artist
+
+ @param[in]   artist     An artist object
+
+ @return                 A link object representing the artist
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_album_cover(sp_album*,sp_image_size)">
+ Create an image link object from an album
+
+ @param[in]   album      An album object
+ @param[in]   size       The desired size of the image
+
+ @return                 A link representing the album cover. Type is set to SP_LINKTYPE_IMAGE
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_album(sp_album*)">
+ Create a link object from an album
+
+ @param[in]   album      An album object
+
+ @return                 A link representing the album
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_track(sp_track*,System.Int32)">
+ Generates a link object from a track
+
+ @param[in]   track        A track object
+ @param[in]   offset       Offset in track in ms.
+
+ @return                   A link representing the track
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_link_create_from_string(System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ Create a Spotify link given a string
+
+ @param[in]   link       A string representation of a Spotify link
+
+ @return                 A link representation of the given string representation.
+                         If the link could not be parsed, this function returns NULL.
+
+ @note You need to release the link when you are done with it.
+ @see sp_link_type()
+ @see sp_link_release()
+
+</member>
+        <member name="M:sp_offline_time_left(sp_session*)">
+ Return remaining time (in seconds) until the offline key store expires
+ and the user is required to relogin
+
+ @param[in]  session        Session object
+ @return                    Seconds until expiration
+
+
+</member>
+        <member name="M:sp_offline_sync_get_status(sp_session*,sp_offline_sync_status*)">
+ Return offline synchronization status. When the internal status is
+ updated the offline_status_updated() callback will be invoked.
+
+ @param[in]  session        Session object
+ @param[out] status         Status object that will be filled with info
+
+ @return false if no synching is in progress (in which case the contents
+               of status is undefined)
+
+
+</member>
+        <member name="M:sp_offline_num_playlists(sp_session*)">
+ Return number of playlisys that is marked for offline synchronization
+
+ @param[in]  session        Session object
+
+ @return Number of playlists
+
+</member>
+        <member name="M:sp_offline_tracks_to_sync(sp_session*)">
+ Get total number of tracks that needs download before everything
+ from all playlists that is marked for offline is fully synchronized
+
+ @param[in]  session        Session object
+
+ @return Number of tracks
+
+</member>
+        <member name="M:sp_session_set_connection_rules(sp_session*,sp_connection_rules)">
+ Set rules for how libspotify connects to Spotify servers and synchronizes offline content
+
+ @param[in]  session        Session object
+ @param[in]  rules          Connection rules
+
+ @note       Used in conjunction with sp_session_set_connection_type() to control
+             how libspotify should behave in respect to network activity and offline
+             synchronization.
+ @see        sp_connection_rules
+ @return     One of the following errors, from ::sp_error
+             SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_set_connection_type(sp_session*,sp_connection_type)">
+ Set to true if the connection is currently routed over a roamed connectivity
+
+ @param[in]  session        Session object
+ @param[in]  type           Connection type
+
+ @note       Used in conjunction with sp_session_set_connection_rules() to control
+             how libspotify should behave in respect to network activity and offline
+             synchronization.
+ @see        sp_connection_type
+ @return     One of the following errors, from ::sp_error
+             SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_set_social_credentials(sp_session*,sp_social_provider,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ * Set the user's credentials with a social provider.
+ * Currently this is only relevant for LastFm
+ * Call sp_session_set_scrobbling to force an authentication attempt
+ * with the LastFm server. If authentication fails a scrobble_error callback will be
+ * sent.
+ *
+ * @param[in]  session         Session object
+ * @param[in]  provider        The scrobbling provider referred to
+ * @param[in]  username        The user name
+ * @param[in]  password        The password
+ *
+ * @return     error code
+
+ * @see sp_session_set_scrobbling
+ * @see sp_session_callbacks#scrobble_error
+ * @return                     One of the following errors, from ::sp_error
+ *                             SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_is_scrobbling_possible(sp_session*,sp_social_provider,System.Boolean*)">
+ Return True if scrobbling settings should be shown to the user. Currently this setting is relevant
+ only to the facebook provider.
+ The returned value may be false if the user is not connected to facebook,
+ or if the user has opted out from facebook social graph.
+
+ @param[in]  session         Session object
+ @param[in]  provider        The scrobbling provider referred to
+ @param[out] out             True iff scrobbling is possible
+
+ @return     error code
+
+</member>
+        <member name="M:sp_session_is_scrobbling(sp_session*,sp_social_provider,sp_scrobbling_state*)">
+ Return the scrobbling state. This makes it possible to find out if scrobbling is locally overrided or
+ if the global setting is used.
+
+ @param[in]  session         Session object
+ @param[in]  provider        The scrobbling provider referred to
+ @param[out] state           The output variable receiving the sp_scrobbling_state state
+
+ @return     error code
+
+</member>
+        <member name="M:sp_session_set_scrobbling(sp_session*,sp_social_provider,sp_scrobbling_state)">
+ Set if scrobbling is enabled. This api allows setting local overrides of the global scrobbling settings.
+ Changing the global settings are currently not supported.
+
+ @param[in]  session         Session object
+ @param[in]  provider        The scrobbling provider referred to
+ @param[in]  state           The state to set the provider to
+
+ @return     error code
+
+ @see sp_social_provider
+ @see sp_scrobbling_state
+
+</member>
+        <member name="M:sp_session_is_private_session(sp_session*)">
+ Return True if private session is enabled
+
+ @param[in]  session         Session object
+
+ @return     True if private session is enabled
+
+</member>
+        <member name="M:sp_session_set_private_session(sp_session*,System.Boolean)">
+ Set if private session is enabled. This disables sharing what the user is listening to
+ to services such as Spotify Social, Facebook and LastFM. The private session will
+ last for a time, and then libspotify will revert to the normal state. The private
+ session is prolonged by user activity.
+
+ @param[in]  session         Session object
+ @param[in]  enabled         True iff private session should be enabled
+ @return                     One of the following errors, from ::sp_error
+                             SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_set_volume_normalization(sp_session*,System.Boolean)">
+ Set volume normalization
+
+ @param[in]  session        Session object
+ @param[in]  on             True iff volume normalization should be enabled
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_get_volume_normalization(sp_session*)">
+ Return status of volume normalization
+
+ @param[in]  session        Session object
+
+ @return true iff volume normalization is enabled
+
+
+</member>
+        <member name="M:sp_session_preferred_offline_bitrate(sp_session*,sp_bitrate,System.Boolean)">
+ Set preferred bitrate for offline sync
+
+ @param[in]  session        Session object
+ @param[in]  bitrate        Preferred bitrate, see ::sp_bitrate for possible values
+ @param[in]  allow_resync   Set to true if libspotify should resynchronize already synchronized tracks. Usually you should set this to false.
+ @return                   One of the following errors, from ::sp_error
+                           SP_ERROR_OK
+                           SP_ERROR_INVALID_ARGUMENT
+
+</member>
+        <member name="M:sp_session_preferred_bitrate(sp_session*,sp_bitrate)">
+ Set preferred bitrate for music streaming
+
+ @param[in]  session        Session object
+ @param[in]  bitrate        Preferred bitrate, see ::sp_bitrate for possible values
+ @return                    One of the following errors, from ::sp_error
+                            SP_ERROR_OK
+                            SP_ERROR_INVALID_ARGUMENT
+
+</member>
+        <member name="M:sp_session_publishedcontainer_for_user_create(sp_session*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ Return the published container for a given @a canonical_username,
+ or the currently logged in user if @a canonical_username is NULL.
+
+ When done with the list you should call sp_playlistconatiner_release() to
+ decrese the reference you own by having created it.
+
+ @param[in]   session    Your session object.
+ @param[in]   canonical_username   The canonical username, or NULL.
+
+ @return Playlist container object, NULL if not logged in.
+
+</member>
+        <member name="M:sp_session_starred_for_user_create(sp_session*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ Returns the starred list for a user
+
+ @param[in]  session        Session object
+ @param[in]  canonical_username       Canonical username
+
+ @return     A playlist or NULL if no user is logged in
+ @note You need to release the playlist when you are done with it.
+ @see sp_playlist_release()
+
+</member>
+        <member name="M:sp_session_starred_create(sp_session*)">
+ Returns the starred list for the current user
+
+ @param[in]  session        Session object
+
+ @return     A playlist or NULL if no user is logged in
+ @note You need to release the playlist when you are done with it.
+ @see sp_playlist_release()
+
+</member>
+        <member name="M:sp_session_inbox_create(sp_session*)">
+ Returns an inbox playlist for the currently logged in user
+
+ @param[in]  session        Session object
+
+ @return     A playlist or NULL if no user is logged in
+ @note You need to release the playlist when you are done with it.
+ @see sp_playlist_release()
+
+</member>
+        <member name="M:sp_session_playlistcontainer(sp_session*)">
+ Returns the playlist container for the currently logged in user.
+
+ @param[in]   session    Your session object
+
+ @return                 Playlist container object, NULL if not logged in
+
+</member>
+        <member name="M:sp_session_player_prefetch(sp_session*,sp_track*)">
+ Prefetch a track
+
+ Instruct libspotify to start loading of a track into its cache.
+ This could be done by an application just before the current track ends.
+
+ @param[in]   session    Your session object
+ @param[in]   track      The track to be prefetched
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_NO_CACHE
+                         SP_ERROR_OK
+
+ @note Prefetching is only possible if a cache is configured
+
+
+</member>
+        <member name="M:sp_session_player_unload(sp_session*)">
+ Stops the currently playing track
+
+ This frees some resources held by libspotify to identify the currently
+ playing track.
+
+ @param[in]   session    Your session object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_player_play(sp_session*,System.Boolean)">
+ Play or pause the currently loaded track
+
+ @param[in]   session    Your session object
+ @param[in]   play       If set to true, playback will occur. If set to false, the playback will be paused.
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_player_seek(sp_session*,System.Int32)">
+ Seek to position in the currently loaded track
+
+ @param[in]   session    Your session object
+ @param[in]   offset     Track position, in milliseconds.
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_player_load(sp_session*,sp_track*)">
+ Loads the specified track
+
+ After successfully loading the track, you have the option of running
+ sp_session_player_play() directly, or using sp_session_player_seek() first.
+ When this call returns, the track will have been loaded, unless an error occurred.
+
+ @param[in]   session    Your session object
+ @param[in]   track      The track to be loaded
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_MISSING_CALLBACK
+                         SP_ERROR_TRACK_NOT_PLAYABLE
+
+
+</member>
+        <member name="M:sp_session_process_events(sp_session*,System.Int32*)">
+ Make the specified session process any pending events
+
+ @param[in]   session         Your session object
+ @param[out]  next_timeout    Stores the time (in milliseconds) until you should call this function again
+ @return                      One of the following errors, from ::sp_error
+                              SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_set_cache_size(sp_session*,System.UInt32)">
+ Set maximum cache size.
+
+ @param[in]   session    Your session object
+ @param[in]   size       Maximum cache size in megabytes.
+                         Setting it to 0 (the default) will let libspotify automatically
+                         resize the cache (10% of disk free space)
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_userdata(sp_session*)">
+ The userdata associated with the session
+
+ @param[in]   session    Your session object
+
+ @return                 The userdata that was passed in on session creation
+
+</member>
+        <member name="M:sp_session_connectionstate(sp_session*)">
+ The connection state of the specified session.
+
+ @param[in]   session    Your session object
+
+ @return                 The connection state - see the sp_connectionstate enum for possible values
+
+</member>
+        <member name="M:sp_session_flush_caches(sp_session*)">
+ Flush the caches
+
+ This will make libspotify write all data that is meant to be stored
+ on disk to the disk immediately. libspotify does this periodically
+ by itself and also on logout. So under normal conditions this
+ should never need to be used.
+
+ @param[in]   session    Your session object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_logout(sp_session*)">
+ Logs out the currently logged in user
+
+ Always call this before terminating the application and libspotify is currently
+ logged in. Otherwise, the settings and cache may be lost.
+
+ @param[in]   session    Your session object
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_user(sp_session*)">
+ Fetches the currently logged in user
+
+ @param[in]   session    Your session object
+
+ @return                 The logged in user (or NULL if not logged in)
+
+</member>
+        <member name="M:sp_session_forget_me(sp_session*)">
+ Remove stored credentials in libspotify. If no credentials are currently stored, nothing will happen.
+
+ @param[in]   session      Your session object
+ @return                   One of the following errors, from ::sp_error
+                           SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_user_name(sp_session*)">
+ Get a pointer to a string representing the user's login username.
+
+ @param[in]   session         Your session object
+
+ @return                   A string representing the login username.
+
+</member>
+        <member name="M:sp_session_remembered_user(sp_session*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte*,System.UInt32)">
+ Get username of the user that will be logged in via sp_session_relogin()
+
+ @param[in]   session      Your session object
+ @param[out]  buffer       The buffer to hold the username
+ @param[in]   buffer_size  The max size of the buffer that will hold the username.
+                           The resulting string is guaranteed to always be null terminated if
+                           buffer_size &gt; 0
+
+ @return                   The number of characters in the username.
+                           If value is greater or equal than \p buffer_size, output was truncated.
+                           If returned value is -1 no credentials are stored in libspotify.
+
+</member>
+        <member name="M:sp_session_relogin(sp_session*)">
+ Log in the remembered user if last user that logged in logged in with remember_me set.
+ If no credentials are stored, this will return SP_ERROR_NO_CREDENTIALS.
+
+ @param[in]   session      Your session object
+
+ @return                 One of the following errors, from ::sp_error
+                         SP_ERROR_OK
+                         SP_ERROR_NO_CREDENTIALS
+
+</member>
+        <member name="M:sp_session_login(sp_session*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,System.Boolean,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*)">
+ Logs in the specified username/password combo. This initiates the login in the background.
+ A callback is called when login is complete
+
+ An application MUST NEVER store the user's password in clear text.
+ If automatic relogin is required, use sp_session_relogin()
+
+ Here is a snippet from \c spshell.c:
+ @dontinclude spshell.c
+ @skip sp_session_login
+ @until }
+
+ @param[in]   session             Your session object
+ @param[in]   username            The username to log in
+ @param[in]   password            The password for the specified username
+ @param[in]   remember_me         If set, the username / password will be remembered by libspotify
+ @param[in]   blob              If you have received a blob in the #credentials_blob_updated
+                                  you can pas this here instead of password
+ @return                          One of the following errors, from ::sp_error
+                                  SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_release(sp_session*)">
+ Release the session. This will clean up all data and connections associated with the session
+
+ @param[in]   sess      Session object returned from sp_session_create()
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+
+</member>
+        <member name="M:sp_session_create(sp_session_config!System.Runtime.CompilerServices.IsConst*,sp_session**)">
+ Initialize a session. The session returned will be initialized, but you will need
+ to log in before you can perform any other operation
+ Currently it is not supported to have multiple active sessions, and it's recommended to only call this once per process.
+
+ Here is a snippet from \c spshell.c:
+ @dontinclude spshell.c
+ @skip config.api_version
+ @until }
+
+ @param[in]   config    The configuration to use for the session
+ @param[out]  sess      If successful, a new session - otherwise NULL
+
+ @return                One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+                        SP_ERROR_BAD_API_VERSION
+                        SP_ERROR_BAD_USER_AGENT
+                        SP_ERROR_BAD_APPLICATION_KEY
+                        SP_ERROR_API_INITIALIZATION_FAILED
+                        SP_ERROR_INVALID_DEVICE_ID
+
+</member>
+        <member name="F:sp_session_config.tracefile">
+Path to API trace file
+
+</member>
+        <member name="F:sp_session_config.proxy_password">
+Password to authenticate with proxy server
+
+</member>
+        <member name="F:sp_session_config.proxy_username">
+Username to authenticate with proxy server
+
+</member>
+        <member name="F:sp_session_config.device_id">
+Device ID for offline synchronization and logging purposes. The Device Id must be unique to the particular device instance,
+i.e. no two units must supply the same Device ID. The Device ID must not change between sessions or power cycles.
+Good examples is the device's MAC address or unique serial number.
+
+</member>
+        <member name="F:sp_session_config.initially_unload_playlists">
+Avoid loading playlists into RAM on startup.
+See sp_playlist_is_in_ram() for more details.
+
+</member>
+        <member name="F:sp_session_config.dont_save_metadata_for_playlists">
+Don't save metadata for local copies of playlists
+Reduces disk space usage at the expense of needing
+to request metadata from Spotify backend when loading list
+
+</member>
+        <member name="F:sp_session_config.compress_playlists">
+Compress local copy of playlists, reduces disk space usage
+
+</member>
+        <member name="T:sp_session_config">
+Session config
+
+</member>
+        <member name="F:sp_session_callbacks.private_session_mode_changed">
+ Called when there is a change in the private session mode
+
+ @param[in]  session    Session
+ @param[in]  isPrivate  True if in private session, false otherwhise
+
+</member>
+        <member name="F:sp_session_callbacks.scrobble_error">
+ Called when there is a scrobble error event
+
+ @param[in]  session    Session
+ @param[in]  error      Scrobble error. Currently SP_ERROR_LASTFM_AUTH_ERROR.
+
+</member>
+        <member name="F:sp_session_callbacks.connectionstate_updated">
+ Called when the connection state has updated - such as when logging in, going offline, etc.
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.credentials_blob_updated">
+ Called when storable credentials have been updated, usually called when
+ we have connected to the AP.
+
+ @param[in]  session    Session
+ @param[in]  blob   Blob is a null-terminated string which contains
+        an encrypted token that can be stored safely on disk
+        instead of storing plaintext passwords.
+
+</member>
+        <member name="F:sp_session_callbacks.offline_error">
+ Called when offline synchronization status is updated
+
+ @param[in]  session    Session
+ @param[in]  error      Offline error. Will be SP_ERROR_OK if the offline synchronization
+                        error state has cleared
+
+</member>
+        <member name="F:sp_session_callbacks.offline_status_updated">
+ Called when offline synchronization status is updated
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.get_audio_buffer_stats">
+ Called to query application about its audio buffer
+
+ @note This function is called from an internal session thread - you need to have proper synchronization!
+
+ @note This function must never block.
+
+ @param[in]  session    Session
+ @param[out] stats      Stats struct to be filled by application
+
+</member>
+        <member name="F:sp_session_callbacks.stop_playback">
+ Called when audio playback should stop
+
+ @note For this to work correctly the application must also implement get_audio_buffer_stats()
+
+ @note This function is called from an internal session thread - you need to have proper synchronization!
+
+ @note This function must never block.
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.start_playback">
+ Called when audio playback should start
+
+ @note For this to work correctly the application must also implement get_audio_buffer_stats()
+
+ @note This function is called from an internal session thread - you need to have proper synchronization!
+
+ @note This function must never block.
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.userinfo_updated">
+ Called after user info (anything related to sp_user objects) have been updated.
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.streaming_error">
+ Streaming error.
+ Called when streaming cannot start or continue.
+
+ @note This function is invoked from the main thread
+
+ @param[in]  session    Session
+ @param[in]  error      One of the following errors, from ::sp_error
+                        SP_ERROR_NO_STREAM_AVAILABLE
+                        SP_ERROR_OTHER_TRANSIENT
+                        SP_ERROR_OTHER_PERMANENT
+
+</member>
+        <member name="F:sp_session_callbacks.end_of_track">
+ End of track.
+ Called when the currently played track has reached its end.
+
+ @note This function is invoked from the main thread
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.log_message">
+ Logging callback.
+
+ @param[in]  session    Session
+ @param[in]  data       Log data
+
+</member>
+        <member name="F:sp_session_callbacks.play_token_lost">
+ Music has been paused because an account only allows music
+ to be played from one location simultaneously.
+
+ @note When this callback is invoked the application should
+       behave just as if the user pressed the pause
+       button. The application should also display a message
+       to the user indicating the playback has been paused
+       because another application is playing using the same
+       account.
+
+ @note IT MUST NOT automatically resume playback but must
+       instead wait for the user to press play.
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.music_delivery">
+ Called when there is decompressed audio data available.
+
+ @param[in]  session    Session
+ @param[in]  format     Audio format descriptor sp_audioformat
+ @param[in]  frames     Points to raw PCM data as described by \p format
+ @param[in]  num_frames Number of available samples in \p frames.
+                        If this is 0, a discontinuity has occurred (such as after a seek). The application
+                        should flush its audio fifos, etc.
+
+ @return                Number of frames consumed.
+                        This value can be used to rate limit the output from the library if your
+                        output buffers are saturated. The library will retry delivery in about 100ms.
+
+ @note This function is called from an internal session thread - you need to have proper synchronization!
+
+ @note This function must never block. If your output buffers are full you must return 0 to signal
+       that the library should retry delivery in a short while.
+
+</member>
+        <member name="F:sp_session_callbacks.notify_main_thread">
+ Called when processing needs to take place on the main thread.
+
+ You need to call sp_session_process_events() in the main thread to get
+ libspotify to do more work. Failure to do so may cause request timeouts,
+ or a lost connection.
+
+ @param[in]  session    Session
+
+ @note This function is called from an internal session thread - you need to have proper synchronization!
+
+</member>
+        <member name="F:sp_session_callbacks.message_to_user">
+ Called when the access point wants to display a message to the user
+
+ In the desktop client, these are shown in a blueish toolbar just below the
+ search box.
+
+ @param[in]  session    Session
+ @param[in]  message    String in UTF-8 format.
+
+</member>
+        <member name="F:sp_session_callbacks.connection_error">
+ Called when there is a connection error, and the library has problems
+ reconnecting to the Spotify service. Could be called multiple times (as
+ long as the problem is present)
+
+
+ @param[in]  session    Session
+ @param[in]  error      One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+                        SP_ERROR_CLIENT_TOO_OLD
+                        SP_ERROR_UNABLE_TO_CONTACT_SERVER
+                        SP_ERROR_BAD_USERNAME_OR_PASSWORD
+                        SP_ERROR_USER_BANNED
+                        SP_ERROR_USER_NEEDS_PREMIUM
+                        SP_ERROR_OTHER_TRANSIENT
+                        SP_ERROR_OTHER_PERMANENT
+
+</member>
+        <member name="F:sp_session_callbacks.metadata_updated">
+ Called whenever metadata has been updated
+
+ If you have metadata cached outside of libspotify, you should purge
+ your caches and fetch new versions.
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.logged_out">
+ Called when logout has been processed. Either called explicitly
+ if you initialize a logout operation, or implicitly if there
+ is a permanent connection error
+
+ @param[in]  session    Session
+
+</member>
+        <member name="F:sp_session_callbacks.logged_in">
+ Called when login has been processed and was successful
+
+ @param[in]  session    Session
+ @param[in]  error      One of the following errors, from ::sp_error
+                        SP_ERROR_OK
+                        SP_ERROR_CLIENT_TOO_OLD
+                        SP_ERROR_UNABLE_TO_CONTACT_SERVER
+                        SP_ERROR_BAD_USERNAME_OR_PASSWORD
+                        SP_ERROR_USER_BANNED
+                        SP_ERROR_USER_NEEDS_PREMIUM
+                        SP_ERROR_OTHER_TRANSIENT
+                        SP_ERROR_OTHER_PERMANENT
+
+</member>
+        <member name="T:sp_session_callbacks">
+ Session callbacks
+
+ Registered when you create a session.
+ If some callbacks should not be of interest, set them to NULL.
+
+</member>
+        <member name="F:sp_offline_sync_status.syncing">
+Set if sync operation is in progress
+
+</member>
+        <member name="F:sp_offline_sync_status.error_tracks">
+A track is counted as error when something goes wrong while
+syncing the track
+
+</member>
+        <member name="F:sp_offline_sync_status.willnotcopy_tracks">
+Tracks that are marked as synced but will not be copied
+(for various reasons)
+
+</member>
+        <member name="F:sp_offline_sync_status.copied_tracks">
+Copied tracks/bytes is things that has been copied in
+current sync operation
+
+</member>
+        <member name="F:sp_offline_sync_status.done_tracks">
+Done tracks/bytes is things marked for sync that existed on
+device before current sync operation
+
+</member>
+        <member name="F:sp_offline_sync_status.queued_tracks">
+Queued tracks/bytes is things left to sync in current sync
+operation
+
+</member>
+        <member name="T:sp_offline_sync_status">
+Offline sync status
+
+</member>
+        <member name="T:sp_artistbrowse_type">
+Controls the type of data that will be included in artist browse queries
+
+</member>
+        <member name="T:sp_connection_rules">
+ Connection rules, bitwise OR of flags
+
+ The default is SP_CONNECTION_RULE_NETWORK | SP_CONNECTION_RULE_ALLOW_SYNC
+
+</member>
+        <member name="T:sp_connection_type">
+Current connection type set using sp_session_set_connection_type()
+
+</member>
+        <member name="T:sp_subscribers">
+List of subscribers returned by sp_playlist_subscribers()
+
+</member>
+        <member name="T:sp_audio_buffer_stats">
+Buffer stats used by get_audio_buffer_stats callback
+
+</member>
+        <member name="T:sp_image_size">
+Image size
+
+</member>
+        <member name="T:sp_track_offline_status">
+Track offline status
+
+</member>
+        <member name="T:sp_availability">
+Track availability
+
+</member>
+        <member name="T:sp_playlist_offline_status">
+Playlist offline status
+
+</member>
+        <member name="T:sp_search_type">
+Search types
+
+</member>
+        <member name="T:sp_playlist_type">
+Playlist types
+
+</member>
+        <member name="T:sp_bitrate">
+Bitrate definitions for music streaming
+
+</member>
+        <member name="T:sp_audioformat">
+Audio format descriptor
+
+</member>
+        <member name="T:sp_sampletype">
+Sample type descriptor
+
+</member>
+        <member name="T:sp_connectionstate">
+@} 
+ @defgroup session Session handling
+
+ The concept of a session is fundamental for all communication with the Spotify ecosystem - it is the
+ object responsible for communicating with the Spotify service. You will need to instantiate a
+ session that then can be used to request artist information, perform searches etc.
+
+ @{
+
+ Current version of the application interface, that is, the API described by this file.
+
+ This value should be set in the sp_session_config struct passed to sp_session_create().
+
+ If an (upgraded) library is no longer compatible with this version the error #SP_ERROR_BAD_API_VERSION will be
+ returned from sp_session_create(). Future versions of the library will provide you with some kind of mechanism
+ to request an updated version of the library.
+
+Describes the current state of the connection
+
+</member>
+        <member name="M:sp_error_message(sp_error)">
+ Convert a numeric libspotify error code to a text string. The error message is in
+ English. This function is useful for logging purposes.
+
+ @param[in]   error   The error code to lookup
+
+</member>
+        <member name="T:sp_error">
+@} 
+ @defgroup error Error Handling
+
+ All functions in libspotify use the same set of error codes. Most of them return
+ an error code, and let the result of the operation be stored in an out-parameter.
+
+ @{
+
+Error codes returned by various functions
+
+</member>
+        <member name="T:SpotiFire.Error">
+-------------------------------------------------------------------------------------------------
+<summary>	Values that errors given from libspotify . </summary><remarks>	Aleksander, 19.10.2012. </remarks>
+-------------------------------------------------------------------------------------------------
+</member>
+        <member name="F:SpotiFire.Error.SYSTEM_FAILURE">
+            <summary>
+An operating system error
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.INVALID_ARGUMENT">
+            <summary>
+An invalid argument was specified
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.LASTFM_AUTH_ERROR">
+            <summary>
+A LastFM scrobble authentication error has occurred
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OFFLINE_LICENSE_ERROR">
+            <summary>
+The Spotify license server does not respond correctly
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OFFLINE_LICENSE_LOST">
+            <summary>
+The license for this device has been lost. Most likely because the user used offline on three other device
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OFFLINE_NOT_ALLOWED">
+            <summary>
+This user is not allowed to use offline mode
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OFFLINE_EXPIRED">
+            <summary>
+Offline key has expired, the user needs to go online again
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OFFLINE_DISK_CACHE">
+            <summary>
+Disk cache is full so no more tracks can be downloaded to offline mode
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OFFLINE_TOO_MANY_TRACKS">
+            <summary>
+Reached the device limit for number of tracks to download
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.APPLICATION_BANNED">
+            <summary>
+This application is no longer allowed to use the Spotify service
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.CANT_OPEN_TRACE_FILE">
+            <summary>
+Unable to open trace file
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.INVALID_DEVICE_ID">
+            <summary>
+Invalid device ID
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.NETWORK_DISABLED">
+            <summary>
+Network disabled
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.NO_CREDENTIALS">
+            <summary>
+No credentials are stored
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.NO_SUCH_USER">
+            <summary>
+Requested user does not exist
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.NO_CACHE">
+            <summary>
+Cache is not enabled
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.INBOX_IS_FULL">
+            <summary>
+Target inbox is full
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.PERMISSION_DENIED">
+            <summary>
+Requested operation is not allowed
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.NO_STREAM_AVAILABLE">
+            <summary>
+Could not find any suitable stream to play
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.IS_LOADING">
+            <summary>
+The resource is currently loading
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OTHER_TRANSIENT">
+            <summary>
+A transient error occurred.
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.USER_NEEDS_PREMIUM">
+            <summary>
+The specified user needs a premium account
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.INDEX_OUT_OF_RANGE">
+            <summary>
+Index out of range
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.INVALID_INDATA">
+            <summary>
+Input data was either missing or invalid
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.MISSING_CALLBACK">
+            <summary>
+No valid callback registered to handle events
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.BAD_USER_AGENT">
+            <summary>
+The user agent string is invalid or too long
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OTHER_PERMANENT">
+            <summary>
+Some other error occurred, and it is permanent (e.g. trying to relogin will not help)
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.CLIENT_TOO_OLD">
+            <summary>
+Client is too old, library will need to be updated
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.UNABLE_TO_CONTACT_SERVER">
+            <summary>
+Cannot connect to the Spotify backend system
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.USER_BANNED">
+            <summary>
+The specified username is banned
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.BAD_USERNAME_OR_PASSWORD">
+            <summary>
+Login failed because of bad username and/or password
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.BAD_APPLICATION_KEY">
+            <summary>
+The application key is invalid
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.TRACK_NOT_PLAYABLE">
+            <summary>
+The track specified for playing cannot be played
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.API_INITIALIZATION_FAILED">
+            <summary>
+Initialization of library failed - are cache locations etc. valid?
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.BAD_API_VERSION">
+            <summary>
+The library version targeted does not match the one you claim you support
+</summary>
+        </member>
+        <member name="F:SpotiFire.Error.OK">
+            <summary>
+No errors encountered
+</summary>
+        </member>
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'T:sp_session'. -->
+        <!-- Discarding badly formed XML document comment for member 'F:sp_session_config.proxy'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_session_user_country(sp_session*)'. -->
+        <!-- Discarding badly formed XML document comment for member 'M:sp_toplistbrowse_create(sp_session*,sp_toplisttype,sp_toplistregion,System.SByte!System.Runtime.CompilerServices.IsSignUnspecifiedByte!System.Runtime.CompilerServices.IsConst*,=FUNC:System.Void(sp_toplistbrowse*,System.Void*),System.Void*)'. -->
+    </members>
+</doc>

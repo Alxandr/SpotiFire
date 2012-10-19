@@ -45,15 +45,33 @@
 			</do>
 		</foreach>
 
-		<cl outputdir="${build.obj}" options="/clr /LN">
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${basedir}/SpotiFire.LibSpotify">
+					<include name="*.cpp" />
+					<include name="${tmp.cpp}" asis="true" />
+					<exclude name="AssemblyInfo.cpp" />
+				</items>
+			</in>
+			<do>
+				<property name="doc" value="${build.obj}/${path::get-file-name-without-extension(filename)}.xdc" />
+				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot;" verbose="false">
+					<sources>
+						<include name="${filename}" asis="true" />
+					</sources>
+				</cl>
+			</do>
+		</foreach>
+
+		<!--<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${build.obj}&quot;" verbose="true">
 			<sources basedir="${basedir}/SpotiFire.LibSpotify">
 				<include name="*.cpp" />
 				<include name="${tmp.cpp}" asis="true" />
 				<exclude name="AssemblyInfo.cpp" />
 			</sources>
-		</cl>
+		</cl>-->
 
-		<csc target="module" output="${build.obj}/SpotiFire.netmodule">
+		<csc target="module" output="${build.obj}/SpotiFire.netmodule" doc="${build.obj}/managed.xml">
 			<modules basedir="${build.obj}">
 				<include name="tmp.obj" />
 			</modules>
@@ -63,7 +81,7 @@
 			</sources>
 		</csc>
 
-		<link output="${build.dir}/${name}.dll" options="/LTCG /FIXED /CLRIMAGETYPE:IJW /NOENTRY /DLL">
+		<link output="${build.obj}/${name}.dll" options="/LTCG /FIXED /CLRIMAGETYPE:IJW /NOENTRY /DLL">
 			<sources basedir="${build.obj}">
 				<include name="*.obj" />
 				<include name="*.netmodule" />
@@ -72,6 +90,27 @@
 			<arg value="/DEBUG" if="${build.debug == 'true'}" />
 		</link>
 
+		<exec program="xdcmake.exe" workingdir="${build.obj}">
+			<arg>
+				<path>
+					<pathelement path="${build.obj}\*.xdc" />
+				</path>
+			</arg>
+			<arg value="/assembly:${name}.dll" />
+			<arg value="/out:${name}.xml" />
+		</exec>
+
+		<!--<xmlstrip file="${build.obj}/${name}.xml" xpath="/doc/members/member[starts-with(@name, 'M:UTF8') or starts-with(@name, 'M:sp_') or starts-with(@name, 'T:sp_') or starts-with(@name, 'F:sp_') or starts-with(@name, 'D:sp_') or starts-with(@name, 'D:inboxpost_') or starts-with(@name, 'D:toplistbrowse_') or starts-with(@name, 'D:search_') or starts-with(@name, 'D:image_') or starts-with(@name, 'D:artistbrowse_') or starts-with(@name, 'D:albumbrowse_')]" />-->
+		<xmlstrip file="${build.obj}/${name}.xml" xpath="/doc/members/member[not(contains(@name, 'SpotiFire'))]" />
+		<xmlmerge file="${build.obj}/${name}.xml" xpath="/doc/members" other="${build.obj}/managed.xml" />
+
+		<copy todir="${build.dir}" flatten="true">
+			<fileset basedir="${build.obj}">
+				<include name="${name}.dll" />
+				<include name="${name}.pdb" />
+				<include name="${name}.xml" />
+			</fileset>
+		</copy>
 		<copy todir="${build.dir}" flatten="true">
 			<fileset basedir="packages">
 				<include name="**net40/**" />

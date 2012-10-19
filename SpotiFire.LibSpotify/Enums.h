@@ -1,6 +1,13 @@
 #pragma once
 
 namespace SpotiFire {
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that errors given from libspotify . </summary>
+	///
+	/// <remarks>	Aleksander, 19.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+
 	public enum class Error
 	{
 		/// <summary>
