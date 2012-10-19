@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public interface ISpotifyAwaiter<T> : ICriticalNotifyCompletion
         where T : ISpotifyObject

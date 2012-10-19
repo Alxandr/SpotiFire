@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+#pragma once
 
-namespace SpotiFire.SpotifyLib
-{
-    /// <summary>
-    /// Error codes returned by various functions
-    /// </summary>
-    public enum Error
-    {
-        /// <summary>
+namespace SpotiFire {
+	public enum class Error
+	{
+		/// <summary>
         /// No errors encountered
         /// </summary>
         OK = 0,
@@ -191,5 +182,5 @@ namespace SpotiFire.SpotifyLib
         /// An operating system error
         /// </summary>
         SYSTEM_FAILURE = 41,
-    }
+	};
 }

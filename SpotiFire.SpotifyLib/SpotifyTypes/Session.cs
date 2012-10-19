@@ -7,12 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using SPSession = SpotiFire.Session;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public delegate void SessionEventHandler(ISession sender, SessionEventArgs e);
     public delegate void MusicDeliveryEventHandler(ISession sender, MusicDeliveryEventArgs e);
+}
 
-
+namespace SpotiFire.Types
+{
     internal class Session : ISession
     {
         static Logger logger = LogManager.GetCurrentClassLogger();
@@ -263,7 +265,7 @@ namespace SpotiFire.SpotifyLib
                 return;
 
             if ((s.ConnectionState == ConnectionState.LoggedIn || s.ConnectionState == ConnectionState.Offline) && error == Error.OK)
-                s.playlistContainer = SpotifyLib.PlaylistContainer.Get(s, SPSession.playlistcontainer(sessionPtr));
+                s.playlistContainer = Types.PlaylistContainer.Get(s, SPSession.playlistcontainer(sessionPtr));
 
             s.EnqueueEventWorkItem(new EventWorkItem(CreateDelegate<SessionEventArgs>(se => se.OnLoginComplete, s), new SessionEventArgs(error)));
         }
@@ -645,8 +647,8 @@ namespace SpotiFire.SpotifyLib
             lock (libspotify.Mutex)
             {
                 IntPtr browsePtr = SpotiFire.Search.create(sessionPtr, query, trackOffset, trackCount, albumOffset, albumCount, artistOffset, artistCount,
-                    playlistOffset, playlistCount, (int)type, Marshal.GetFunctionPointerForDelegate(SpotifyLib.Search.search_complete), IntPtr.Zero);
-                return browsePtr != IntPtr.Zero ? SpotifyLib.Search.Get(this, browsePtr) : null;
+                    playlistOffset, playlistCount, (int)type, Marshal.GetFunctionPointerForDelegate(Types.Search.search_complete), IntPtr.Zero);
+                return browsePtr != IntPtr.Zero ? Types.Search.Get(this, browsePtr) : null;
             }
         }
 

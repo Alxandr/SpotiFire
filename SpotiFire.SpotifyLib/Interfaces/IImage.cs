@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public interface IImage : ISpotifyObject, IDisposable
     {

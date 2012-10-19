@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public interface IArray<T> : IEnumerable<T>
     {

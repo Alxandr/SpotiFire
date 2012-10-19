@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Playlistcontainer
+	ref class Playlistcontainer
 	{
 	internal:
 		static int add_callbacks(IntPtr pcPtr, IntPtr callbacks, IntPtr userDataPtr);

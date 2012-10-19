@@ -20,7 +20,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 
-[assembly:InternalsVisibleTo("SpotiFire.SpotifyLib")];
+[assembly:InternalsVisibleTo("SpotiFire")];
 
 //
 // Version information for an assembly consists of the following four values:

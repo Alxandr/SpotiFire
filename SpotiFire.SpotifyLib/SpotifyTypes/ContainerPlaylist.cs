@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire.Types
 {
     internal class ContainerPlaylist : Playlist, IContainerPlaylist
     {

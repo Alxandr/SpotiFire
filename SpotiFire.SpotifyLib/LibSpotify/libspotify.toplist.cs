@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal delegate void toplistbrowse_complete_delegate(IntPtr tlbPtr, IntPtr userDataPtr);
 

@@ -6,3 +6,5 @@
 
 
 #include <string.h>
+#include "Enums.h"
+#include "include\libspotify\api.h"

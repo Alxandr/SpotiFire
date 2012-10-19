@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Inbox
+	ref class Inbox
 	{
 	internal:
 		static IntPtr post_tracks(IntPtr sessionPtr, String^ user, array<IntPtr>^ trackPtrs, Int32 numTracks, String^ message, IntPtr callbackPtr, IntPtr userDataPtr);

@@ -4,9 +4,13 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using SPImage = SpotiFire.Image;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public delegate void ImageEventHandler(IImage sender, EventArgs e);
+}
+
+namespace SpotiFire.Types
+{
     internal class Image : CountedDisposeableSpotifyObject, IImage
     {
         #region Wrapper

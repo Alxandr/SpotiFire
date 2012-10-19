@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SpotiFire.SpotifyLib {
+namespace SpotiFire {
 
     public interface IAlbumBrowse : ISpotifyObject, IDisposable {
         Error Error { get; }

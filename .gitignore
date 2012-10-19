@@ -27,5 +27,6 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 SpotiFire.Tests
 ipch/
+tmp/
 *.sdf
 *.opensdf

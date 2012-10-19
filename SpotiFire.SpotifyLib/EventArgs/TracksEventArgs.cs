@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public class TracksEventArgs : EventArgs
     {

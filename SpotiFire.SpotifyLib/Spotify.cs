@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public static class Spotify
     {
@@ -48,7 +48,7 @@ namespace SpotiFire.SpotifyLib
 
         internal static async Task<ISession> CreateSessionInternal(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
-            _session = await SpotiFire.SpotifyLib.Session.Create(applicationKey, cacheLocation, settingsLocation, userAgent);
+            _session = await SpotiFire.Types.Session.Create(applicationKey, cacheLocation, settingsLocation, userAgent);
             return _session;
         }
     }

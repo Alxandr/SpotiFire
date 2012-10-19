@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire.Types
 {
     internal class PlaylistTrack : Track, IPlaylistTrack
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using SPArtist = SpotiFire.Artist;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire.Types
 {
 
     internal class Artist : CountedDisposeableSpotifyObject, IArtist
@@ -156,8 +156,8 @@ namespace SpotiFire.SpotifyLib
             lock (libspotify.Mutex)
             {
                 IntPtr artistBrowsePtr = SpotiFire.Artistbrowse.create(session.sessionPtr, artistPtr, (int)type,
-                    Marshal.GetFunctionPointerForDelegate(SpotifyLib.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
-                return artistBrowsePtr != IntPtr.Zero ? SpotifyLib.ArtistBrowse.Get(session, artistBrowsePtr) : null;
+                    Marshal.GetFunctionPointerForDelegate(Types.ArtistBrowse.artistbrowse_complete), IntPtr.Zero);
+                return artistBrowsePtr != IntPtr.Zero ? Types.ArtistBrowse.Get(session, artistBrowsePtr) : null;
             }
         }
 

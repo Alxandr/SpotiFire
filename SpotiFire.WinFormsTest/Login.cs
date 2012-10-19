@@ -12,10 +12,10 @@ namespace SpotiFire.WinFormsTest
 {
     public partial class Login : Form
     {
-        private SpotifyLib.ISession session;
+        private ISession session;
         private TaskCompletionSource<bool> _loginWait = new TaskCompletionSource<bool>();
 
-        public Login(SpotifyLib.ISession session)
+        public Login(ISession session)
         {
             InitializeComponent();
             DialogResult = DialogResult.Cancel;

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<project default="build-all" xmlns="http://nant.sourceforge.net/release/0.92/nant.xsd" name="SpotiFire">
+	<property name="project.version" value="0.5" />
+	<property name="project.config" value="debug" />
+	<property name="basedir" value="${project::get-base-directory()}" />
+	<property name="name" value="${project::get-name()}" />
+
+	<target name="init">
+		<call target="${project.config}" />
+	</target>
+
+	<target name="debug">
+		<property name="project.config" value="debug" />
+	    <property name="build.debug" value="true" />
+	    <property name="basedir.suffix" value="-debug" />
+	</target>
+
+	<target name="release">
+		<property name="project.config" value="release" />
+		<property name="build.debug" value="true" />
+	    <property name="basedir.suffix" value="" />
+	</target>
+
+	<target name="build" depends="init">
+		<assemblyfileset id="all_refs" basedir="packages">
+			<include name="**net40/*.dll" />
+		</assemblyfileset>
+
+
+		<property name="build.dir" value="${basedir}/bin/${name}_${project.version}${basedir.suffix}" />
+		<property name="build.obj" value="${basedir}/obj/${name}_${project.version}${basedir.suffix}" />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.obj}" />
+		<property name="tmp.cpp" value="${build.obj}/tmp.cpp" />
+
+		<delete file="${tmp.cpp}" />
+		<foreach item="File" property="filename">
+			<in>
+				<items basedir="${basedir}/SpotiFire.LibSpotify">
+					<include name="**.h" />
+				</items>
+			</in>
+			<do>
+				<echo message="#include &quot;${filename}&quot;&#10;" append="true" file="${tmp.cpp}" />
+			</do>
+		</foreach>
+
+		<cl outputdir="${build.obj}" options="/clr /LN">
+			<sources basedir="${basedir}/SpotiFire.LibSpotify">
+				<include name="*.cpp" />
+				<include name="${tmp.cpp}" asis="true" />
+				<exclude name="AssemblyInfo.cpp" />
+			</sources>
+		</cl>
+
+		<csc target="module" output="${build.obj}/SpotiFire.netmodule">
+			<modules basedir="${build.obj}">
+				<include name="tmp.obj" />
+			</modules>
+			<references refid="all_refs" />
+			<sources basedir="${basedir}/SpotiFire.SpotifyLib">
+				<include name="**.cs" />
+			</sources>
+		</csc>
+
+		<link output="${build.dir}/${name}.dll" options="/LTCG /FIXED /CLRIMAGETYPE:IJW /NOENTRY /DLL">
+			<sources basedir="${build.obj}">
+				<include name="*.obj" />
+				<include name="*.netmodule" />
+				<include name="${basedir}/libspotify.lib" asis="true" />
+			</sources>
+			<arg value="/DEBUG" if="${build.debug == 'true'}" />
+		</link>
+
+		<copy todir="${build.dir}" flatten="true">
+			<fileset basedir="packages">
+				<include name="**net40/**" />
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}" flatten="true">
+			<fileset basedir="${basedir}">
+				<include name="*.dll" />
+				<include name="*.xml" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-extras" depends="build">
+		<nant>
+			<buildfiles basedir="${basedir}">
+				<include name="*/*.build" />
+			</buildfiles>
+		</nant>
+	</target>
+
+	<target name="build-all" depends="build build-extras" />
+
+	<target name="clean">
+		<delete dir="${basedir}/bin" />
+		<delete dir="${basedir}/obj" />
+	</target>
+</project>

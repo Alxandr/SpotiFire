@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
 
     public static class ISessionExtensions
@@ -13,7 +13,7 @@ namespace SpotiFire.SpotifyLib
         // IImage methods
         public static IImage GetImageFromId(this ISession session, string id)
         {
-            return Image.FromId(session, id);
+            return Types.Image.FromId(session, id);
         }
 
         public static System.Drawing.Image GetImage(this IImage image)

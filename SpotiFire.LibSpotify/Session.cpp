@@ -208,13 +208,6 @@ Int32 SpotiFire::Session::offline_tracks_to_sync(IntPtr sessionPtr)
 	return (Int32)sp_offline_tracks_to_sync(session);
 }
 
-int SpotiFire::Session::link_release(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (int)sp_link_release(link);
-}
-
 int SpotiFire::Session::create(IntPtr configPtr, [System::Runtime::InteropServices::Out]IntPtr %sessionPtr)
 {
 	sp_session_config* config = SP_TYPE(sp_session_config, configPtr);
@@ -344,147 +337,6 @@ int SpotiFire::Session::player_seek(IntPtr sessionPtr, Int32 offset)
 	return (int)sp_session_player_seek(session, offset);
 }
 
-IntPtr SpotiFire::Session::link_create_from_string(String^ link)
-{
-	char* _link = SP_STRING(link);
-
-	IntPtr ret = (IntPtr)(void *)sp_link_create_from_string(_link);
-	SP_FREE(_link);
-	return ret;
-}
-
-IntPtr SpotiFire::Session::link_create_from_track(IntPtr trackPtr, Int32 offset)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_track(track, offset);
-}
-
-IntPtr SpotiFire::Session::link_create_from_album(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_album(album);
-}
-
-IntPtr SpotiFire::Session::link_create_from_album_cover(IntPtr albumPtr, int size)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_album_cover(album, (sp_image_size)size);
-}
-
-IntPtr SpotiFire::Session::link_create_from_artist(IntPtr artistPtr)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_artist(artist);
-}
-
-IntPtr SpotiFire::Session::link_create_from_artist_portrait(IntPtr artistPtr, int size)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_artist_portrait(artist, (sp_image_size)size);
-}
-
-IntPtr SpotiFire::Session::link_create_from_artistbrowse_portrait(IntPtr artistPtr, Int32 index)
-{
-	sp_artistbrowse* artist = SP_TYPE(sp_artistbrowse, artistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_artistbrowse_portrait(artist, index);
-}
-
-IntPtr SpotiFire::Session::link_create_from_search(IntPtr searchPtr)
-{
-	sp_search* search = SP_TYPE(sp_search, searchPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_search(search);
-}
-
-IntPtr SpotiFire::Session::link_create_from_playlist(IntPtr playlistPtr)
-{
-	sp_playlist* playlist = SP_TYPE(sp_playlist, playlistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_playlist(playlist);
-}
-
-IntPtr SpotiFire::Session::link_create_from_user(IntPtr userPtr)
-{
-	sp_user* user = SP_TYPE(sp_user, userPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_user(user);
-}
-
-IntPtr SpotiFire::Session::link_create_from_image(IntPtr imagePtr)
-{
-	sp_image* image = SP_TYPE(sp_image, imagePtr);
-
-	return (IntPtr)(void *)sp_link_create_from_image(image);
-}
-
-String^ SpotiFire::Session::link_as_string(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-	int length = sp_link_as_string(link, NULL, 0) + 1;
-	char* buffer = new char[length];
-	sp_link_as_string(link, buffer, length);
-
-	String^ ret = UTF8(buffer);
-	delete buffer;
-	return ret;
-}
-
-int SpotiFire::Session::link_type(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (int)sp_link_type(link);
-}
-
-IntPtr SpotiFire::Session::link_as_track(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_track(link);
-}
-
-IntPtr SpotiFire::Session::link_as_track_and_offset(IntPtr linkPtr, [System::Runtime::InteropServices::Out]Int32 %offset)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-	pin_ptr<int> pinned = &offset;
-
-	return (IntPtr)(void *)sp_link_as_track_and_offset(link, pinned);
-}
-
-IntPtr SpotiFire::Session::link_as_album(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_album(link);
-}
-
-IntPtr SpotiFire::Session::link_as_artist(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_artist(link);
-}
-
-IntPtr SpotiFire::Session::link_as_user(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_user(link);
-}
-
-int SpotiFire::Session::link_add_ref(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (int)sp_link_add_ref(link);
-}
-
 IntPtr SpotiFire::Session::localtrack_create(String^ artist, String^ title, String^ album, Int32 length)
 {
 	char *_a = SP_STRING(artist),
@@ -587,3 +439,8 @@ Int32 SpotiFire::Session::toplistbrowse_backend_request_duration(IntPtr tlbPtr)
 	return (Int32)sp_toplistbrowse_backend_request_duration(tlb);
 }
 
+// Error:
+String^ SpotiFire::Session::error_message(Error^ error)
+{
+	return UTF8(sp_error_message((sp_error)*error));
+}

@@ -8,8 +8,8 @@
     <ProjectGuid>{CBF5614B-AF79-4228-8265-7DC2BAF9A626}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpotiFire.SpotifyLib</RootNamespace>
-    <AssemblyName>SpotiFire.SpotifyLib</AssemblyName>
+    <RootNamespace>SpotiFire</RootNamespace>
+    <AssemblyName>SpotiFire</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -75,7 +75,6 @@
     <Compile Include="LibSpotify\libspotify.album.cs" />
     <Compile Include="LibSpotify\libspotify.tracks.cs" />
     <Compile Include="LibSpotify\libspotify.links.cs" />
-    <Compile Include="LibSpotify\libspotify.error.cs" />
     <Compile Include="LibSpotify\libspotify.session.cs" />
     <Compile Include="LinkExtensions.cs" />
     <Compile Include="Interfaces\ITrackAndOffset.cs" />
@@ -145,10 +144,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -4,10 +4,13 @@ using System.Linq.Expressions;
 using System.Text;
 using SPArtistbrowse = SpotiFire.Artistbrowse;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
-
     public delegate void ArtistBrowseEventHandler(IArtistBrowse sender, ArtistBrowseEventArgs e);
+}
+
+namespace SpotiFire.Types
+{
     internal class ArtistBrowse : CountedDisposeableSpotifyObject, IArtistBrowse, ISpotifyAwaitable
     {
 
@@ -209,7 +212,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return SpotifyLib.Artist.Get(session, SPArtistbrowse.similar_artist(artistBrowsePtr, index));
+                    return Types.Artist.Get(session, SPArtistbrowse.similar_artist(artistBrowsePtr, index));
             });
 
             _Complete += new artistbrowse_complete_cb(ArtistBrowse__Complete);
@@ -254,7 +257,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        artist = SpotifyLib.Artist.Get(session, SPArtistbrowse.artist(artistBrowsePtr));
+                        artist = Types.Artist.Get(session, SPArtistbrowse.artist(artistBrowsePtr));
                 }
                 return artist;
             }

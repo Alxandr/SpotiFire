@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Search
+	ref class Search
 	{
 	internal:
 		static Int32 num_artists(IntPtr searchPtr);

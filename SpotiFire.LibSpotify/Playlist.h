@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Playlist
+	ref class Playlist
 	{
 	internal:
 		static int subscribers_free(IntPtr subsPtr);

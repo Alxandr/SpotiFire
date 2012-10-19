@@ -1,4 +1,4 @@
-﻿namespace SpotiFire.SpotifyLib
+﻿namespace SpotiFire
 {
     public interface IPlaylistTrackList : IEditableArray<IPlaylistTrack>
     {

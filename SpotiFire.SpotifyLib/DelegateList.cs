@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal class DelegateList<T> : DelegateArray<T>, IEditableArray<T>
     {

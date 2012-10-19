@@ -5,9 +5,13 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using SPAlbumbrowse = SpotiFire.Albumbrowse;
 
-namespace SpotiFire.SpotifyLib {
-
+namespace SpotiFire
+{
     public delegate void AlbumBrowseEventHandler(IAlbumBrowse sender, AlbumBrowseEventArgs e);
+}
+
+namespace SpotiFire.Types
+{
     internal class AlbumBrowse : CountedDisposeableSpotifyObject, IAlbumBrowse, ISpotifyAwaitable {
 
         #region Wrapper
@@ -196,7 +200,7 @@ namespace SpotiFire.SpotifyLib {
                 if (album == null) {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        album = SpotifyLib.Album.Get(session, SPAlbumbrowse.album(albumBrowsePtr));
+                        album = Types.Album.Get(session, SPAlbumbrowse.album(albumBrowsePtr));
                 }
                 return album;
             }
@@ -207,7 +211,7 @@ namespace SpotiFire.SpotifyLib {
                 if (album == null) {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        artist = SpotifyLib.Artist.Get(session, SPAlbumbrowse.artist(albumBrowsePtr));
+                        artist = Types.Artist.Get(session, SPAlbumbrowse.artist(albumBrowsePtr));
                 }
                 return artist;
             }

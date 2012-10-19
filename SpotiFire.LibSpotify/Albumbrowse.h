@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Albumbrowse
+	ref class Albumbrowse
 	{
 	internal:
 		static IntPtr album(IntPtr albPtr);

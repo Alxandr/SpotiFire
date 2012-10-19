@@ -43,6 +43,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>SpotiFire.Native</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -81,9 +82,11 @@
     <ClInclude Include="Albumbrowse.h" />
     <ClInclude Include="Artist.h" />
     <ClInclude Include="Artistbrowse.h" />
+    <ClInclude Include="Enums.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Inbox.h" />
     <ClInclude Include="include\libspotify\api.h" />
+    <ClInclude Include="Link.h" />
     <ClInclude Include="Playlist.h" />
     <ClInclude Include="Playlistcontainer.h" />
     <ClInclude Include="resource.h" />
@@ -99,15 +102,16 @@
     <ClCompile Include="Artist.cpp" />
     <ClCompile Include="Artistbrowse.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Enums.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Inbox.cpp" />
+    <ClCompile Include="Link.cpp" />
     <ClCompile Include="Playlist.cpp" />
     <ClCompile Include="Playlistcontainer.cpp" />
     <ClCompile Include="Search.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="Stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Track.cpp" />
     <ClCompile Include="User.cpp" />

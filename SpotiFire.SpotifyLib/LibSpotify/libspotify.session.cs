@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     #region Delegates
     internal delegate void logged_in_delegate(IntPtr sessionPtr, Error error);
@@ -99,7 +99,7 @@ namespace SpotiFire.SpotifyLib
     }
 
     /// <summary>
-    /// List of subscribers returned by <see cref="SpotiFire.SpotifyLib.IPlaylist.Subscribers"/>
+    /// List of subscribers returned by <see cref="SpotiFire.Types.IPlaylist.Subscribers"/>
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct SubscribersInfo
@@ -470,7 +470,7 @@ namespace SpotiFire.SpotifyLib
     }
 
     /// <summary>
-    /// Current connection type set using <see cref="SpotiFire.SpotifyLib.ISession.ConnectionType"/>.
+    /// Current connection type set using <see cref="SpotiFire.Types.ISession.ConnectionType"/>.
     /// </summary>
     public enum ConnectionType
     {
@@ -508,7 +508,7 @@ namespace SpotiFire.SpotifyLib
     /// <summary>
     /// Connection rules, bitwise OR of flags.
     /// 
-    /// The default is <see cref="SpotiFire.SpotifyLib.ConnectionType.Network"/> | <see cref="SpotiFire.SpotifyLib.ConnectionType.AllowSync"/>
+    /// The default is <see cref="SpotiFire.Types.ConnectionType.Network"/> | <see cref="SpotiFire.Types.ConnectionType.AllowSync"/>
     /// </summary>
     [Flags]
     public enum ConnectionRules

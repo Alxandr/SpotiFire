@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using SPAlbum = SpotiFire.Album;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire.Types
 {
     internal class Album : CountedDisposeableSpotifyObject, IAlbum
     {
@@ -174,7 +174,7 @@ namespace SpotiFire.SpotifyLib
             {
                 if (artist == null)
                     lock (libspotify.Mutex)
-                        artist = SpotifyLib.Artist.Get(session, SPAlbum.artist(albumPtr));
+                        artist = Types.Artist.Get(session, SPAlbum.artist(albumPtr));
 
                 return artist;
             }
@@ -235,8 +235,8 @@ namespace SpotiFire.SpotifyLib
         public IAlbumBrowse Browse() {
             lock (libspotify.Mutex) {
                 IntPtr albumBrowsePtr = SpotiFire.Albumbrowse.create(session.sessionPtr, albumPtr,
-                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(SpotifyLib.AlbumBrowse.albumbrowse_complete), IntPtr.Zero);
-                return albumBrowsePtr != IntPtr.Zero ? SpotifyLib.AlbumBrowse.Get(session, albumBrowsePtr) : null;
+                    System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(Types.AlbumBrowse.albumbrowse_complete), IntPtr.Zero);
+                return albumBrowsePtr != IntPtr.Zero ? Types.AlbumBrowse.Get(session, albumBrowsePtr) : null;
             }
         }
 

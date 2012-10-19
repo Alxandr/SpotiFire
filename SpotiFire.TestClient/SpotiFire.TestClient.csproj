@@ -52,6 +52,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SpotiFire.LibSpotify\SpotiFire.LibSpotify.vcxproj">
+      <Project>{3a193712-4ae2-4b7a-9adf-139d3213e34b}</Project>
+      <Name>SpotiFire.LibSpotify</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SpotiFire.SpotifyLib\SpotiFire.SpotifyLib.csproj">
       <Project>{cbf5614b-af79-4228-8265-7dc2baf9a626}</Project>
       <Name>SpotiFire.SpotifyLib</Name>

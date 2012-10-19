@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Session
+	ref class Session
 	{
 	internal:
 		static Int32 __ApiVersion();
@@ -37,7 +37,6 @@ namespace SpotiFire {
 		static int set_connection_type(IntPtr sessionPtr, int type);
 		static int set_connection_rules(IntPtr sessionPtr, int rules);
 		static Int32 offline_tracks_to_sync(IntPtr sessionPtr);
-		static int link_release(IntPtr linkPtr);
 		static int create(IntPtr configPtr, [System::Runtime::InteropServices::Out]IntPtr %sessionPtr);
 		static int release(IntPtr sessionPtr);
 		static int login(IntPtr sessionPtr, String^ username, String^ password, Boolean rememberMe, String^ blob);
@@ -54,25 +53,6 @@ namespace SpotiFire {
 		static int process_events(IntPtr sessionPtr, [System::Runtime::InteropServices::Out]int %nextTimeout);
 		static int player_load(IntPtr sessionPtr, IntPtr trackPtr);
 		static int player_seek(IntPtr sessionPtr, Int32 offset);
-		static IntPtr link_create_from_string(String^ link);
-		static IntPtr link_create_from_track(IntPtr trackPtr, Int32 offset);
-		static IntPtr link_create_from_album(IntPtr albumPtr);
-		static IntPtr link_create_from_album_cover(IntPtr albumPtr, int size);
-		static IntPtr link_create_from_artist(IntPtr artistPtr);
-		static IntPtr link_create_from_artist_portrait(IntPtr artistPtr, int size);
-		static IntPtr link_create_from_artistbrowse_portrait(IntPtr artistPtr, Int32 index);
-		static IntPtr link_create_from_search(IntPtr searchPtr);
-		static IntPtr link_create_from_playlist(IntPtr playlistPtr);
-		static IntPtr link_create_from_user(IntPtr userPtr);
-		static IntPtr link_create_from_image(IntPtr imagePtr);
-		static String^ link_as_string(IntPtr linkPtr);
-		static int link_type(IntPtr linkPtr);
-		static IntPtr link_as_track(IntPtr linkPtr);
-		static IntPtr link_as_track_and_offset(IntPtr linkPtr, [System::Runtime::InteropServices::Out]Int32 %offset);
-		static IntPtr link_as_album(IntPtr linkPtr);
-		static IntPtr link_as_artist(IntPtr linkPtr);
-		static IntPtr link_as_user(IntPtr linkPtr);
-		static int link_add_ref(IntPtr linkPtr);
 		static IntPtr localtrack_create(String^ artist, String^ title, String^ album, Int32 length);
 		static IntPtr toplistbrowse_create(IntPtr sessionPtr, int type, int region, String^ username, IntPtr callbackPtr, IntPtr userDataPtr);
 		static Boolean toplistbrowse_is_loaded(IntPtr tlbPtr);
@@ -86,5 +66,8 @@ namespace SpotiFire {
 		static Int32 toplistbrowse_num_tracks(IntPtr tlbPtr);
 		static IntPtr toplistbrowse_track(IntPtr tlbPtr, Int32 index);
 		static Int32 toplistbrowse_backend_request_duration(IntPtr tlbPtr);
+		
+		// Error:
+		static String^ error_message(Error^ error);
 	};
 }

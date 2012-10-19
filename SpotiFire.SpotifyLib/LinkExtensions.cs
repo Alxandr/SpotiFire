@@ -1,7 +1,7 @@
 ﻿using System;
-using SPLink = SpotiFire.Session;
+using SPLink = SpotiFire.Link;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public static class LinkExtensions
     {
@@ -9,11 +9,11 @@ namespace SpotiFire.SpotifyLib
         {
             IntPtr linkPtr;
             lock (libspotify.Mutex)
-                linkPtr = SPLink.link_create_from_string(link);
+                linkPtr = SPLink.create_from_string(link);
 
-            ILink lnk = Link.Get((Session)session, linkPtr);
+            ILink lnk = Types.Link.Get((Types.Session)session, linkPtr);
             lock (libspotify.Mutex)
-                SPLink.link_release(linkPtr);
+                SPLink.release(linkPtr);
 
             return lnk;
         }
@@ -21,13 +21,13 @@ namespace SpotiFire.SpotifyLib
         public static ILink<IArtist> CreateLink(this IArtist artist)
         {
             IntPtr linkPtr, artistPtr;
-            artistPtr = Artist.GetPointer(artist);
+            artistPtr = Types.Artist.GetPointer(artist);
             lock (libspotify.Mutex)
-                linkPtr = SPLink.link_create_from_artist(artistPtr);
+                linkPtr = SPLink.create_from_artist(artistPtr);
 
-            ILink<IArtist> link = (ILink<IArtist>)Link.Get((Session)artist.Session, linkPtr);
+            ILink<IArtist> link = (ILink<IArtist>)Types.Link.Get((Types.Session)artist.Session, linkPtr);
             lock (libspotify.Mutex)
-                SPLink.link_release(linkPtr);
+                SPLink.release(linkPtr);
 
             return link;
         }
@@ -35,13 +35,13 @@ namespace SpotiFire.SpotifyLib
         public static ILink<ITrack> CreateLink(this ITrack track)
         {
             IntPtr linkPtr, trackPtr;
-            trackPtr = Track.GetPointer(track);
+            trackPtr = Types.Track.GetPointer(track);
             lock (libspotify.Mutex)
-                linkPtr = SPLink.link_create_from_track(trackPtr, 0);
+                linkPtr = SPLink.create_from_track(trackPtr, 0);
 
-            ILink<ITrack> link = (ILink<ITrack>)Link.Get((Session)track.Session, linkPtr);
+            ILink<ITrack> link = (ILink<ITrack>)Types.Link.Get((Types.Session)track.Session, linkPtr);
             lock (libspotify.Mutex)
-                SPLink.link_release(linkPtr);
+                SPLink.release(linkPtr);
 
             return link;
         }

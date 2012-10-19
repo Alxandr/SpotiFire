@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal delegate void playlist_added_delegate(IntPtr pcPtr, IntPtr plPtr, int position, IntPtr userDataPtr);
     internal delegate void playlist_removed_delegate(IntPtr pcPtr, IntPtr plPtr, int position, IntPtr userDataPtr);

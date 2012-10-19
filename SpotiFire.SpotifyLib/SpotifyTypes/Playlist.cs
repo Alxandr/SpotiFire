@@ -4,13 +4,14 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using SPPlaylist = SpotiFire.Playlist;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public delegate void PlaylistEventHandler(IPlaylist playlist, EventArgs args);
     public delegate void PlaylistEventHandler<TEventArgs>(IPlaylist playlist, TEventArgs args) where TEventArgs : EventArgs;
+}
 
-
-
+namespace SpotiFire.Types
+{
     internal class Playlist : CountedDisposeableSpotifyObject, IPlaylist
     {
         #region Wrapper

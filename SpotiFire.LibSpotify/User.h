@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class User
+	ref class User
 	{
 	internal:
 		static String^ canonical_name(IntPtr userPtr);

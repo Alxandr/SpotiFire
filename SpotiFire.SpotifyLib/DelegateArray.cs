@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal class DelegateArray<T> : IArray<T>
     {

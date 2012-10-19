@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using SPTrack = SpotiFire.Track;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire.Types
 {
     internal class Track : CountedDisposeableSpotifyObject, ITrack
     {
@@ -212,7 +212,7 @@ namespace SpotiFire.SpotifyLib
                 IsAlive(true);
                 if (album == null)
                     lock (libspotify.Mutex)
-                        album = SpotifyLib.Album.Get(session, SPTrack.album(trackPtr));
+                        album = Types.Album.Get(session, SPTrack.album(trackPtr));
 
                 return album;
             }

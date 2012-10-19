@@ -7,7 +7,7 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	public ref class Track
+	ref class Track
 	{
 	internal:
 		static int add_ref(IntPtr trackPtr);

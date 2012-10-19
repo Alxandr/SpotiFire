@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using SPLink = SpotiFire.Session;
+using SPLink = SpotiFire.Link;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire.Types
 {
     internal abstract class Link : CountedDisposeableSpotifyObject, ILink
     {
@@ -106,7 +106,7 @@ namespace SpotiFire.SpotifyLib
         {
             LinkType type;
             lock (libspotify.Mutex)
-                type = (LinkType)SPLink.link_type(linkPtr);
+                type = (LinkType)SPLink.type(linkPtr);
 
             switch (type)
             {
@@ -177,7 +177,7 @@ namespace SpotiFire.SpotifyLib
             this.linkPtr = linkPtr;
 
             lock (libspotify.Mutex)
-                SPLink.link_add_ref(linkPtr);
+                SPLink.add_ref(linkPtr);
 
             session.DisposeAll += new SessionEventHandler(session_DisposeAll);
         }
@@ -195,7 +195,7 @@ namespace SpotiFire.SpotifyLib
             {
                 IsAlive(true);
                 lock (libspotify.Mutex)
-                    return (LinkType)SPLink.link_type(linkPtr);
+                    return (LinkType)SPLink.type(linkPtr);
             }
         }
 
@@ -217,7 +217,7 @@ namespace SpotiFire.SpotifyLib
             if (!IsAlive())
                 return "";
 
-            return SpotiFire.Session.link_as_string(linkPtr);
+            return SPLink.as_string(linkPtr);
         }
         #endregion
 
@@ -228,7 +228,7 @@ namespace SpotiFire.SpotifyLib
 
             if (!session.ProcExit)
                 lock (libspotify.Mutex)
-                    SPLink.link_release(linkPtr);
+                    SPLink.release(linkPtr);
 
             linkPtr = IntPtr.Zero;
         }
@@ -243,7 +243,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Artist.Get(session, SPLink.link_as_artist(linkPtr));
+                        return Artist.Get(session, SPLink.as_artist(linkPtr));
                 }
             }
 
@@ -267,7 +267,7 @@ namespace SpotiFire.SpotifyLib
                 public LinkAndOffset(Session session, IntPtr linkPtr, int offset)
                 {
                     this.offset = TimeSpan.FromSeconds(offset);
-                    this.track = SpotifyLib.Track.Get(session, linkPtr);
+                    this.track = Types.Track.Get(session, linkPtr);
                 }
 
                 public ITrack Track
@@ -289,7 +289,7 @@ namespace SpotiFire.SpotifyLib
                     int offset;
                     IntPtr trackPtr;
                     lock (libspotify.Mutex)
-                        trackPtr = SPLink.link_as_track_and_offset(linkPtr, out offset);
+                        trackPtr = SPLink.as_track_and_offset(linkPtr, out offset);
                     return new LinkAndOffset(session, trackPtr, offset);
                 }
             }
@@ -311,7 +311,7 @@ namespace SpotiFire.SpotifyLib
                 {
                     IsAlive(true);
                     lock (libspotify.Mutex)
-                        return Album.Get(session, SPLink.link_as_album(linkPtr));
+                        return Album.Get(session, SPLink.as_album(linkPtr));
                 }
             }
 

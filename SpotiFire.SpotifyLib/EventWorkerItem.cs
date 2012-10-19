@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal class EventWorkItem
     {	

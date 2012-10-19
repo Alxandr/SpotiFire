@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<project default="build" xmlns="http://nant.sourceforge.net/release/0.92/nant.xsd" name="Console">
+	<target name="build">
+		<csc target="exe" output="${build.dir}\${project::get-name()}.exe" platform="x86">
+			<references basedir="${build.dir}">
+				<include name="*.dll" />
+				<exclude name="bass.dll" />
+				<exclude name="libspotify.dll" />
+			</references>
+			<sources basedir="${project::get-base-directory()}">
+				<include name="**.cs" />
+			</sources>
+		</csc>
+	</target>
+</project>

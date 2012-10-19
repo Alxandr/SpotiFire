@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public interface ISearch : ISpotifyObject, IDisposable
     {

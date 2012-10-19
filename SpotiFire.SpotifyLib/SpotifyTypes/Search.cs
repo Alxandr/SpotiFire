@@ -5,9 +5,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using SPSearch = SpotiFire.Search;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     public delegate void SearchEventHandler(ISearch sender, SearchEventArgs e);
+}
+
+namespace SpotiFire.Types
+{
     internal class Search : CountedDisposeableSpotifyObject, ISearch, ISpotifyAwaitable
     {
         #region Wrapper

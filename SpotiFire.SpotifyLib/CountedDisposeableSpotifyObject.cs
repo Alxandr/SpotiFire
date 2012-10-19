@@ -1,5 +1,5 @@
 ﻿
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal abstract class CountedDisposeableSpotifyObject : DisposeableSpotifyObject
     {

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpotiFire.SpotifyLib
+namespace SpotiFire
 {
     internal delegate void albumbrowse_complete_delegate(IntPtr resultPtr, IntPtr userDataPtr);
 }
