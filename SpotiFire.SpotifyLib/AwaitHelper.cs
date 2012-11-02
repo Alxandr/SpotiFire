@@ -40,7 +40,7 @@ namespace SpotiFire
                     _continuation = new Continuation(continuation, false);
                     if (!awaitable.AddContinuation(() => _continuation.Run(awaitable, true)))
                     {
-                        UnsafeScheduleAction(continuation);
+                        UnsafeScheduleAction(awaitable, continuation);
                     }
                 }
                 else
@@ -98,12 +98,6 @@ namespace SpotiFire
                     _capturedContext = ExecutionContext.Capture();
             }
 
-            public virtual void WaitCallback(object state)
-            {
-                RunCallback(GetInvokeActionCallback(), _action);
-            }
-
-
             public virtual void Run(ISpotifyAwaitable awaitable, bool canInlineContinueTask)
             {
                 RunCallback(GetInvokeActionCallback(), _action);
@@ -155,11 +149,6 @@ namespace SpotiFire
                 _postCallback = (object state) => ((Action)state)();
             }
 
-            public override void WaitCallback(object state)
-            {
-                throw new NotImplementedException();
-            }
-
             [SecurityCritical]
             static ContextCallback GetPostActionCallback()
             {
@@ -190,9 +179,11 @@ namespace SpotiFire
             }
         }
 
-        static void UnsafeScheduleAction(Action action)
+        static void UnsafeScheduleAction(ISpotifyAwaitable awaitable, Action action)
         {
-            ThreadPool.UnsafeQueueUserWorkItem(new Continuation(action, false).WaitCallback, null);
+            ThreadPool.UnsafeQueueUserWorkItem(delegate {
+                new Continuation(action, false).Run(awaitable, true);
+            }, null);
         }
 
         public struct AwaitableAwaiter<T> : ICriticalNotifyCompletion

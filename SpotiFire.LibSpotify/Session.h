@@ -43,6 +43,7 @@ namespace SpotiFire {
 		void logged_in(Error error);
 		void logged_out();
 		void music_delivery(MusicDeliveryEventArgs ^e);
+		void end_of_track();
 
 	public:
 		virtual property ConnectionState ConnectionState { SpotiFire::ConnectionState get() sealed; }

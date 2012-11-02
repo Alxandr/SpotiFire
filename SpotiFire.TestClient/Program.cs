@@ -53,14 +53,19 @@ namespace SpotiFire.TestClient
             session.PrefferedBitrate = BitRate.Bitrate320k;
 
             await session.PlaylistContainer;
+            while (session.PlaylistContainer.Playlists.Count < 1)
+            {
+                Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count);
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
             var playlist = await session.PlaylistContainer.Playlists[0];
-            Console.WriteLine("Playing first from " + playlist.Name);
-            var track = await playlist.Tracks[0];
+            Console.WriteLine("Playing random from " + playlist.Name);
+            var track = await playlist.Tracks[new Random().Next(playlist.Tracks.Count)];
             await session.Play(track);
 
             playlist = await session.Starred;
-            Console.WriteLine("Playing first starred track");
-            track = await playlist.Tracks[0];
+            Console.WriteLine("Playing random starred track");
+            track = await playlist.Tracks[new Random().Next(playlist.Tracks.Count)];
             //Console.WriteLine("Found track " + track.Name);
             await session.Play(track);
 

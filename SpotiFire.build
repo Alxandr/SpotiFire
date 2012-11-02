@@ -80,9 +80,13 @@
 			<sources basedir="${basedir}/SpotiFire.SpotifyLib">
 				<include name="**.cs" />
 			</sources>
+			<nowarn>
+		        <warning number="1684" /> <!-- do not report warnings for extern members not found -->
+		        <warning number="1591" /> <!-- do not report warnings for missing XML comments -->
+		    </nowarn>
 		</csc>
 
-		<link output="${build.obj}/${name}.dll" options="/LTCG /FIXED /CLRIMAGETYPE:IJW /NOENTRY /DLL">
+		<link output="${build.obj}/${name}.dll" options="/LTCG /FIXED /CLRIMAGETYPE:IJW /NOENTRY /DLL /ignore:4248">
 			<sources basedir="${build.obj}">
 				<include name="*.obj" />
 				<include name="*.netmodule" />

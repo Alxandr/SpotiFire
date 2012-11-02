@@ -98,7 +98,7 @@ SP_CALL log_message(sp_session *session, const char *message) {
 }
 
 SP_CALL end_of_track(sp_session *session) {
-
+	TP0(SESSION, Session::end_of_track);
 }
 
 SP_CALL streaming_error(sp_session *session, sp_error error) {
@@ -295,7 +295,11 @@ PlaylistContainer ^Session::PlaylistContainer::get() {
 }
 
 Playlist ^Session::Starred::get() {
-	throw gcnew NotImplementedException("starred get");
+	SPLock lock;
+	sp_playlist *ptr = sp_session_starred_create(_ptr);
+	auto ret = gcnew Playlist(this, ptr);
+	sp_playlist_release(ptr);
+	return ret;
 }
 
 void Session::PrefferedBitrate::set(BitRate bitRate) {
@@ -313,4 +317,8 @@ void Session::logged_in(Error error) {
 
 void Session::logged_out() {
 	_logout->SetResult(true);
+}
+
+void Session::end_of_track() {
+	EndOfTrack(this, gcnew SessionEventArgs());
 }
