@@ -61,12 +61,13 @@ namespace SpotiFire.TestClient
             var playlist = await session.PlaylistContainer.Playlists[0];
             Console.WriteLine("Playing random from " + playlist.Name);
             var track = await playlist.Tracks[new Random().Next(playlist.Tracks.Count)];
+            Console.WriteLine("Found track " + track.Name);
             await session.Play(track);
 
             playlist = await session.Starred;
             Console.WriteLine("Playing random starred track");
             track = await playlist.Tracks[new Random().Next(playlist.Tracks.Count)];
-            //Console.WriteLine("Found track " + track.Name);
+            Console.WriteLine("Found track " + track.Name);
             await session.Play(track);
 
             //Console.WriteLine("Enter song search");

@@ -113,11 +113,11 @@ namespace SpotiFire.WinFormsTest
             private CachedTrack(Track track)
             {
                 _track = track;
-                //_name = track.Name;
-                //_isStarred = track.IsStarred;
-                //_artist = String.Join(", ", track.Artists.Select(a => a.Name));
-                //_duration = track.Duration.ToString();
-                //_isAvail = track.Availability == TrackAvailability.Available;
+                _name = track.Name;
+                _isStarred = track.IsStarred;
+                _artist = String.Join(", ", track.Artists.Select(a => a.Name));
+                _duration = track.Duration.ToString();
+                _isAvail = track.IsAvailable;
             }
 
             public static async Task<CachedTrack> Make(Track track)

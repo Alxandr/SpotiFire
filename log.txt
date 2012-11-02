@@ -18,9 +18,21 @@ debug:
 build:
 
    [delete] Deleting file C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.cpp.
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Playlistcontainer.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmpAF8F.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Playlistcontainer.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Playlistcontainer.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmpAF8F.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Playlistcontainer.cpp
        [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.cpp' has been updated, recompiling.
        [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
-       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmpFBBA.tmp.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmpB432.tmp.
        [cl] /c
        [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
        [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
@@ -28,7 +40,7 @@ build:
        [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
        [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.cpp"
        [cl] 
-       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmpFBBA.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmpB432.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
        [cl] tmp.cpp
       [csc] Compiling 9 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\SpotiFire.netmodule'.
      [link] Linking 19 files.
@@ -97,5 +109,5 @@ build-all:
 
 BUILD SUCCEEDED
 
-Total time: 3.4 seconds.
+Total time: 4.7 seconds.
 

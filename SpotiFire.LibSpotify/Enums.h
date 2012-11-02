@@ -336,4 +336,24 @@ namespace SpotiFire {
 		EndFolder = 2,
 		Placeholder = 3
 	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent track availability. </summary>
+	///
+	/// <remarks>	Aleksander, 02.11.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class TrackAvailability
+	{
+		/// <summary>	Track is not available. </summary>
+		Unavailable = 0,
+
+		/// <summary>	Track is available and can be played. </summary>
+		Available = 1,
+
+		/// <summary>	Track can not be streamed using this account. </summary>
+		NotStreamable = 2,
+
+		/// <summary>	Track not available on artist's request. </summary>
+		BannedByArtist = 3,
+	};
 }

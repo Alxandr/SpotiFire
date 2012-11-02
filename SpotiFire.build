@@ -55,7 +55,7 @@
 			</in>
 			<do>
 				<property name="doc" value="${build.obj}/${path::get-file-name-without-extension(filename)}.xdc" />
-				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot; /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED" verbose="true">
+				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot; /GS /EHa /MP /Ob1 /D _UNICODE /D UNICODE /D INTEGRATED" verbose="false">
 					<sources>
 						<include name="${filename}" asis="true" />
 					</sources>
@@ -63,14 +63,6 @@
 				</cl>
 			</do>
 		</foreach>
-
-		<!--<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${build.obj}&quot;" verbose="true">
-			<sources basedir="${basedir}/SpotiFire.LibSpotify">
-				<include name="*.cpp" />
-				<include name="${tmp.cpp}" asis="true" />
-				<exclude name="AssemblyInfo.cpp" />
-			</sources>
-		</cl>-->
 
 		<csc target="module" output="${build.obj}/SpotiFire.netmodule" doc="${build.obj}/managed.xml">
 			<modules basedir="${build.obj}">
@@ -96,6 +88,7 @@
 		</link>
 
 		<exec program="xdcmake.exe" workingdir="${build.obj}">
+			<arg value="/nologo" />
 			<arg>
 				<path>
 					<pathelement path="${build.obj}\*.xdc" />
