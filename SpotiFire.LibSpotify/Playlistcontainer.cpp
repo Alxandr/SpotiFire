@@ -135,9 +135,12 @@ bool PlaylistContainer::IsComplete::get() {
 }
 
 ref struct $PlaylistContainer$Continuation {
+	PlaylistContainer ^_pc;
 	Action ^_action;
+	PlaylistContainerHandler<EventArgs ^> ^_dlg;
 	void Handler(PlaylistContainer ^pc, EventArgs ^args) {
 		_action();
+		_pc->Loaded -= _dlg;
 	}
 };
 
@@ -149,12 +152,14 @@ bool PlaylistContainer::AddContinuation(Action ^continuation) {
 
 	$PlaylistContainer$Continuation ^c = gcnew $PlaylistContainer$Continuation();
 	c->_action = continuation;
-	Loaded += gcnew PlaylistContainerHandler<EventArgs ^>(c, &$PlaylistContainer$Continuation::Handler);
+	c->_pc = this;
+	Loaded += c->_dlg = gcnew PlaylistContainerHandler<EventArgs ^>(c, &$PlaylistContainer$Continuation::Handler);
+	return true;
 }
 
 //--------------------------------------------
 // Callbacks
 void PlaylistContainer::loaded() {
 	SPLock lock;
-	Loaded(this, gcnew EventArgs());
+	Loaded(this, EventArgs::Empty);
 }
