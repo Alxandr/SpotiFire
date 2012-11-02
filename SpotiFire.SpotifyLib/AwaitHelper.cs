@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Security;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SpotiFire
 {
-    static class AwaitHelper
+    public static class AwaitHelper
     {
         internal static void OnComplete(ISpotifyAwaitable awaitable, Action continuation, bool continueOnCapturedContext, bool flowExecutionContext)
         {
@@ -36,14 +37,15 @@ namespace SpotiFire
 
                 if (_continuation == null)
                 {
-                    if (!awaitable.AddContinuation(new Continuation(continuation, false), false))
+                    _continuation = new Continuation(continuation, false);
+                    if (!awaitable.AddContinuation(() => _continuation.Run(awaitable, true)))
                     {
                         UnsafeScheduleAction(continuation);
                     }
                 }
                 else
                 {
-                    if (!awaitable.AddContinuation(_continuation, false))
+                    if (!awaitable.AddContinuation(() => _continuation.Run(awaitable, true)))
                     {
                         _continuation.Run(awaitable, false);
                     }
@@ -55,7 +57,7 @@ namespace SpotiFire
             }
         }
 
-        internal static ISpotifyAwaiter<T> GetAwaiter<T>(T value)
+        internal static AwaitableAwaiter<T> GetAwaiter<T>(T value)
             where T : ISpotifyObject
         {
             return new AwaitableAwaiter<T>(value);
@@ -98,7 +100,7 @@ namespace SpotiFire
 
             public virtual void WaitCallback(object state)
             {
-                throw new NotImplementedException();
+                RunCallback(GetInvokeActionCallback(), _action);
             }
 
 
@@ -193,7 +195,7 @@ namespace SpotiFire
             ThreadPool.UnsafeQueueUserWorkItem(new Continuation(action, false).WaitCallback, null);
         }
 
-        struct AwaitableAwaiter<T> : ISpotifyAwaiter<T>
+        public struct AwaitableAwaiter<T> : ICriticalNotifyCompletion
             where T : ISpotifyObject
         {
             T result;

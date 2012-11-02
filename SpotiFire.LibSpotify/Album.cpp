@@ -1,7 +1,7 @@
 #include "stdafx.h"
+#include <stdio.h>
 
 #include "Album.h"
-#include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
 #include <string.h>
@@ -10,66 +10,81 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-int SpotiFire::Album::type(IntPtr albumPtr)
+static __forceinline String^ HEX(const byte *bytes, int count)
 {
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (int)sp_album_type(album);
+	char result[41];
+	result[40] = '\0';
+	char *current = result;
+	for(int i = 0; i < count; i++) {
+		sprintf(current, "%02X", bytes[i]);
+		current += 2;
+	}
+	return UTF8(result);
 }
 
-int SpotiFire::Album::add_ref(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (int)sp_album_add_ref(album);
+Album::Album(SpotiFire::Session ^session, sp_album *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_album_add_ref(_ptr);
 }
 
-int SpotiFire::Album::release(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (int)sp_album_release(album);
+Album::~Album() {
+	this->!Album();
 }
 
-Boolean SpotiFire::Album::is_loaded(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (Boolean)sp_album_is_loaded(album);
+Album::!Album() {
+	SPLock lock;
+	sp_album_release(_ptr);
+	_ptr = NULL;
 }
 
-Boolean SpotiFire::Album::is_available(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (Boolean)sp_album_is_available(album);
+Session ^Album::Session::get() {
+	return _session;
 }
 
-IntPtr SpotiFire::Album::artist(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (IntPtr)(void *)sp_album_artist(album);
+bool Album::IsReady::get() {
+	SPLock lock;
+	const char *name = sp_album_name(_ptr);
+	return name != NULL && strlen(name) > 0;
 }
 
-IntPtr SpotiFire::Album::cover(IntPtr albumPtr, int size)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (IntPtr)(void *)sp_album_cover(album, (sp_image_size)size);
+bool Album::IsLoaded::get() {
+	SPLock lock;
+	return sp_album_is_loaded(_ptr);
 }
 
-String^ SpotiFire::Album::name(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return UTF8(sp_album_name(album));
+bool Album::IsAvailable::get() {
+	SPLock lock;
+	return sp_album_is_available(_ptr);
 }
 
-Int32 SpotiFire::Album::year(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (Int32)sp_album_year(album);
+Artist ^Album::Artist::get() {
+	SPLock lock;
+	return gcnew SpotiFire::Artist(_session, sp_album_artist(_ptr));
 }
 
+String^ Album::CoverId::get() {
+	SPLock lock;
+	return HEX(sp_album_cover(_ptr, SP_IMAGE_SIZE_NORMAL), 20);
+}
+
+String^ Album::Name::get() {
+	SPLock lock;
+	return UTF8(sp_album_name(_ptr));
+}
+
+AlbumType Album::Type::get() {
+	SPLock lock;
+	return AlbumType(sp_album_type(_ptr));
+}
+
+int Album::Year::get() {
+	SPLock lock;
+	return sp_album_year(_ptr);
+}
+
+AlbumBrowse ^Album::Browse() {
+	SPLock lock;
+	return AlbumBrowse::Create(_session, this);
+}

@@ -55,10 +55,11 @@
 			</in>
 			<do>
 				<property name="doc" value="${build.obj}/${path::get-file-name-without-extension(filename)}.xdc" />
-				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot;" verbose="false">
+				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot; /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED" verbose="true">
 					<sources>
 						<include name="${filename}" asis="true" />
 					</sources>
+					<forcedusingfiles refid="all_refs" />
 				</cl>
 			</do>
 		</foreach>

@@ -1,35 +1,25 @@
 // Search.h
 
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	ref class Search
+	public ref class Search sealed : ISpotifyObject
 	{
 	internal:
-		static Int32 num_artists(IntPtr searchPtr);
-		static IntPtr artist(IntPtr searchPtr, Int32 index);
-		static String^ query(IntPtr searchPtr);
-		static String^ did_you_mean(IntPtr searchPtr);
-		static Int32 total_tracks(IntPtr searchPtr);
-		static Int32 total_albums(IntPtr searchPtr);
-		static Int32 total_artists(IntPtr searchPtr);
-		static Int32 total_playlists(IntPtr searchPtr);
-		static int add_ref(IntPtr searchPtr);
-		static int release(IntPtr searchPtr);
-		static IntPtr create(IntPtr sessionPtr, String^ query, Int32 trackOffset, Int32 trackCount, Int32 albumOffset, Int32 albumCount, Int32 artistOffset, Int32 artistCount, Int32 playlistOffset, Int32 playlistCount, int type, IntPtr callbackPtr, IntPtr userDataPtr);
-		static Boolean is_loaded(IntPtr searchPtr);
-		static int error(IntPtr searchPtr);
-		static Int32 num_tracks(IntPtr searchPtr);
-		static IntPtr track(IntPtr searchPtr, Int32 index);
-		static Int32 num_albums(IntPtr searchPtr);
-		static IntPtr album(IntPtr searchPtr, Int32 index);
-		static Int32 num_playlists(IntPtr searchPtr);
-		static String^ playlist_name(IntPtr searchPtr, Int32 index);
-		static String^ playlist_uri(IntPtr searchPtr, Int32 index);
-		static String^ playlist_image_uri(IntPtr searchPtr, Int32 index);
+		Session ^_session;
+		sp_search *_ptr;
+
+		Search(Session ^session, sp_search *ptr);
+		!Search(); // finalizer
+		~Search(); // destructor
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get() sealed; }
+		virtual property String ^DidYouMean { String ^get() sealed; }
 	};
 }

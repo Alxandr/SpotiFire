@@ -2,11 +2,14 @@
 
 #include "Session.h"
 #include "include\libspotify\api.h"
-#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
-using namespace System::Runtime::InteropServices;
-#define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
-#define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
+
+#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
+#define SP_CALL void _stdcall
+#define SESSION SP_DATA(Session, _config.userdata)
+
+
+//#define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 
 #include <string.h>
 static __forceinline String^ UTF8(const char *text)
@@ -14,433 +17,300 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-Int32 SpotiFire::Session::__ApiVersion()
-{
-	return SPOTIFY_API_VERSION;
+SP_CALL logged_in(sp_session *session, sp_error);
+SP_CALL logged_out(sp_session *session);
+SP_CALL metadata_updated(sp_session *session);
+SP_CALL connection_error(sp_session *session, sp_error error);
+SP_CALL message_to_user(sp_session *session, const char *message);
+SP_CALL notify_main_thread(sp_session *session);
+int _stdcall music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames);
+SP_CALL playtoken_lost(sp_session *session);
+SP_CALL log_message(sp_session *session, const char *message);
+SP_CALL end_of_track(sp_session *session);
+SP_CALL streaming_error(sp_session *session, sp_error error);
+SP_CALL userinfo_updated(sp_session *session);
+SP_CALL start_playback(sp_session *session);
+SP_CALL stop_playback(sp_session *session);
+//SP_CALL get_audio_buffer_stats(sp_session *session, sp_audio_buffer_stats *stats);
+
+static bool _shutdown;
+static sp_session_callbacks _callbacks = {
+	&logged_in, // logged in
+	&logged_out, // logged out
+	&metadata_updated, // metadata updated
+	&connection_error, // connection error
+	&message_to_user, // message to user
+	&notify_main_thread, // notify main thread
+	&music_delivery, // music delivery
+	&playtoken_lost, // play token lost
+	&log_message, // log message
+	&end_of_track, // end of track
+	&streaming_error, // streaming error
+	&userinfo_updated, // userinfo updated
+	&start_playback, // start playback
+	&stop_playback, // stop playback
+	NULL, //&get_audio_buffer_stats, // get audio buffer stats
+	NULL, // offline status updated
+	NULL, // offline error
+	NULL, // credentials blob updated
+	NULL, // connectionstate updated
+	NULL, // scrobble error
+	NULL, // private session mode change
+};
+
+static sp_session_config _config = {
+	SPOTIFY_API_VERSION, // api version
+	NULL, // cache location
+	NULL, // settings location
+	NULL, // application key
+	0, // application key size
+	NULL, // user agent
+	&_callbacks, // callbacks
+	NULL, // userdata
+	false, // compress playlists
+	false, // don't save metadata for playlists
+	false, // don't unload playlists
+	NULL, // device id
+	NULL, // proxy
+	NULL, // proxy username
+	NULL, // proxy password
+	NULL, // tracefile
+};
+
+SP_CALL metadata_updated(sp_session *session) {
+
 }
 
-Int32 SpotiFire::Session::offline_num_playlists(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL connection_error(sp_session *session, sp_error error) {
 
-	return (Int32)sp_offline_num_playlists(session);
 }
 
-Boolean SpotiFire::Session::offline_sync_get_status(IntPtr sessionPtr, int& status)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_offline_sync_status *stat = SP_TYPE(sp_offline_sync_status, &status);
+SP_CALL message_to_user(sp_session *session, const char *message) {
 
-	return (Boolean)sp_offline_sync_get_status(session, stat);
 }
 
-Int32 SpotiFire::Session::offline_time_left(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL playtoken_lost(sp_session *session) {
 
-	return (Int32)sp_offline_time_left(session);
 }
 
-Int32 SpotiFire::Session::user_country(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL log_message(sp_session *session, const char *message) {
 
-	return (Int32)sp_session_user_country(session);
 }
 
-int SpotiFire::Session::player_play(IntPtr sessionPtr, Boolean play)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL end_of_track(sp_session *session) {
 
-	return (int)sp_session_player_play(session, play);
 }
 
-int SpotiFire::Session::player_unload(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL streaming_error(sp_session *session, sp_error error) {
 
-	return (int)sp_session_player_unload(session);
 }
 
-int SpotiFire::Session::player_prefetch(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
+SP_CALL userinfo_updated(sp_session *session) {
 
-	return (int)sp_session_player_prefetch(session, track);
 }
 
-IntPtr SpotiFire::Session::playlistcontainer(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL start_playback(sp_session *session) {
 
-	return (IntPtr)(void *)sp_session_playlistcontainer(session);
 }
 
-IntPtr SpotiFire::Session::inbox_create(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+SP_CALL stop_playback(sp_session *session) {
 
-	return (IntPtr)(void *)sp_session_inbox_create(session);
 }
 
-IntPtr SpotiFire::Session::starred_create(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (IntPtr)(void *)sp_session_starred_create(session);
+SP_CALL notify_main_thread(sp_session *session) {
+	Session::notifier->Set();
 }
 
-IntPtr SpotiFire::Session::starred_for_user_create(IntPtr sessionPtr, String^ canonicalUsername)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	char *_username = SP_STRING(canonicalUsername);
-
-	IntPtr ret = (IntPtr)(void *)sp_session_starred_for_user_create(session, _username);
-	SP_FREE(_username);
-	return ret;
+SP_CALL logged_in(sp_session *session, sp_error error) {
+	TP1(Error, SESSION, Session::logged_in, ENUM(Error, error));
 }
 
-IntPtr SpotiFire::Session::publishedcontainer_for_user_create(IntPtr sessionPtr, String^ canonicalUsername)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	char *_username = SP_STRING(canonicalUsername);
-
-	IntPtr ret = (IntPtr)(void *)sp_session_publishedcontainer_for_user_create(session, _username);
-	SP_FREE(_username);
-	return ret;
+SP_CALL logged_out(sp_session *session) {
+	TP0(SESSION, Session::logged_out);
 }
 
-int SpotiFire::Session::preferred_bitrate(IntPtr sessionPtr, int bitrate)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+int _stdcall music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
+	Session ^s = SESSION;
+	array<byte> ^samples;
+	if(num_frames > 0) {
+		samples = gcnew array<byte>(num_frames * format->channels * 2);
+		pin_ptr<byte> data_array_start = &samples[0];
+		memcpy(data_array_start, frames, samples->Length);
+	} else {
+		samples = gcnew array<byte>(0);
+	}
 
-	return (int)sp_session_preferred_bitrate(session, (sp_bitrate)bitrate);
+	auto e = gcnew MusicDeliveryEventArgs(format->channels, format->sample_rate, samples, num_frames);
+	s->music_delivery(e);
+
+	return e->ConsumedFrames;
 }
 
-int SpotiFire::Session::preferred_offline_bitrate(IntPtr sessionPtr, int bitrate, Boolean allowResync)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_preferred_offline_bitrate(session, (sp_bitrate)bitrate, allowResync);
+void main_thread(Object ^arg) {
+	Session ^session = (Session ^)arg;
+	Session::logger->Debug("Starting main thread");
+	int waitTime = 0;
+	while(!_shutdown) {
+		Session::notifier->WaitOne(waitTime, false);
+		do
+		{
+			SPLock lock;
+			if(_shutdown) break;
+			try {
+				sp_session_process_events(session->_ptr, &waitTime);
+			}
+			catch(Exception ^e) {
+				Session::logger->WarnException("Exception from sp_session_process_events", e);
+				waitTime = 1000;
+			}
+			catch(...) {
+				Console::WriteLine("Exception here...");
+			}
+		} while(waitTime == 0);
+	}
+	Session::logger->Debug("Stopping main thread");
 }
 
-Boolean SpotiFire::Session::get_volume_normalization(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent) {
+	SPLock lock;
+	marshal_context context;
+	sp_error err;
 
-	return (Boolean)sp_session_get_volume_normalization(session);
+	_config.cache_location = context.marshal_as<const char *>(cacheLocation);
+	_config.settings_location = context.marshal_as<const char *>(settingsLocation);
+	_config.user_agent = context.marshal_as<const char *>(userAgent);
+	{
+		pin_ptr<byte> pin(&applicationKey[0]);
+		byte *appKey = (byte *)malloc(sizeof(byte) * applicationKey->Length);
+		std::copy(static_cast<byte *>(pin), static_cast<byte *>(pin + applicationKey->Length), appKey);
+		_config.application_key = appKey;
+	}
+	_config.application_key_size = applicationKey->Length;
+	_config.userdata = new gcroot<Session ^>(this);
+
+	notifier = gcnew AutoResetEvent(true);
+	logger->Debug("Creating session");
+	try {
+		sp_session *session;
+		sp_session_config config(_config);
+		err = sp_session_create(&config, &session);
+		if(err != SP_ERROR_OK) {
+			throw gcnew System::Exception("Error creating session: " + SPERR(err));
+		}
+		_ptr = session;
+
+		_mainThread = gcnew Thread(gcnew ParameterizedThreadStart(&main_thread));
+		_mainThread->IsBackground = true;
+		_mainThread->Start(this);
+	}
+	catch(System::Exception ^e) {
+		logger->ErrorException("Error occured during creating of session", e);
+		throw;
+	}
+	finally {
+
+	}
 }
 
-int SpotiFire::Session::set_volume_normalization(IntPtr sessionPtr, Boolean on)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_set_volume_normalization(session, on);
+Session::~Session() {
+	this->!Session();
 }
 
-int SpotiFire::Session::set_private_session(IntPtr sessionPtr, Boolean enabled)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
+Session::!Session() {
+	SPLock lock;
+	marshal_context context;
+	_shutdown = true;
+	notifier->Set();
+	sp_session_release(_ptr);
+};
 
-	return (int)sp_session_set_private_session(session, enabled);
+value struct $session$create {
+	array<byte> ^applicationKey;
+	String ^cacheLocation;
+	String ^settingsLocation;
+	String ^userAgent;
+
+	Session ^run() {
+		return gcnew Session(applicationKey, cacheLocation, settingsLocation, userAgent);
+	};
+};
+
+Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent) {
+	$session$create^ create = gcnew $session$create();
+	create->applicationKey = applicationKey;
+	create->cacheLocation = cacheLocation;
+	create->settingsLocation = settingsLocation;
+	create->userAgent = userAgent;
+
+	return Task::Factory->StartNew(gcnew Func<Session ^>(create, &$session$create::run));
 }
 
-Boolean SpotiFire::Session::is_private_session(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (Boolean)sp_session_is_private_session(session);
+ConnectionState Session::ConnectionState::get() {
+	return ENUM(SpotiFire::ConnectionState, sp_session_connectionstate(_ptr));
 }
 
-int SpotiFire::Session::set_scrobbling(IntPtr sessionPtr, int provider, int state)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_set_scrobbling(session, (sp_social_provider)provider, (sp_scrobbling_state)state);
+Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
+	marshal_context context;
+	_login = gcnew TaskCompletionSource<Error>();
+	sp_session_login(_ptr, context.marshal_as<const char *>(username), context.marshal_as<const char *>(password), remember, NULL);
+	return _login->Task;
 }
 
-int SpotiFire::Session::is_scrobbling(IntPtr sessionPtr, int provider, int& state)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_scrobbling_state* s = SP_TYPE(sp_scrobbling_state, state);
-
-	return (int)sp_session_is_scrobbling(session, (sp_social_provider)provider, s);
+Task ^Session::Logout() {
+	_logout = gcnew TaskCompletionSource<bool>();
+	sp_session_logout(_ptr);
+	return _logout->Task;
 }
 
-int SpotiFire::Session::is_scrobbling_possible(IntPtr sessionPtr, int provider, Boolean& isPossible)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_is_scrobbling_possible(session, (sp_social_provider)provider, &isPossible);
+Error Session::PlayerLoad(Track ^track) {
+	return ENUM(Error, sp_session_player_load(_ptr, track->_ptr));
 }
 
-int SpotiFire::Session::set_social_credentials(IntPtr sessionPtr, int provider, String^ username, String^ password)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	char* _username = SP_STRING(username);
-	char *_password = SP_STRING(password);
-
-	int ret = (int)sp_session_set_social_credentials(session, (sp_social_provider)provider, _username, _password);
-	SP_FREE(_username);
-	SP_FREE(_password);
-	return ret;
+Error Session::PlayerPause() {
+	return ENUM(Error, sp_session_player_play(_ptr, false));
 }
 
-int SpotiFire::Session::set_connection_type(IntPtr sessionPtr, int type)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_set_connection_type(session, (sp_connection_type)type);
+Error Session::PlayerPlay() {
+	return ENUM(Error, sp_session_player_play(_ptr, true));
 }
 
-int SpotiFire::Session::set_connection_rules(IntPtr sessionPtr, int rules)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_set_connection_rules(session, (sp_connection_rules)rules);
+Error Session::PlayerSeek(int offset) {
+	return ENUM(Error, sp_session_player_seek(_ptr, offset));
 }
 
-Int32 SpotiFire::Session::offline_tracks_to_sync(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (Int32)sp_offline_tracks_to_sync(session);
+Error Session::PlayerSeek(TimeSpan offset) {
+	return PlayerSeek(offset.TotalMilliseconds);
 }
 
-int SpotiFire::Session::create(IntPtr configPtr, [System::Runtime::InteropServices::Out]IntPtr %sessionPtr)
-{
-	sp_session_config* config = SP_TYPE(sp_session_config, configPtr);
-	sp_session* session;
-
-	int ret = (int)sp_session_create(config, &session);
-	sessionPtr = (IntPtr)(void *)session;
-	return ret;
+Error Session::PlayerUnload() {
+	return ENUM(Error, sp_session_player_unload(_ptr));
 }
 
-int SpotiFire::Session::release(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_release(session);
+PlaylistContainer ^Session::PlaylistContainer::get() {
+	if(_pc == nullptr) {
+		SPLock lock;
+		Interlocked::CompareExchange<SpotiFire::PlaylistContainer ^>(_pc, gcnew SpotiFire::PlaylistContainer(this, sp_session_playlistcontainer(_ptr)), nullptr);
+	}
+	return _pc;
 }
 
-int SpotiFire::Session::login(IntPtr sessionPtr, String^ username, String^ password, Boolean rememberMe, String^ blob)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	char* _uname = SP_STRING(username);
-	char *_pw = SP_STRING(password);
-	char *_blob = SP_STRING(blob);
-
-	int ret = (int)sp_session_login(session, _uname, _pw, rememberMe, _blob);
-	SP_FREE(_uname);
-	SP_FREE(_pw);
-	SP_FREE(_blob);
-	return ret;
+Playlist ^Session::Starred::get() {
+	throw gcnew NotImplementedException("starred get");
 }
 
-int SpotiFire::Session::relogin(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_relogin(session);
+void Session::PrefferedBitrate::set(BitRate bitRate) {
+	sp_session_preferred_bitrate(_ptr, (sp_bitrate)bitRate);
 }
 
-String^ SpotiFire::Session::remembered_user(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	int size = sp_session_remembered_user(session, NULL, 0) + 1;
-	char* buffer = new char[size];
-	sp_session_remembered_user(session, buffer, size);
-
-	String^ ret = UTF8(buffer);
-	delete buffer;
-	return ret;
+//------------------ Event Handlers ------------------//
+void Session::music_delivery(MusicDeliveryEventArgs ^args) {
+	MusicDelivered(this, args);
 }
 
-String^ SpotiFire::Session::user_name(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return UTF8(sp_session_user_name(session));
+void Session::logged_in(Error error) {
+	_login->SetResult(error);
 }
 
-int SpotiFire::Session::forget_me(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_forget_me(session);
-}
-
-IntPtr SpotiFire::Session::user(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (IntPtr)(void *)sp_session_user(session);
-}
-
-int SpotiFire::Session::logout(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_logout(session);
-}
-
-int SpotiFire::Session::flush_caches(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_flush_caches(session);
-}
-
-int SpotiFire::Session::connectionstate(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_connectionstate(session);
-}
-
-IntPtr SpotiFire::Session::userdata(IntPtr sessionPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (IntPtr)(void *)sp_session_userdata(session);
-}
-
-int SpotiFire::Session::set_cache_size(IntPtr sessionPtr, Int32 size)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_set_cache_size(session, size);
-}
-
-int SpotiFire::Session::process_events(IntPtr sessionPtr, [System::Runtime::InteropServices::Out]int %nextTimeout)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	pin_ptr<int> nt = &nextTimeout;
-
-	return (int)sp_session_process_events(session, nt);
-}
-
-int SpotiFire::Session::player_load(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (int)sp_session_player_load(session, track);
-}
-
-int SpotiFire::Session::player_seek(IntPtr sessionPtr, Int32 offset)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_session_player_seek(session, offset);
-}
-
-IntPtr SpotiFire::Session::localtrack_create(String^ artist, String^ title, String^ album, Int32 length)
-{
-	char *_a = SP_STRING(artist),
-		*_t = SP_STRING(title),
-		*_al = SP_STRING(album);
-
-	IntPtr ret = (IntPtr)(void *)sp_localtrack_create(_a, _t, _al, length);
-	SP_FREE(_a);
-	SP_FREE(_t);
-	SP_FREE(_al);
-	return ret;
-}
-
-IntPtr SpotiFire::Session::toplistbrowse_create(IntPtr sessionPtr, int type, int region, String^ username, IntPtr callbackPtr, IntPtr userDataPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	toplistbrowse_complete_cb* callback = SP_TYPE(toplistbrowse_complete_cb, callbackPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	char* _u = SP_STRING(username);
-
-	IntPtr ret = (IntPtr)(void *)sp_toplistbrowse_create(session, (sp_toplisttype)type, (sp_toplistregion)region, _u, callback, userData);
-	SP_FREE(_u);
-	return ret;
-}
-
-Boolean SpotiFire::Session::toplistbrowse_is_loaded(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (Boolean)sp_toplistbrowse_is_loaded(tlb);
-}
-
-int SpotiFire::Session::toplistbrowse_error(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (int)sp_toplistbrowse_error(tlb);
-}
-
-int SpotiFire::Session::toplistbrowse_add_ref(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (int)sp_toplistbrowse_add_ref(tlb);
-}
-
-int SpotiFire::Session::toplistbrowse_release(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (int)sp_toplistbrowse_release(tlb);
-}
-
-Int32 SpotiFire::Session::toplistbrowse_num_artists(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (Int32)sp_toplistbrowse_num_artists(tlb);
-}
-
-IntPtr SpotiFire::Session::toplistbrowse_artist(IntPtr tlbPtr, Int32 index)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (IntPtr)(void *)sp_toplistbrowse_artist(tlb, index);
-}
-
-Int32 SpotiFire::Session::toplistbrowse_num_albums(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (Int32)sp_toplistbrowse_num_albums(tlb);
-}
-
-IntPtr SpotiFire::Session::toplistbrowse_album(IntPtr tlbPtr, Int32 index)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (IntPtr)(void *)sp_toplistbrowse_album(tlb, index);
-}
-
-Int32 SpotiFire::Session::toplistbrowse_num_tracks(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (Int32)sp_toplistbrowse_num_tracks(tlb);
-}
-
-IntPtr SpotiFire::Session::toplistbrowse_track(IntPtr tlbPtr, Int32 index)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (IntPtr)(void *)sp_toplistbrowse_track(tlb, index);
-}
-
-Int32 SpotiFire::Session::toplistbrowse_backend_request_duration(IntPtr tlbPtr)
-{
-	sp_toplistbrowse* tlb = SP_TYPE(sp_toplistbrowse, tlbPtr);
-
-	return (Int32)sp_toplistbrowse_backend_request_duration(tlb);
-}
-
-// Error:
-String^ SpotiFire::Session::error_message(Error^ error)
-{
-	return UTF8(sp_error_message((sp_error)*error));
+void Session::logged_out() {
+	_logout->SetResult(true);
 }

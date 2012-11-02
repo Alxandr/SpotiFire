@@ -1,32 +1,46 @@
 // Artistbrowse.h
 
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
+	
+	ref class ArtistBrowse;
 
-	ref class Artistbrowse
+	public delegate void ArtistBrowseEventHandler(ArtistBrowse ^sender, EventArgs ^e);
+
+	public ref class ArtistBrowse sealed : ISpotifyObject
 	{
+	private:
+		IList<String ^> ^_copyrights;
+		IList<Track ^> ^_tracks;
+
 	internal:
-		static IntPtr create(IntPtr sessionPtr, IntPtr artistPtr, int type, IntPtr callback, IntPtr userDataPtr);
-		static Boolean is_loaded(IntPtr arbPtr);
-		static int error(IntPtr arbPtr);
-		static IntPtr artist(IntPtr arbPtr);
-		static Int32 num_portraits(IntPtr arbPtr);
-		static IntPtr portrait(IntPtr arbPtr, Int32 index);
-		static Int32 num_tracks(IntPtr arbPtr);
-		static IntPtr track(IntPtr arbPtr, Int32 index);
-		static Int32 num_tophit_tracks(IntPtr arbPtr);
-		static IntPtr tophit_track(IntPtr arbPtr, Int32 index);
-		static Int32 num_albums(IntPtr arbPtr);
-		static IntPtr album(IntPtr arbPtr, Int32 index);
-		static Int32 num_similar_artists(IntPtr arbPtr);
-		static IntPtr similar_artist(IntPtr arbPtr, Int32 index);
-		static String^ biography(IntPtr arbPtr);
-		static Int32 backend_request_duration(IntPtr arbPtr);
-		static int add_ref(IntPtr arbPtr);
-		static int release(IntPtr arbPtr);
+		Session ^_session;
+		sp_artistbrowse *_ptr;
+
+		ArtistBrowse(Session ^session, sp_artistbrowse *ptr);
+		!ArtistBrowse(); // finalizer
+		~ArtistBrowse(); // destructor
+
+		//static ArtistBrowse ^Create(Session ^session, Artist ^album);
+
+		// Events
+		void OnCompleted();
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get() sealed; }
+		virtual property Error Error { SpotiFire::Error get() sealed; }
+		virtual property Artist ^Artist { SpotiFire::Artist ^get() sealed; }
+		virtual property bool IsCompleted { bool get() sealed; }
+		virtual property IList<String ^> ^PortraitIds { IList<String ^> ^get() sealed; }
+		virtual property IList<Track ^> ^Tracks { IList<Track ^> ^get() sealed; }
+		virtual property IList<SpotiFire::Artist ^> ^SimilarArtists { IList<SpotiFire::Artist ^> ^get() sealed; }
+		virtual property String ^Biography { String ^get() sealed; }
+
+		event ArtistBrowseEventHandler ^Completed;
 	};
 }

@@ -14,41 +14,32 @@ static __forceinline String^ UTF8(const char *text)
 
 using namespace System::Runtime::InteropServices;
 
-IntPtr SpotiFire::Inbox::post_tracks(IntPtr sessionPtr, String^ user, array<IntPtr>^ trackPtrs, Int32 numTracks, String^ message, IntPtr callbackPtr, IntPtr userDataPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track** tracks = new sp_track*[trackPtrs->Length];
-	for(int i = 0, l = trackPtrs->Length; i < l; i++)
-		tracks[i] = SP_TYPE(sp_track, trackPtrs[i]);
-	inboxpost_complete_cb* callback = SP_TYPE(inboxpost_complete_cb, callbackPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	char* _user = SP_STRING(user);
-	char *_message = SP_STRING(message);
-
-	IntPtr ret = (IntPtr)(void *)sp_inbox_post_tracks(session, _user, tracks, numTracks, _message, callback, userData);
-	SP_FREE(_user);
-	SP_FREE(_message);
-	return ret;
+Inbox::Inbox(SpotiFire::Session ^session, sp_inbox *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_inbox_add_ref(_ptr);
 }
 
-int SpotiFire::Inbox::error(IntPtr inboxPtr)
-{
-	sp_inbox* inbox = SP_TYPE(sp_inbox, inboxPtr);
-
-	return (int)sp_inbox_error(inbox);
+Inbox::~Inbox() {
+	this->!Inbox();
 }
 
-int SpotiFire::Inbox::add_ref(IntPtr inboxPtr)
-{
-	sp_inbox* inbox = SP_TYPE(sp_inbox, inboxPtr);
-
-	return (int)sp_inbox_add_ref(inbox);
+Inbox::!Inbox() {
+	SPLock lock;
+	sp_inbox_release(_ptr);
+	_ptr = NULL;
 }
 
-int SpotiFire::Inbox::release(IntPtr inboxPtr)
-{
-	sp_inbox* inbox = SP_TYPE(sp_inbox, inboxPtr);
-
-	return (int)sp_inbox_release(inbox);
+Session ^Inbox::Session::get() {
+	return _session;
 }
 
+Error Inbox::Error::get() {
+	SPLock lock;
+	return ENUM(SpotiFire::Error, sp_inbox_error(_ptr));
+}
+
+Task ^Inbox::PostTracks(String ^user, array<Track ^> ^tracks, String ^message) {
+	throw gcnew NotImplementedException("Inbox::PostTracks");
+}

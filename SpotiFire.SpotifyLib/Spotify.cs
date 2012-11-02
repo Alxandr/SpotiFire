@@ -6,10 +6,10 @@ namespace SpotiFire
     public static class Spotify
     {
         static readonly object _lock = new object();
-        static ISession _session;
-        static Task<ISession> _task;
+        static Session _session;
+        static Task<Session> _task;
 
-        public static Task<ISession> CreateSession(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
+        public static Task<Session> CreateSession(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
             lock (_lock)
             {
@@ -22,7 +22,7 @@ namespace SpotiFire
             return _task;
         }
 
-        public static Task<ISession> Task
+        public static Task<Session> Task
         {
             get
             {
@@ -30,7 +30,7 @@ namespace SpotiFire
             }
         }
 
-        public static ISession Session
+        public static Session Session
         {
             get
             {
@@ -46,9 +46,9 @@ namespace SpotiFire
             }
         }
 
-        internal static async Task<ISession> CreateSessionInternal(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
+        internal static async Task<Session> CreateSessionInternal(byte[] applicationKey, string cacheLocation, string settingsLocation, string userAgent)
         {
-            _session = await SpotiFire.Types.Session.Create(applicationKey, cacheLocation, settingsLocation, userAgent);
+            _session = await Session.Create(applicationKey, cacheLocation, settingsLocation, userAgent);
             return _session;
         }
     }

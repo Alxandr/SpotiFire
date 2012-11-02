@@ -46,40 +46,40 @@ namespace SpotiFire.TestClient
         static async Task Run()
         {
             Console.WriteLine("Enter username and password (a line for each)");
-            ISession session = await Spotify.CreateSession(key, cache, settings, userAgent);
-            session.MusicDeliver += session_MusicDeliver;
+            Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
+            session.MusicDelivered += session_MusicDeliver;
 
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
-            session.SetPrefferedBitrate(BitRate.Bitrate320k);
+            session.PrefferedBitrate = BitRate.Bitrate320k;
 
             await session.PlaylistContainer;
-            var playlist = await session.PlaylistContainer[0];
+            var playlist = await session.PlaylistContainer.Playlists[0];
             Console.WriteLine("Playing first from " + playlist.Name);
-            var track = await playlist[0];
+            var track = await playlist.Tracks[0];
             await session.Play(track);
 
             playlist = await session.Starred;
             Console.WriteLine("Playing first starred track");
-            track = await playlist[0];
-            Console.WriteLine("Found track " + track.Name);
+            track = await playlist.Tracks[0];
+            //Console.WriteLine("Found track " + track.Name);
             await session.Play(track);
 
-            Console.WriteLine("Enter song search");
-            var search = await session.SearchTracks(Console.ReadLine(), 0, 1);
-            if (search.Tracks.Count > 0)
-            {
-                track = await search.Tracks[0];
-                Console.WriteLine("Playing " + track.Name);
-                await session.Play(track);
-            }
-            else
-            {
-                Console.WriteLine("No matching tracks.");
-            }
+            //Console.WriteLine("Enter song search");
+            //var search = await session.SearchTracks(Console.ReadLine(), 0, 1);
+            //if (search.Tracks.Count > 0)
+            //{
+            //    track = await search.Tracks[0];
+            //    Console.WriteLine("Playing " + track.Name);
+            //    await session.Play(track);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("No matching tracks.");
+            //}
             await session.Logout();
         }
 
-        static void session_MusicDeliver(ISession sender, MusicDeliveryEventArgs e)
+        static void session_MusicDeliver(Session sender, MusicDeliveryEventArgs e)
         {
             if (e.Samples.Length > 0)
             {

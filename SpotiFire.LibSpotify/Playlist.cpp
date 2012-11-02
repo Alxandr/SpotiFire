@@ -10,6 +10,7 @@ using namespace System::Runtime::InteropServices;
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
 #include <string.h>
+#include <vector>
 static __forceinline String^ UTF8(const char *text)
 {
 	if(!text)
@@ -17,266 +18,172 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-int SpotiFire::Playlist::subscribers_free(IntPtr subsPtr)
+static __forceinline String ^UTF8(const std::vector<char> text)
 {
-	sp_subscribers* subs = SP_TYPE(sp_subscribers, subsPtr);
-
-	return (int)sp_playlist_subscribers_free(subs);
+	return UTF8(text.data());
 }
 
-int SpotiFire::Playlist::update_subscribers(IntPtr sessionPtr, IntPtr plPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_update_subscribers(session, pl);
+static __forceinline DateTime TIMESTAMP(int timestamp) {
+	DateTime dt(1970, 1, 1, 0, 0, 0, 0);
+	return dt.AddSeconds(timestamp).ToLocalTime();
 }
 
-Boolean SpotiFire::Playlist::is_in_ram(IntPtr sessionPtr, IntPtr plPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Boolean)sp_playlist_is_in_ram(session, pl);
+Playlist::Playlist(SpotiFire::Session ^session, sp_playlist *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_playlist_add_ref(_ptr);
 }
 
-int SpotiFire::Playlist::set_in_ram(IntPtr sessionPtr, IntPtr plPtr, Boolean inRam)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_set_in_ram(session, pl, inRam);
+Playlist::~Playlist() {
+	this->!Playlist();
 }
 
-IntPtr SpotiFire::Playlist::create(IntPtr sessionPtr, IntPtr linkPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_playlist_create(session, link);
+Playlist::!Playlist() {
+	SPLock lock;
+	sp_playlist_release(_ptr);
+	_ptr = NULL;
 }
 
-int SpotiFire::Playlist::set_offline_mode(IntPtr sessionPtr, IntPtr plPtr, Boolean offline)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_set_offline_mode(session, pl, offline);
+Session ^Playlist::Session::get() {
+	return _session;
 }
 
-int SpotiFire::Playlist::get_offline_status(IntPtr sessionPtr, IntPtr plPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_get_offline_status(session, pl);
+bool Playlist::InRam::get() {
+	SPLock lock;
+	return sp_playlist_is_in_ram(_session->_ptr, _ptr);
 }
 
-Int32 SpotiFire::Playlist::get_offline_download_completed(IntPtr sessionPtr, IntPtr plPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Int32)sp_playlist_get_offline_download_completed(session, pl);
+void Playlist::InRam::set(bool value) {
+	SPLock lock;
+	sp_playlist_set_in_ram(_session->_ptr, _ptr, value);
 }
 
-int SpotiFire::Playlist::add_ref(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_add_ref(pl);
+bool Playlist::Offline::get() {
+	return this->OfflineStatus != SpotiFire::OfflineStatus::No;
 }
 
-int SpotiFire::Playlist::release(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_release(pl);
+void Playlist::Offline::set(bool value) {
+	SPLock lock;
+	sp_playlist_set_offline_mode(_session->_ptr, _ptr, value);
 }
 
-Int32 SpotiFire::Playlist::num_tracks(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Int32)sp_playlist_num_tracks(pl);
+OfflineStatus Playlist::OfflineStatus::get() {
+	SPLock lock;
+	return ENUM(SpotiFire::OfflineStatus, sp_playlist_get_offline_status(_session->_ptr, _ptr));
 }
 
-IntPtr SpotiFire::Playlist::track(IntPtr plPtr, Int32 index)
+ref class $Playlist$TracksArray sealed : SPList<Track ^>
 {
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
+internal:
+	Playlist ^_playlist;
+	$Playlist$TracksArray(Playlist ^playlist) { _playlist = playlist; }
 
-	return (IntPtr)(void *)sp_playlist_track(pl, index);
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_playlist_num_tracks(_playlist->_ptr);
+	}
+
+	virtual Track ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return gcnew Track(_playlist->_session, sp_playlist_track(_playlist->_ptr, index));
+	}
+
+	virtual void DoInsert(int index, Track ^item) override sealed {
+		SPLock lock;
+		sp_track *track = item->_ptr;
+		sp_playlist_add_tracks(_playlist->_ptr, &track, 1, index, _playlist->_session->_ptr);
+	}
+
+	virtual void DoRemove(int index) override sealed {
+		SPLock lock;
+		sp_playlist_remove_tracks(_playlist->_ptr, &index, 1);
+	}
+
+	virtual void DoUpdate(int index, Track ^item) override sealed {
+		SPLock lock;
+		DoRemove(index);
+		DoInsert(index - 1, item);
+	}
+};
+
+IList<Track ^> ^Playlist::Tracks::get() {
+	if(_tracks == nullptr) {
+		Interlocked::CompareExchange<IList<Track ^> ^>(_tracks, gcnew $Playlist$TracksArray(this), nullptr);
+	}
+	return _tracks;
 }
 
-Int32 SpotiFire::Playlist::track_create_time(IntPtr plPtr, Int32 index)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Int32)sp_playlist_track_create_time(pl, index);
+String ^Playlist::Name::get() {
+	SPLock lock;
+	return UTF8(sp_playlist_name(_ptr));
 }
 
-IntPtr SpotiFire::Playlist::track_creator(IntPtr plPtr, Int32 index)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (IntPtr)(void *)sp_playlist_track_creator(pl, index);
+void Playlist::Name::set(String ^value) {
+	SPLock lock;
+	marshal_context context;
+	sp_playlist_rename(_ptr, context.marshal_as<const char *>(value));
 }
 
-Boolean SpotiFire::Playlist::track_seen(IntPtr plPtr, Int32 index)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Boolean)sp_playlist_track_seen(pl, index);
+User ^Playlist::Owner::get() {
+	SPLock lock;
+	return gcnew User(_session, sp_playlist_owner(_ptr));
 }
 
-int SpotiFire::Playlist::track_set_seen(IntPtr plPtr, Int32 index, Boolean seen)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_track_set_seen(pl, index, seen);
+bool Playlist::IsCollaborative::get() {
+	SPLock lock;
+	return sp_playlist_is_collaborative(_ptr);
 }
 
-String^ SpotiFire::Playlist::track_message(IntPtr plPtr, Int32 index)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return UTF8(sp_playlist_track_message(pl, index));
+void Playlist::IsCollaborative::set(bool value) {
+	SPLock lock;
+	sp_playlist_set_collaborative(_ptr, value);
 }
 
-String^ SpotiFire::Playlist::name(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	
-	return UTF8(sp_playlist_name(pl));
+void Playlist::IsAutolinked::set(bool value) {
+	SPLock lock;
+	sp_playlist_set_autolink_tracks(_ptr, value);
 }
 
-int SpotiFire::Playlist::rename(IntPtr plPtr, String^ newName)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	char *_newName = SP_STRING(newName);
-
-	int ret = (int)sp_playlist_rename(pl, _newName);
-	SP_FREE(_newName);
-	return ret;
+String ^Playlist::Description::get() {
+	SPLock lock;
+	return UTF8(sp_playlist_get_description(_ptr));
 }
 
-IntPtr SpotiFire::Playlist::owner(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (IntPtr)(void *)sp_playlist_owner(pl);
+bool Playlist::HasPendingChanges::get() {
+	SPLock lock;
+	return sp_playlist_has_pending_changes(_ptr);
 }
 
-Boolean SpotiFire::Playlist::is_collaborative(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Boolean)sp_playlist_is_collaborative(pl);
+bool Playlist::IsLoaded::get() {
+	SPLock lock;
+	return sp_playlist_is_loaded(_ptr);
 }
 
-int SpotiFire::Playlist::set_collaborative(IntPtr plPtr, Boolean collaborative)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (int)sp_playlist_set_collaborative(pl, collaborative);
+bool Playlist::IsReady::get() {
+	return true;
 }
 
-int SpotiFire::Playlist::set_autolink_tracks(IntPtr plPtr, Boolean autolink)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
+//---------------------------------------------
+// Track meta-properties
 
-	return (int)sp_playlist_set_autolink_tracks(pl, autolink);
+DateTime Playlist::GetCreateTime(int trackIndex) {
+	return TIMESTAMP(sp_playlist_track_create_time(_ptr, trackIndex));
 }
 
-String^ SpotiFire::Playlist::get_description(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return UTF8(sp_playlist_get_description(pl));
+User ^Playlist::GetCreator(int trackIndex) {
+	return gcnew User(_session, sp_playlist_track_creator(_ptr, trackIndex));
 }
 
-Boolean SpotiFire::Playlist::get_image(IntPtr plPtr, IntPtr imageIdPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	byte* imageId = SP_TYPE(byte, imageIdPtr);
-
-	return (Boolean)sp_playlist_get_image(pl, imageId);
+bool Playlist::GetTrackSeen(int trackIndex) {
+	return sp_playlist_track_seen(_ptr, trackIndex);
 }
 
-Boolean SpotiFire::Playlist::has_pending_changes(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Boolean)sp_playlist_has_pending_changes(pl);
+Error Playlist::SetTrackSeen(int trackIndex, bool value) {
+	return ENUM(Error, sp_playlist_track_set_seen(_ptr, trackIndex, value));
 }
 
-int SpotiFire::Playlist::add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int32 position, IntPtr sessionPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	sp_track** tracks = new sp_track*[trackPtrs->Length];
-	for(int i = 0, l = trackPtrs->Length; i < l; i++)
-		tracks[i] = SP_TYPE(sp_track, trackPtrs[i]);
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-
-	return (int)sp_playlist_add_tracks(pl, tracks, trackPtrs->Length, position, session);
+String ^Playlist::GetTrackMessage(int trackIndex) {
+	return UTF8(sp_playlist_track_message(_ptr, trackIndex));
 }
-
-int SpotiFire::Playlist::remove_tracks(IntPtr plPtr, array<Int32>^ trackIndexs)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	int* trackIndexes = new int[trackIndexs->Length];
-	for(int i = 0, l = trackIndexs->Length; i < l; i++)
-		trackIndexes[i] = trackIndexs[i];
-
-	return (int)sp_playlist_remove_tracks(pl, trackIndexes, trackIndexs->Length);
-}
-
-int SpotiFire::Playlist::reorder_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 newPosition)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	int* trackIndexes = new int[trackIndexs->Length];
-	for(int i = 0, l = trackIndexs->Length; i < l; i++)
-		trackIndexes[i] = trackIndexs[i];
-
-	return (int)sp_playlist_reorder_tracks(pl, trackIndexes, trackIndexs->Length, newPosition);
-}
-
-UInt32 SpotiFire::Playlist::num_subscribers(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (UInt32)sp_playlist_num_subscribers(pl);
-}
-
-IntPtr SpotiFire::Playlist::subscribers(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (IntPtr)(void *)sp_playlist_subscribers(pl);
-}
-
-Boolean SpotiFire::Playlist::is_loaded(IntPtr plPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Boolean)sp_playlist_is_loaded(pl);
-}
-
-int SpotiFire::Playlist::add_callbacks(IntPtr plPtr, IntPtr callbacksPtr, IntPtr userDataPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	sp_playlist_callbacks* callbacks = SP_TYPE(sp_playlist_callbacks, callbacksPtr);
-
-	return (int)sp_playlist_add_callbacks(pl, callbacks, userData);
-}
-
-int SpotiFire::Playlist::remove_callbacks(IntPtr plPtr, IntPtr callbacksPtr, IntPtr userDataPtr)
-{
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	sp_playlist_callbacks* callbacks = SP_TYPE(sp_playlist_callbacks, callbacksPtr);
-
-	return (int)sp_playlist_remove_callbacks(pl, callbacks, userData);
-}
-

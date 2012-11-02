@@ -1,25 +1,33 @@
 // Image.h
 
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	ref class Image
+	ref class Image;
+
+	public delegate void ImageEventHandler(Image ^sender, EventArgs ^e);
+
+	public ref class Image sealed : ISpotifyObject
 	{
 	internal:
-		static IntPtr create(IntPtr sessionPtr, IntPtr imageIdArr);
-		static IntPtr create_from_link(IntPtr sessionPtr, IntPtr linkPtr);
-		static int add_load_callback(IntPtr imagePtr, IntPtr callbackPtr, IntPtr userDataPtr);
-		static int remove_load_callback(IntPtr imagePtr, IntPtr callbackPtr, IntPtr userDataPtr);
-		static Boolean is_loaded(IntPtr imagePtr);
-		static int error(IntPtr imagePtr);
-		static int format(IntPtr imagePtr);
-		static IntPtr data(IntPtr imagePtr, [System::Runtime::InteropServices::Out]int %dataSize);
-		static IntPtr image_id(IntPtr imagePtr);
-		static int add_ref(IntPtr imagePtr);
-		static int release(IntPtr imagePtr);
+		Session ^_session;
+		sp_image *_ptr;
+
+		Image(Session ^session, sp_image *ptr);
+		!Image(); // finalizer
+		~Image(); // destructor
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get() sealed; }
+		virtual property bool IsLoaded { bool get() sealed; }
+		virtual property Error Error { SpotiFire::Error get() sealed; }
+		virtual property ImageFormat Format { ImageFormat get() sealed; }
+
+		event ImageEventHandler ^Completed;
 	};
 }

@@ -9,155 +9,148 @@ using namespace System::Runtime::InteropServices;
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
 #include <string.h>
+#include <vector>
 static __forceinline String^ UTF8(const char *text)
 {
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-int SpotiFire::Link::release(IntPtr linkPtr)
+static __forceinline String ^UTF8(const std::vector<char> text)
 {
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (int)sp_link_release(link);
+	return UTF8(text.data());
 }
 
-IntPtr SpotiFire::Link::create_from_string(String^ link)
-{
-	char* _link = SP_STRING(link);
+Link::Link(SpotiFire::Session ^session, sp_link *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_link_add_ref(_ptr);
+}
 
-	IntPtr ret = (IntPtr)(void *)sp_link_create_from_string(_link);
-	SP_FREE(_link);
+Link::~Link() {
+	this->!Link();
+}
+
+Link::!Link() {
+	SPLock lock;
+	sp_link_release(_ptr);
+	_ptr = NULL;
+}
+
+Session ^Link::Session::get() {
+	return _session;
+}
+
+String ^Link::ToString() {
+	SPLock;
+	int size = sp_link_as_string(_ptr, NULL, 0) + 1;
+	std::vector<char> buffer(size);
+	sp_link_as_string(_ptr, buffer.data(), size);
+	String ^ret = UTF8(buffer);
 	return ret;
 }
 
-IntPtr SpotiFire::Link::create_from_track(IntPtr trackPtr, Int32 offset)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_track(track, offset);
+LinkType Link::Type::get() {
+	SPLock lock;
+	return ENUM(LinkType, sp_link_type(_ptr));
 }
 
-IntPtr SpotiFire::Link::create_from_album(IntPtr albumPtr)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_album(album);
+Track ^Link::AsTrack() {
+	SPLock lock;
+	return gcnew Track(_session, sp_link_as_track(_ptr));
 }
 
-IntPtr SpotiFire::Link::create_from_album_cover(IntPtr albumPtr, int size)
-{
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_album_cover(album, (sp_image_size)size);
+Track ^Link::AsTrack(TimeSpan %offset) {
+	SPLock lock;
+	int o = 0;
+	sp_track *track = sp_link_as_track_and_offset(_ptr, &o);
+	offset = TimeSpan::FromMilliseconds(o);
+	return gcnew Track(_session, track);
 }
 
-IntPtr SpotiFire::Link::create_from_artist(IntPtr artistPtr)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_artist(artist);
+Album ^Link::AsAlbum() {
+	SPLock lock;
+	return gcnew Album(_session, sp_link_as_album(_ptr));
 }
 
-IntPtr SpotiFire::Link::create_from_artist_portrait(IntPtr artistPtr, int size)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_artist_portrait(artist, (sp_image_size)size);
+Artist ^Link::AsArtist() {
+	SPLock lock;
+	return gcnew Artist(_session, sp_link_as_artist(_ptr));
 }
 
-IntPtr SpotiFire::Link::create_from_artistbrowse_portrait(IntPtr artistPtr, Int32 index)
-{
-	sp_artistbrowse* artist = SP_TYPE(sp_artistbrowse, artistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_artistbrowse_portrait(artist, index);
+User ^Link::AsUser() {
+	SPLock lock;
+	return gcnew User(_session, sp_link_as_user(_ptr));
 }
 
-IntPtr SpotiFire::Link::create_from_search(IntPtr searchPtr)
-{
-	sp_search* search = SP_TYPE(sp_search, searchPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_search(search);
-}
-
-IntPtr SpotiFire::Link::create_from_playlist(IntPtr playlistPtr)
-{
-	sp_playlist* playlist = SP_TYPE(sp_playlist, playlistPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_playlist(playlist);
-}
-
-IntPtr SpotiFire::Link::create_from_user(IntPtr userPtr)
-{
-	sp_user* user = SP_TYPE(sp_user, userPtr);
-
-	return (IntPtr)(void *)sp_link_create_from_user(user);
-}
-
-IntPtr SpotiFire::Link::create_from_image(IntPtr imagePtr)
-{
-	sp_image* image = SP_TYPE(sp_image, imagePtr);
-
-	return (IntPtr)(void *)sp_link_create_from_image(image);
-}
-
-String^ SpotiFire::Link::as_string(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-	int length = sp_link_as_string(link, NULL, 0) + 1;
-	char* buffer = new char[length];
-	sp_link_as_string(link, buffer, length);
-
-	String^ ret = UTF8(buffer);
-	delete buffer;
+Playlist ^Link::AsPlaylist() {
+	SPLock lock;
+	sp_playlist *pl = sp_playlist_create(_session->_ptr, _ptr);
+	Playlist ^ret = gcnew Playlist(_session, pl);
+	sp_playlist_release(pl);
 	return ret;
 }
 
-int SpotiFire::Link::type(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (int)sp_link_type(link);
+__forceinline Link ^CREATE(Session ^session, sp_link *link) {
+	Link ^ret = gcnew Link(session, link);
+	sp_link_release(link);
+	return ret;
 }
 
-IntPtr SpotiFire::Link::as_track(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_track(link);
+Link ^Link::Create(SpotiFire::Session ^session, String ^link) {
+	SPLock lock;
+	marshal_context context;
+	const char *str = context.marshal_as<const char *>(link);
+	return CREATE(session, sp_link_create_from_string(str));
 }
 
-IntPtr SpotiFire::Link::as_track_and_offset(IntPtr linkPtr, [System::Runtime::InteropServices::Out]Int32 %offset)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-	pin_ptr<int> pinned = &offset;
-
-	return (IntPtr)(void *)sp_link_as_track_and_offset(link, pinned);
+Link ^Link::Create(Track ^track, TimeSpan offset) {
+	SPLock lock;
+	int millisecs = offset.TotalMilliseconds;
+	return CREATE(track->_session, sp_link_create_from_track(track->_ptr, millisecs));
 }
 
-IntPtr SpotiFire::Link::as_album(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_album(link);
+Link ^Link::Create(Album ^album) {
+	SPLock lock;
+	return CREATE(album->_session, sp_link_create_from_album(album->_ptr));
 }
 
-IntPtr SpotiFire::Link::as_artist(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_artist(link);
+Link ^Link::Create(Artist ^artist) {
+	SPLock lock;
+	return CREATE(artist->_session, sp_link_create_from_artist(artist->_ptr));
 }
 
-IntPtr SpotiFire::Link::as_user(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_link_as_user(link);
+Link ^Link::Create(Search ^search) {
+	SPLock lock;
+	return CREATE(search->_session, sp_link_create_from_search(search->_ptr));
 }
 
-int SpotiFire::Link::add_ref(IntPtr linkPtr)
-{
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
+Link ^Link::Create(Playlist ^playlist) {
+	SPLock lock;
+	return CREATE(playlist->_session, sp_link_create_from_playlist(playlist->_ptr));
+}
 
-	return (int)sp_link_add_ref(link);
+Link ^Link::Create(User ^user) {
+	SPLock lock;
+	return CREATE(user->_session, sp_link_create_from_user(user->_ptr));
+}
+
+Link ^Link::Create(Image ^image) {
+	SPLock lock;
+	return CREATE(image->_session, sp_link_create_from_image(image->_ptr));
+}
+
+Link ^Link::CreateCover(Album ^album, ImageSize size) {
+	SPLock lock;
+	return CREATE(album->_session, sp_link_create_from_album_cover(album->_ptr, (sp_image_size)size));
+}
+
+Link ^Link::CreatePortrait(Artist ^artist, ImageSize size) {
+	SPLock lock;
+	return CREATE(artist->_session, sp_link_create_from_artist_portrait(artist->_ptr, (sp_image_size)size));
+}
+
+Link ^Link::CreatePortrait(ArtistBrowse ^artistBrowse, int index) {
+	SPLock lock;
+	return CREATE(artistBrowse->_session, sp_link_create_from_artistbrowse_portrait(artistBrowse->_ptr, index));
 }

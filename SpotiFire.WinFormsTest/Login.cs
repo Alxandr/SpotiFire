@@ -12,10 +12,10 @@ namespace SpotiFire.WinFormsTest
 {
     public partial class Login : Form
     {
-        private ISession session;
+        private Session session;
         private TaskCompletionSource<bool> _loginWait = new TaskCompletionSource<bool>();
 
-        public Login(ISession session)
+        public Login(Session session)
         {
             InitializeComponent();
             DialogResult = DialogResult.Cancel;
@@ -25,8 +25,8 @@ namespace SpotiFire.WinFormsTest
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            var success = await session.Login(textBox1.Text, maskedTextBox1.Text, false);
-            if (success)
+            var result = await session.Login(textBox1.Text, maskedTextBox1.Text, false);
+            if (result == Error.OK)
             {
                 DialogResult = DialogResult.OK;
                 _loginWait.SetResult(true);

@@ -10,97 +10,131 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-IntPtr SpotiFire::Albumbrowse::album(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (IntPtr)(void *)sp_albumbrowse_album(alb);
+AlbumBrowse::AlbumBrowse(SpotiFire::Session ^session, sp_albumbrowse *ptr) {
+	SPLock lock;
+	_session = session;
+	_ptr = ptr;
+	sp_albumbrowse_add_ref(_ptr);
 }
 
-IntPtr SpotiFire::Albumbrowse::artist(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (IntPtr)(void *)sp_albumbrowse_artist(alb);
+AlbumBrowse::~AlbumBrowse() {
+	this->!AlbumBrowse();
 }
 
-Int32 SpotiFire::Albumbrowse::num_copyrights(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (Int32)sp_albumbrowse_num_copyrights(alb);
+AlbumBrowse::!AlbumBrowse() {
+	SPLock lock;
+	sp_albumbrowse_release(_ptr);
+	_ptr = NULL;
 }
 
-String^ SpotiFire::Albumbrowse::copyright(IntPtr albPtr, Int32 index)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return UTF8(sp_albumbrowse_copyright(alb, index));
+Session ^AlbumBrowse::Session::get() {
+	return _session;
 }
 
-Int32 SpotiFire::Albumbrowse::num_tracks(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (Int32)sp_albumbrowse_num_tracks(alb);
+Error AlbumBrowse::Error::get() {
+	SPLock lock;
+	return ENUM(SpotiFire::Error, sp_albumbrowse_error(_ptr));
 }
 
-IntPtr SpotiFire::Albumbrowse::track(IntPtr albPtr, Int32 index)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (IntPtr)(void *)sp_albumbrowse_track(alb, index);
+Album ^AlbumBrowse::Album::get() {
+	SPLock lock;
+	return gcnew SpotiFire::Album(_session, sp_albumbrowse_album(_ptr));
 }
 
-String^ SpotiFire::Albumbrowse::review(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return UTF8(sp_albumbrowse_review(alb));
+Artist ^AlbumBrowse::Artist::get() {
+	SPLock lock;
+	return gcnew SpotiFire::Artist(_session, sp_albumbrowse_artist(_ptr));
 }
 
-Int32 SpotiFire::Albumbrowse::backend_request_duration(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (Int32)sp_albumbrowse_backend_request_duration(alb);
+bool AlbumBrowse::IsCompleted::get() {
+	SPLock lock;
+	return sp_albumbrowse_is_loaded(_ptr);
 }
 
-int SpotiFire::Albumbrowse::add_ref(IntPtr albPtr)
+ref class $AlbumBrowse$CopyrightsArray sealed : ReadOnlyList<String ^>
 {
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
+internal:
+	AlbumBrowse ^_browse;
+	$AlbumBrowse$CopyrightsArray(AlbumBrowse ^browse) { _browse = browse; }
 
-	return (int)sp_albumbrowse_add_ref(alb);
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_albumbrowse_num_copyrights(_browse->_ptr);
+	}
+
+	virtual String ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return UTF8(sp_albumbrowse_copyright(_browse->_ptr, index));
+	}
+};
+
+IList<String ^> ^AlbumBrowse::Copyrights::get() {
+	if(_copyrights == nullptr) {
+		Interlocked::CompareExchange<IList<String ^> ^>(_copyrights, gcnew $AlbumBrowse$CopyrightsArray(this), nullptr);
+	}
+	return _copyrights;
 }
 
-int SpotiFire::Albumbrowse::release(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (int)sp_albumbrowse_release(alb);
+String ^AlbumBrowse::Review::get() {
+	SPLock lock;
+	return UTF8(sp_albumbrowse_review(_ptr));
 }
 
-IntPtr SpotiFire::Albumbrowse::create(IntPtr sessionPtr, IntPtr albumPtr, IntPtr callbackPtr, IntPtr userDataPtr)
+ref class $AlbumBrowse$TracksArray sealed : ReadOnlyList<Track ^>
 {
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_album* album = SP_TYPE(sp_album, albumPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	albumbrowse_complete_cb* callback = SP_TYPE(albumbrowse_complete_cb, callbackPtr);
+internal:
+	AlbumBrowse ^_browse;
+	$AlbumBrowse$TracksArray(AlbumBrowse ^browse) { _browse = browse; }
 
-	return (IntPtr)(void *)sp_albumbrowse_create(session, album, callback, userData);
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_albumbrowse_num_tracks(_browse->_ptr);
+	}
+
+	virtual Track ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return gcnew Track(_browse->_session, sp_albumbrowse_track(_browse->_ptr, index));
+	}
+};
+
+IList<Track ^> ^AlbumBrowse::Tracks::get() {
+	if(_tracks == nullptr) {
+		Interlocked::CompareExchange<IList<Track ^> ^>(_tracks, gcnew $AlbumBrowse$TracksArray(this), nullptr);
+	}
+	return _tracks;
 }
 
-Boolean SpotiFire::Albumbrowse::is_loaded(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
-
-	return (Boolean)sp_albumbrowse_is_loaded(alb);
+void SP_CALLCONV completed(sp_albumbrowse *browse, void *userdata);
+AlbumBrowse ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^album) {
+	SPLock lock;
+	AlbumBrowse ^ret;
+	ret = gcnew AlbumBrowse(session, sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, new gcroot<AlbumBrowse ^>(ret)));
+	return ret;
 }
 
-int SpotiFire::Albumbrowse::error(IntPtr albPtr)
-{
-	sp_albumbrowse* alb = SP_TYPE(sp_albumbrowse, albPtr);
+//------------------ Event Handlers ------------------//
 
-	return (int)sp_albumbrowse_error(alb);
+ref struct $albumbrowse$completed {
+internal:
+	AlbumBrowse ^_browse;
+
+	$albumbrowse$completed(AlbumBrowse ^browse) {
+		_browse = browse;
+	}
+
+	void WaitCallback(Object ^state) {
+		_browse->OnCompleted();
+	}
+};
+
+void SP_CALLCONV completed(sp_albumbrowse *browse, void *userdata) {
+	AlbumBrowse ^b = SP_DATA(AlbumBrowse, userdata);
+	ThreadPool::QueueUserWorkItem(gcnew WaitCallback(gcnew $albumbrowse$completed(b), &$albumbrowse$completed::WaitCallback));
+}
+
+void AlbumBrowse::OnCompleted() {
+	Completed(this, gcnew EventArgs());
 }
 

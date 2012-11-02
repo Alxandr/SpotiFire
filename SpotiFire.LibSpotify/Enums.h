@@ -1,4 +1,5 @@
 #pragma once
+#include "Stdafx.h"
 
 namespace SpotiFire {
 
@@ -189,5 +190,150 @@ namespace SpotiFire {
         /// An operating system error
         /// </summary>
         SYSTEM_FAILURE = 41,
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent album types. </summary>
+	///
+	/// <remarks>	Aleksander, 20.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+
+	public enum class AlbumType
+    {
+        Album = 0,
+        Single = 1,
+        Compilation = 2,
+        Unknown = 3
+    };
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent different bitrates. </summary>
+	///
+	/// <remarks>	Aleksander, 20.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+
+	public enum class BitRate
+	{
+		/// <summary>	Bitrate 160kbps. </summary>
+		Bitrate160k = 0,
+
+		/// <summary>	Bitrate 320kbps. </summary>
+		Bitrate320k = 1,
+
+		/// <summary>	Bitrate 96kbps. </summary>
+		Bitrate96k = 2
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent a state of connection. </summary>
+	///
+	/// <remarks>	Aleksander, 20.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+
+	public enum class ConnectionState
+	{
+		/// <summary>
+        /// User not yet logged in.
+        /// </summary>
+        LoggedOut = 0,
+
+        /// <summary>
+        /// Logged in against a Spotify access point.
+        /// </summary>
+        LoggedIn = 1,
+
+        /// <summary>
+        /// Was logged in, but has now been disconnected.
+        /// </summary>
+        Disconnected = 2,
+
+        /// <summary>
+        /// The connection state is undefined.
+        /// </summary>
+        Undefined = 3,
+
+        /// <summary>
+        /// Logged in in offline mode.
+        /// </summary>
+        Offline = 4
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent the format of an image. </summary>
+	///
+	/// <remarks>	Aleksander, 31.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class ImageFormat
+	{
+		/// <summary>	Unknown image format. </summary>
+		Unknown = -1,
+
+		/// <summary>	JPEG image. </summary>
+		Jpeg = 0,
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent link types. </summary>
+	///
+	/// <remarks>	Aleksander, 31.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class LinkType
+	{
+		/// <summary>	Link type not valid - default until the library has parsed the link, or when parsing failed. </summary>
+		Invalid = 0,
+		Track = 1,
+		Album = 2,
+		Artist = 3,
+		Search = 4,
+		Playlist = 5,
+		Profile = 6,
+		Starred = 7,
+		Localtrack = 8,
+		Image = 9
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent the size of an image. </summary>
+	///
+	/// <remarks>	Aleksander, 31.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class ImageSize
+	{
+		Normal = 0,
+		Small = 1,
+		Large = 2
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent offline status of a playlist. </summary>
+	///
+	/// <remarks>	Aleksander, 31.10.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class OfflineStatus
+	{
+		/// <summary>	Playlist is not offline enabled. </summary>
+		No = 0,
+
+		/// <summary>	Playlist is synchronized to local storage. </summary>
+		Yes = 1,
+
+		/// <summary>	Playlist is currently downloading. Only one playlist can be in this state at any given time. </summary>
+		Downloading = 2,
+
+		/// <summary>	Playlist is queued for download. </summary>
+		Waiting = 3
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent type of playlist. </summary>
+	///
+	/// <remarks>	Aleksander, 01.11.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class PlaylistType
+	{
+		Playlist = 0,
+		StartFolder = 1,
+		EndFolder = 2,
+		Placeholder = 3
 	};
 }

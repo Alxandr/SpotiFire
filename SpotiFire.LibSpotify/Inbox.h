@@ -1,18 +1,26 @@
 // Inbox.h
 
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	ref class Inbox
+	public ref class Inbox sealed : ISpotifyObject
 	{
-	internal:
-		static IntPtr post_tracks(IntPtr sessionPtr, String^ user, array<IntPtr>^ trackPtrs, Int32 numTracks, String^ message, IntPtr callbackPtr, IntPtr userDataPtr);
-		static int error(IntPtr inboxPtr);
-		static int add_ref(IntPtr inboxPtr);
-		static int release(IntPtr inboxPtr);
+		Session ^_session;
+		sp_inbox *_ptr;
+
+		Inbox(Session ^session, sp_inbox *ptr);
+		!Inbox(); // finalizer
+		~Inbox(); // destructor
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get() sealed; }
+		virtual property Error Error { SpotiFire::Error get() sealed; }
+
+		virtual Task ^PostTracks(String ^user, array<Track ^> ^tracks, String ^message) sealed;
 	};
 }

@@ -1,19 +1,24 @@
 // User.h
 
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	ref class User
+	public ref class User sealed : ISpotifyObject
 	{
 	internal:
-		static String^ canonical_name(IntPtr userPtr);
-		static String^ display_name(IntPtr userPtr);
-		static Boolean is_loaded(IntPtr userPtr);
-		static int add_ref(IntPtr userPtr);
-		static int release(IntPtr userPtr);
+		Session ^_session;
+		sp_user *_ptr;
+
+		User(Session ^session, sp_user *ptr);
+		!User(); // finalizer
+		~User(); // destructor
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get() sealed; }
 	};
 }

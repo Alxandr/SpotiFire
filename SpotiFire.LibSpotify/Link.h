@@ -1,32 +1,44 @@
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 
 namespace SpotiFire {
 
-	ref class Link
+	public ref class Link sealed : ISpotifyObject
 	{
 	internal:
-		static IntPtr create_from_string(String^ link);
-		static IntPtr create_from_track(IntPtr trackPtr, Int32 offset);
-		static IntPtr create_from_album(IntPtr albumPtr);
-		static IntPtr create_from_album_cover(IntPtr albumPtr, int size);
-		static IntPtr create_from_artist(IntPtr artistPtr);
-		static IntPtr create_from_artist_portrait(IntPtr artistPtr, int size);
-		static IntPtr create_from_artistbrowse_portrait(IntPtr artistPtr, Int32 index);
-		static IntPtr create_from_search(IntPtr searchPtr);
-		static IntPtr create_from_playlist(IntPtr playlistPtr);
-		static IntPtr create_from_user(IntPtr userPtr);
-		static IntPtr create_from_image(IntPtr imagePtr);
-		static String^ as_string(IntPtr linkPtr);
-		static int type(IntPtr linkPtr);
-		static IntPtr as_track(IntPtr linkPtr);
-		static IntPtr as_track_and_offset(IntPtr linkPtr, [System::Runtime::InteropServices::Out]Int32 %offset);
-		static IntPtr as_album(IntPtr linkPtr);
-		static IntPtr as_artist(IntPtr linkPtr);
-		static IntPtr as_user(IntPtr linkPtr);
-		static int add_ref(IntPtr linkPtr);
-		static int release(IntPtr linkPtr);
+		Session ^_session;
+		sp_link *_ptr;
+
+		Link(Session ^session, sp_link *ptr);
+		!Link(); // finalizer
+		~Link(); // destructor
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get(); }
+		virtual String ^ToString() override sealed;
+		virtual property LinkType Type { LinkType get() sealed; }
+		virtual Track ^AsTrack() sealed;
+		virtual Track ^AsTrack([System::Runtime::InteropServices::Out] TimeSpan %offset) sealed;
+		virtual Album ^AsAlbum() sealed;
+		virtual Artist ^AsArtist() sealed;
+		virtual User ^AsUser() sealed;
+		virtual Playlist ^AsPlaylist() sealed;
+
+	internal:
+		static Link ^Create(SpotiFire::Session ^session, String ^link);
+		static Link ^Create(Track ^track, TimeSpan offset);
+		static Link ^Create(Album ^album);
+		static Link ^Create(Artist ^artist);
+		static Link ^Create(Search ^search);
+		static Link ^Create(Playlist ^playlist);
+		static Link ^Create(User ^user);
+		static Link ^Create(Image ^image);
+
+		static Link ^CreateCover(Album ^album, ImageSize size);
+		static Link ^CreatePortrait(Artist ^artist, ImageSize size);
+		static Link ^CreatePortrait(ArtistBrowse ^artistBrowse, int index);
 	};
 
 }

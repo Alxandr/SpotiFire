@@ -10,38 +10,44 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-String^ SpotiFire::Artist::name(IntPtr artistPtr)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return UTF8(sp_artist_name(artist));
+Artist::Artist(SpotiFire::Session ^session, sp_artist *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_artist_add_ref(_ptr);
 }
 
-Boolean SpotiFire::Artist::is_loaded(IntPtr artistPtr)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (Boolean)sp_artist_is_loaded(artist);
+Artist::~Artist() {
+	this->!Artist();
 }
 
-IntPtr SpotiFire::Artist::portrait(IntPtr artistPtr, int size)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (IntPtr)(void *)sp_artist_portrait(artist, (sp_image_size)size);
+Artist::!Artist() {
+	SPLock lock;
+	sp_artist_release(_ptr);
+	_ptr = NULL;
 }
 
-int SpotiFire::Artist::add_ref(IntPtr artistPtr)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (int)sp_artist_add_ref(artist);
+Session ^Artist::Session::get() {
+	return _session;
 }
 
-int SpotiFire::Artist::release(IntPtr artistPtr)
-{
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-
-	return (int)sp_artist_release(artist);
+bool Artist::IsReady::get() {
+	SPLock lock;
+	const char *name = sp_artist_name(_ptr);
+	return name != NULL && strlen(name) > 0;
 }
 
+bool Artist::IsLoaded::get() {
+	SPLock lock;
+	return sp_artist_is_loaded(_ptr);
+}
+
+String ^Artist::Name::get() {
+	SPLock lock;
+	return UTF8(sp_artist_name(_ptr));
+}
+
+ArtistBrowse ^Artist::Browse() {
+	throw gcnew NotImplementedException("Artist::Browse");
+	//return ArtistBrowse::Create(_session, this);
+}

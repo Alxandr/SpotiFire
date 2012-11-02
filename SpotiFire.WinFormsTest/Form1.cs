@@ -13,11 +13,11 @@ namespace SpotiFire.WinFormsTest
 {
     public partial class Form1 : Form
     {
-        ISession session;
+        Session session;
         
         static BASSPlayer player = new BASSPlayer();
 
-        private IPlaylistContainer pc;
+        private PlaylistContainer pc;
 
         public Form1()
         {
@@ -30,22 +30,22 @@ namespace SpotiFire.WinFormsTest
 
         private void SetupSession()
         {
-            session.MusicDeliver += session_MusicDeliver;
+            session.MusicDelivered += session_MusicDeliverd;
         }
 
-        void session_MusicDeliver(ISession sender, MusicDeliveryEventArgs e)
+        void session_MusicDeliverd(Session sender, MusicDeliveryEventArgs e)
         {
             e.ConsumedFrames = player.EnqueueSamples(e.Channels, e.Rate, e.Samples, e.Frames);
         }
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            var search = await session.SearchTracks(textBox1.Text, 0, 100);
-            List<CachedTrack> tracks = new List<CachedTrack>(search.Tracks.Count);
-            foreach (var t in search.Tracks)
-                tracks.Add(await CachedTrack.Make(t));
+            //var search = await session.SearchTracks(textBox1.Text, 0, 100);
+            //List<CachedTrack> tracks = new List<CachedTrack>(search.Tracks.Count);
+            //foreach (var t in search.Tracks)
+            //    tracks.Add(await CachedTrack.Make(t));
 
-            dataGridView1.DataSource = tracks;
+            //dataGridView1.DataSource = tracks;
         }
 
         private async void Form1_Load(object sender, EventArgs e)
@@ -64,7 +64,7 @@ namespace SpotiFire.WinFormsTest
             }
 
             pc = await session.PlaylistContainer;
-            List<IPlaylist> playlists = new List<IPlaylist>(pc.Playlists.Count);
+            List<Playlist> playlists = new List<Playlist>(pc.Playlists.Count);
             foreach (var playlist in pc.Playlists)
             {
                 playlists.Add(await playlist);
@@ -76,9 +76,9 @@ namespace SpotiFire.WinFormsTest
 
         class PlaylistListViewItem : ListViewItem
         {
-            internal IPlaylist _playlist;
+            internal Playlist _playlist;
 
-            public PlaylistListViewItem(IPlaylist playlist)
+            public PlaylistListViewItem(Playlist playlist)
                 : base(new [] { playlist.Name })
             {
                 _playlist = playlist;
@@ -108,23 +108,23 @@ namespace SpotiFire.WinFormsTest
             string _artist;
             string _duration;
 
-            internal ITrack _track;
+            internal Track _track;
 
-            private CachedTrack(ITrack track)
+            private CachedTrack(Track track)
             {
                 _track = track;
-                _name = track.Name;
-                _isStarred = track.IsStarred;
-                _artist = String.Join(", ", track.Artists.Select(a => a.Name));
-                _duration = track.Duration.ToString();
-                _isAvail = track.Availability == TrackAvailability.Available;
+                //_name = track.Name;
+                //_isStarred = track.IsStarred;
+                //_artist = String.Join(", ", track.Artists.Select(a => a.Name));
+                //_duration = track.Duration.ToString();
+                //_isAvail = track.Availability == TrackAvailability.Available;
             }
 
-            public static async Task<CachedTrack> Make(ITrack track)
+            public static async Task<CachedTrack> Make(Track track)
             {
-                await track;
-                foreach (var artist in track.Artists)
-                    await artist;
+                //await track;
+                //foreach (var artist in track.Artists)
+                //    await artist;
                 return new CachedTrack(track);
             }
 

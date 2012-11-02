@@ -14,151 +14,32 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-int SpotiFire::Track::add_ref(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (int)sp_track_add_ref(track);
+Track::Track(SpotiFire::Session ^session, sp_track *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_track_add_ref(_ptr);
 }
 
-int SpotiFire::Track::release(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (int)sp_track_release(track);
+Track::~Track() {
+	this->!Track();
 }
 
-Boolean SpotiFire::Track::is_loaded(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Boolean)sp_track_is_loaded(track);
+Track::!Track() {
+	SPLock lock;
+	sp_track_release(_ptr);
+	_ptr = NULL;
 }
 
-int SpotiFire::Track::error(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (int)sp_track_error(track);
+Session ^Track::Session::get() {
+	return _session;
 }
 
-int SpotiFire::Track::offline_get_status(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (int)sp_track_offline_get_status(track);
+bool Track::IsLoaded::get() {
+	SPLock lock;
+	return sp_track_is_loaded(_ptr);
 }
 
-int SpotiFire::Track::get_availability(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (int)sp_track_get_availability(session, track);
+bool Track::IsReady::get() {
+	return true;
 }
-
-Boolean SpotiFire::Track::is_local(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Boolean)sp_track_is_local(session, track);
-}
-
-Boolean SpotiFire::Track::is_autolinked(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Boolean)sp_track_is_autolinked(session, track);
-}
-
-IntPtr SpotiFire::Track::get_playable(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (IntPtr)(void *)sp_track_get_playable(session, track);
-}
-
-Boolean SpotiFire::Track::is_placeholder(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Boolean)sp_track_is_placeholder(track);
-}
-
-Boolean SpotiFire::Track::is_starred(IntPtr sessionPtr, IntPtr trackPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Boolean)sp_track_is_starred(session, track);
-}
-
-int SpotiFire::Track::set_starred(IntPtr sessionPtr, array<IntPtr>^ trackPtrArray, Boolean starred)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_track** tracks = new sp_track*[trackPtrArray->Length];
-	for(int i = 0, l = trackPtrArray->Length; i < l; i++)
-		tracks[i] = SP_TYPE(sp_track, trackPtrArray[i]);
-
-	return (int)sp_track_set_starred(session, tracks, trackPtrArray->Length, starred);
-}
-
-Int32 SpotiFire::Track::num_artists(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Int32)sp_track_num_artists(track);
-}
-
-IntPtr SpotiFire::Track::artist(IntPtr trackPtr, Int32 index)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (IntPtr)(void *)sp_track_artist(track, index);
-}
-
-IntPtr SpotiFire::Track::album(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (IntPtr)(void *)sp_track_album(track);
-}
-
-String^ SpotiFire::Track::name(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return UTF8(sp_track_name(track));
-}
-
-Int32 SpotiFire::Track::duration(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Int32)sp_track_duration(track);
-}
-
-Int32 SpotiFire::Track::popularity(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Int32)sp_track_popularity(track);
-}
-
-Int32 SpotiFire::Track::disc(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Int32)sp_track_disc(track);
-}
-
-Int32 SpotiFire::Track::index(IntPtr trackPtr)
-{
-	sp_track* track = SP_TYPE(sp_track, trackPtr);
-
-	return (Int32)sp_track_index(track);
-}
-

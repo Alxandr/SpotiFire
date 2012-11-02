@@ -1,0 +1,134 @@
+
+C:\Users\Aleksander\Documents\GitHub\SpotiFire>call "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat" 
+NAnt 0.92 (Build 0.92.4543.0; release; 09.06.2012)
+Copyright (C) 2001-2012 Gerry Shaw
+http://nant.sourceforge.net
+
+Buildfile: file:///C:/Users/Aleksander/Documents/GitHub/SpotiFire/SpotiFire.build
+Target framework: Microsoft .NET Framework 4.5
+Target(s) specified: build-all 
+
+
+init:
+
+
+debug:
+
+
+build:
+
+   [delete] Deleting file C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.cpp.
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Albumbrowse.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmp1F48.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Albumbrowse.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Albumbrowse.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmp1F48.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Albumbrowse.cpp
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Artist.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmp2429.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Artist.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Artist.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmp2429.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Artist.cpp
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Artistbrowse.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmp27D2.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Artistbrowse.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Artistbrowse.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmp27D2.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Artistbrowse.cpp
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Playlist.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmp2BF8.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Playlist.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Playlist.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmp2BF8.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Playlist.cpp
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Session.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmp2FFE.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Session.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Session.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmp2FFE.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] Session.cpp
+       [cl] c:\users\aleksander\documents\github\spotifire\spotifire.libspotify\session.cpp(143) : warning C4700: uninitialized local variable 'err' used
+       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.cpp' has been updated, recompiling.
+       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
+       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmp3415.tmp.
+       [cl] /c
+       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
+       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
+       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
+       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.cpp"
+       [cl] 
+       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmp3415.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
+       [cl] tmp.cpp
+      [csc] Compiling 79 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\SpotiFire.netmodule'.
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'IAsyncLoaded'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\Interfaces\IAsyncLoaded.cs(4,22): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'SessionEventArgs'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\EventArgs\SessionEventArgs.cs(8,18): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'MusicDeliveryEventArgs'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\EventArgs\MusicDeliveryEventArgs.cs(8,18): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'SessionEventHandler'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\SpotifyTypes\Session.cs(12,26): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'MusicDeliveryEventHandler'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\SpotifyTypes\Session.cs(13,26): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'AlbumBrowseEventHandler'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\SpotifyTypes\AlbumBrowse.cs(10,26): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'ArtistBrowseEventHandler'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\SpotifyTypes\ArtistBrowse.cs(9,26): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'ImageEventHandler'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\SpotifyTypes\Image.cs(9,26): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'libspotify'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.session.cs(578,18): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'AlbumType'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.album.cs(10,17): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'BitRate'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.session.cs(300,17): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'ConnectionState'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.session.cs(258,17): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'ImageFormat'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.image.cs(15,17): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'LinkType'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.links.cs(13,17): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'ImageSize'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.session.cs(454,17): (Location of symbol related to previous error)
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.obj: error CS0101: The namespace 'SpotiFire' already contains a definition for 'PlaylistType'
+      [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.SpotifyLib\LibSpotify\libspotify.session.cs(321,17): (Location of symbol related to previous error)
+
+BUILD FAILED
+
+C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.build(75,4):
+External Program Failed: C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe (return code was 1)
+
+Total time: 6.8 seconds.
+

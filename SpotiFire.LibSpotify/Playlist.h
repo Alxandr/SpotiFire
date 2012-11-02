@@ -1,48 +1,48 @@
 // Playlist.h
 
 #pragma once
+#include "Stdafx.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
-	ref class Playlist
+	ref class User;
+	ref class Track;
+
+	public ref class Playlist sealed : ISpotifyObject, IAsyncLoaded
 	{
 	internal:
-		static int subscribers_free(IntPtr subsPtr);
-		static int update_subscribers(IntPtr sessionPtr, IntPtr plPtr);
-		static Boolean is_in_ram(IntPtr sessionPtr, IntPtr plPtr);
-		static int set_in_ram(IntPtr sessionPtr, IntPtr plPtr, Boolean inRam);
-		static IntPtr create(IntPtr sessionPtr, IntPtr linkPtr);
-		static int set_offline_mode(IntPtr sessionPtr, IntPtr plPtr, Boolean offline);
-		static int get_offline_status(IntPtr sessionPtr, IntPtr plPtr);
-		static Int32 get_offline_download_completed(IntPtr sessionPtr, IntPtr plPtr);
-		static int add_ref(IntPtr plPtr);
-		static int release(IntPtr plPtr);
-		static Int32 num_tracks(IntPtr plPtr);
-		static IntPtr track(IntPtr plPtr, Int32 index);
-		static Int32 track_create_time(IntPtr plPtr, Int32 index);
-		static IntPtr track_creator(IntPtr plPtr, Int32 index);
-		static Boolean track_seen(IntPtr plPtr, Int32 index);
-		static int track_set_seen(IntPtr plPtr, Int32 index, Boolean seen);
-		static String^ track_message(IntPtr plPtr, Int32 index);
-		static String^ name(IntPtr plPtr);
-		static int rename(IntPtr plPtr, String^ newName);
-		static IntPtr owner(IntPtr plPtr);
-		static Boolean is_collaborative(IntPtr plPtr);
-		static int set_collaborative(IntPtr plPtr, Boolean collaborative);
-		static int set_autolink_tracks(IntPtr plPtr, Boolean autolink);
-		static String^ get_description(IntPtr plPtr);
-		static Boolean get_image(IntPtr plPtr, IntPtr imageIdPtr);
-		static Boolean has_pending_changes(IntPtr plPtr);
-		static int add_tracks(IntPtr plPtr, array<IntPtr>^ trackPtrs, Int32 position, IntPtr sessionPtr);
-		static int remove_tracks(IntPtr plPtr, array<Int32>^ trackIndexs);
-		static int reorder_tracks(IntPtr plPtr, array<Int32>^ trackIndexs, Int32 newPosition);
-		static UInt32 num_subscribers(IntPtr plPtr);
-		static IntPtr subscribers(IntPtr plPtr);
-		static Boolean is_loaded(IntPtr plPtr);
-		static int add_callbacks(IntPtr plPtr, IntPtr callbacks, IntPtr userDataPtr);
-		static int remove_callbacks(IntPtr plPtr, IntPtr callbacks, IntPtr userDataPtr);
+		Session ^_session;
+		sp_playlist *_ptr;
+		IList<Track ^> ^_tracks;
+
+		Playlist(Session ^session, sp_playlist *ptr);
+		!Playlist(); // finalizer
+		~Playlist(); // destructor
+
+	public:
+		virtual property Session ^Session { SpotiFire::Session ^get() sealed; }
+		virtual property bool InRam { bool get() sealed; void set(bool value) sealed; }
+		virtual property bool Offline { bool get() sealed; void set(bool value) sealed; }
+		virtual property OfflineStatus OfflineStatus { SpotiFire::OfflineStatus get() sealed; }
+		virtual property IList<Track ^> ^Tracks { IList<Track ^> ^get() sealed; }
+		virtual property String ^Name { String ^get() sealed; void set(String ^value) sealed; }
+		virtual property User ^Owner { User ^get() sealed; }
+		virtual property bool IsCollaborative { bool get() sealed; void set(bool value) sealed; }
+		virtual property bool IsAutolinked { void set(bool value) sealed; }
+		virtual property String ^Description { String ^get() sealed; }
+		virtual property bool HasPendingChanges { bool get() sealed; }
+		// TODO: Add subscribers
+		virtual property bool IsLoaded { bool get() sealed; }
+		virtual property bool IsReady { bool get() sealed; }
+
+	internal:
+		virtual DateTime GetCreateTime(int trackIndex) sealed;
+		virtual User ^GetCreator(int trackIndex) sealed;
+		virtual bool GetTrackSeen(int trackIndex) sealed;
+		virtual Error SetTrackSeen(int trackIndex, bool value) sealed;
+		virtual String ^GetTrackMessage(int trackIndex) sealed;
 	};
 }

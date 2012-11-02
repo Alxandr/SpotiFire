@@ -10,132 +10,87 @@ static __forceinline String^ UTF8(const char *text)
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-IntPtr SpotiFire::Artistbrowse::create(IntPtr sessionPtr, IntPtr artistPtr, int type, IntPtr callbackPtr, IntPtr userDataPtr)
-{
-	sp_session* session = SP_TYPE(sp_session, sessionPtr);
-	sp_artist* artist = SP_TYPE(sp_artist, artistPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	artistbrowse_complete_cb* callback = SP_TYPE(artistbrowse_complete_cb, callbackPtr);
-
-	return (IntPtr)(void *)sp_artistbrowse_create(session, artist, (sp_artistbrowse_type)type, callback, userData);
+ArtistBrowse::ArtistBrowse(SpotiFire::Session ^session, sp_artistbrowse *ptr) {
+	SPLock lock;
+	_session = session;
+	_ptr = ptr;
+	sp_artistbrowse_add_ref(_ptr);
 }
 
-Boolean SpotiFire::Artistbrowse::is_loaded(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Boolean)sp_artistbrowse_is_loaded(arb);
+ArtistBrowse::~ArtistBrowse() {
+	this->!ArtistBrowse();
 }
 
-int SpotiFire::Artistbrowse::error(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (int)sp_artistbrowse_error(arb);
+ArtistBrowse::!ArtistBrowse() {
+	SPLock lock;
+	sp_artistbrowse_release(_ptr);
+	_ptr = NULL;
 }
 
-IntPtr SpotiFire::Artistbrowse::artist(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (IntPtr)(void *)sp_artistbrowse_artist(arb);
+Session ^ArtistBrowse::Session::get() {
+	return _session;
 }
 
-Int32 SpotiFire::Artistbrowse::num_portraits(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Int32)sp_artistbrowse_num_portraits(arb);
+Error ArtistBrowse::Error::get() {
+	SPLock lock;
+	return ENUM(SpotiFire::Error, sp_artistbrowse_error(_ptr));
 }
 
-IntPtr SpotiFire::Artistbrowse::portrait(IntPtr arbPtr, Int32 index)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (IntPtr)(void *)sp_artistbrowse_portrait(arb, index);
+Artist ^ArtistBrowse::Artist::get() {
+	SPLock lock;
+	return gcnew SpotiFire::Artist(_session, sp_artistbrowse_artist(_ptr));
 }
 
-Int32 SpotiFire::Artistbrowse::num_tracks(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Int32)sp_artistbrowse_num_tracks(arb);
+bool ArtistBrowse::IsCompleted::get() {
+	SPLock lock;
+	return sp_artistbrowse_is_loaded(_ptr);
 }
 
-IntPtr SpotiFire::Artistbrowse::track(IntPtr arbPtr, Int32 index)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (IntPtr)(void *)sp_artistbrowse_track(arb, index);
+IList<String ^> ^ArtistBrowse::PortraitIds::get() {
+	throw gcnew NotImplementedException("ArtistBrowse::PortraitIds");
 }
 
-Int32 SpotiFire::Artistbrowse::num_tophit_tracks(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Int32)sp_artistbrowse_num_tophit_tracks(arb);
+IList<Track ^> ^ArtistBrowse::Tracks::get() {
+	throw gcnew NotImplementedException("ArtistBrowse::Tracks");
 }
 
-IntPtr SpotiFire::Artistbrowse::tophit_track(IntPtr arbPtr, Int32 index)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (IntPtr)(void *)sp_artistbrowse_tophit_track(arb, index);
+IList<Artist ^> ^ArtistBrowse::SimilarArtists::get() {
+	throw gcnew NotImplementedException("ArtistBrowse::SimilarArtists");
 }
 
-Int32 SpotiFire::Artistbrowse::num_albums(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Int32)sp_artistbrowse_num_albums(arb);
+String ^ArtistBrowse::Biography::get() {
+	return UTF8(sp_artistbrowse_biography(_ptr));
 }
 
-IntPtr SpotiFire::Artistbrowse::album(IntPtr arbPtr, Int32 index)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
+//void SP_CALLCONV completed(sp_artistbrowse *browse, void *userdata);
+//ArtistBrowse ^ArtistBrowse::Create(Session ^session, SpotiFire::Artist ^artist) {
+//	SPLock lock;
+//	ArtistBrowse ^ret;
+//	ret = gcnew ArtistBrowse(session, sp_artistbrowse_create(session->_ptr, artist->_ptr, &completed, new gcroot<ArtistBrowse ^>(ret)));
+//	return ret;
+//}
 
-	return (IntPtr)(void *)sp_artistbrowse_album(arb, index);
+//------------------ Event Handlers ------------------//
+
+ref struct $artistbrowse$completed {
+internal:
+	ArtistBrowse ^_browse;
+
+	$artistbrowse$completed(ArtistBrowse ^browse) {
+		_browse = browse;
+	}
+
+	void WaitCallback(Object ^state) {
+		_browse->OnCompleted();
+	}
+};
+
+void SP_CALLCONV completed(sp_artistbrowse *browse, void *userdata) {
+	ArtistBrowse ^b = SP_DATA(ArtistBrowse, userdata);
+	ThreadPool::QueueUserWorkItem(gcnew WaitCallback(gcnew $artistbrowse$completed(b), &$artistbrowse$completed::WaitCallback));
 }
 
-Int32 SpotiFire::Artistbrowse::num_similar_artists(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Int32)sp_artistbrowse_num_similar_artists(arb);
-}
-
-IntPtr SpotiFire::Artistbrowse::similar_artist(IntPtr arbPtr, Int32 index)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (IntPtr)(void *)sp_artistbrowse_similar_artist(arb, index);
-}
-
-String^ SpotiFire::Artistbrowse::biography(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return UTF8(sp_artistbrowse_biography(arb));
-}
-
-Int32 SpotiFire::Artistbrowse::backend_request_duration(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (Int32)sp_artistbrowse_backend_request_duration(arb);
-}
-
-int SpotiFire::Artistbrowse::add_ref(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (int)sp_artistbrowse_add_ref(arb);
-}
-
-int SpotiFire::Artistbrowse::release(IntPtr arbPtr)
-{
-	sp_artistbrowse* arb = SP_TYPE(sp_artistbrowse, arbPtr);
-
-	return (int)sp_artistbrowse_release(arb);
+void ArtistBrowse::OnCompleted() {
+	Completed(this, gcnew EventArgs());
 }
 

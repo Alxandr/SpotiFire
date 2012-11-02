@@ -9,165 +9,152 @@ using namespace System::Runtime::InteropServices;
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
 #include <string.h>
+#include <vector>
 static __forceinline String^ UTF8(const char *text)
 {
 	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
 }
 
-int SpotiFire::Playlistcontainer::add_callbacks(IntPtr pcPtr, IntPtr callbacksPtr, IntPtr userDataPtr)
+static __forceinline String ^UTF8(const std::vector<char> text)
 {
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	sp_playlistcontainer_callbacks* callbacks = SP_TYPE(sp_playlistcontainer_callbacks, callbacksPtr);
-
-	return (int)sp_playlistcontainer_add_callbacks(pc, callbacks, userData);
+	return UTF8(text.data());
 }
 
-int SpotiFire::Playlistcontainer::remove_callbacks(IntPtr pcPtr, IntPtr callbacksPtr, IntPtr userDataPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	void* userData = SP_TYPE(void, userDataPtr);
-	sp_playlistcontainer_callbacks* callbacks = SP_TYPE(sp_playlistcontainer_callbacks, callbacksPtr);
+void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata);
 
-	return (int)sp_playlistcontainer_remove_callbacks(pc, callbacks, userData);
+sp_playlistcontainer_callbacks _callbacks = {
+	NULL, // playlist added
+	NULL, // playlist removed
+	NULL, // playlist moved
+	&loaded, // loaded
+};
+
+void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata) {
+	TP0(SP_DATA(PlaylistContainer, userdata), PlaylistContainer::loaded);
 }
 
-Int32 SpotiFire::Playlistcontainer::num_playlists(IntPtr pcPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (Int32)sp_playlistcontainer_num_playlists(pc);
+PlaylistContainer::PlaylistContainer(SpotiFire::Session ^session, sp_playlistcontainer *ptr) {
+	SPLock lock;
+	_ptr = ptr;
+	_session = session;
+	sp_playlistcontainer_add_ref(_ptr);
+	sp_playlistcontainer_add_callbacks(_ptr, &_callbacks, new gcroot<PlaylistContainer ^>(this));
 }
 
-Boolean SpotiFire::Playlistcontainer::is_loaded(IntPtr pcPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (Boolean)sp_playlistcontainer_is_loaded(pc);
+PlaylistContainer::~PlaylistContainer() {
+	this->!PlaylistContainer();
 }
 
-IntPtr SpotiFire::Playlistcontainer::playlist(IntPtr pcPtr, Int32 index)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (IntPtr)(void *)sp_playlistcontainer_playlist(pc, index);
+PlaylistContainer::!PlaylistContainer() {
+	SPLock lock;
+	sp_playlistcontainer_release(_ptr);
+	_ptr = NULL;
 }
 
-int SpotiFire::Playlistcontainer::playlist_type(IntPtr pcPtr, Int32 index)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (int)sp_playlistcontainer_playlist_type(pc, index);
+Session ^PlaylistContainer::Session::get() {
+	return _session;
 }
 
-String^ SpotiFire::Playlistcontainer::playlist_folder_name(IntPtr pcPtr, Int32 index)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	int length = 256;
-	char* buffer = new char[length];
+User ^PlaylistContainer::Owner::get() {
+	SPLock lock;
+	return gcnew User(_session, sp_playlistcontainer_owner(_ptr));
+}
 
-	int actualLength = sp_playlistcontainer_playlist_folder_name(pc, index, buffer, length);
-	if(actualLength >= length) {
-		length = actualLength + 1;
-		delete buffer;
-		buffer = new char[length];
-		sp_playlistcontainer_playlist_folder_name(pc, index, buffer, length);
+ref class $PlaylistContainer$PlaylistList sealed : SPList<Playlist ^>
+{
+internal:
+	PlaylistContainer ^_pc;
+	$PlaylistContainer$PlaylistList(PlaylistContainer ^pc) { _pc = pc; }
+
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_playlistcontainer_num_playlists(_pc->_ptr);
 	}
 
-	String^ ret = UTF8(buffer);
-	delete buffer;
-	return ret;
+	virtual Playlist ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return gcnew Playlist(_pc->_session, sp_playlistcontainer_playlist(_pc->_ptr, index));
+	}
+
+	virtual void DoInsert(int index, Playlist ^item) override sealed {
+		SPLock lock;
+		throw gcnew NotImplementedException("PlaylistList::DoInsert");
+	}
+
+	virtual void DoRemove(int index) override sealed {
+		SPLock lock;
+		throw gcnew NotImplementedException("PlaylistList::DoRemove");
+	}
+
+	virtual void DoUpdate(int index, Playlist ^item) override sealed {
+		SPLock lock;
+		DoRemove(index);
+		DoInsert(index - 1, item);
+	}
+};
+
+IList<Playlist ^> ^PlaylistContainer::Playlists::get() {
+	if(_playlists == nullptr) {
+		Interlocked::CompareExchange<IList<Playlist ^> ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
+	}
+	return _playlists;
 }
 
-UInt64 SpotiFire::Playlistcontainer::playlist_folder_id(IntPtr pcPtr, Int32 index)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (UInt64)sp_playlistcontainer_playlist_folder_id(pc, index);
+//--------------------------------------------
+// Meta folder
+Error PlaylistContainer::AddFolder(int index, String ^name) {
+	SPLock lock;
+	marshal_context context;
+	return ENUM(Error, sp_playlistcontainer_add_folder(_ptr, index, context.marshal_as<const char *>(name)));
 }
 
-IntPtr SpotiFire::Playlistcontainer::add_new_playlist(IntPtr pcPtr, String^ name)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	char* _name = SP_STRING(name);
-
-	IntPtr ret = (IntPtr)(void *)sp_playlistcontainer_add_new_playlist(pc, _name);
-	SP_FREE(_name);
-	return ret;
+PlaylistType PlaylistContainer::GetPlaylistType(int index) {
+	SPLock lock;
+	return ENUM(PlaylistType, sp_playlistcontainer_playlist_type(_ptr, index));
 }
 
-IntPtr SpotiFire::Playlistcontainer::add_playlist(IntPtr pcPtr, IntPtr linkPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	sp_link* link = SP_TYPE(sp_link, linkPtr);
-
-	return (IntPtr)(void *)sp_playlistcontainer_add_playlist(pc, link);
+String ^PlaylistContainer::GetFolderName(int index) {
+	SPLock lock;
+	int count = sp_playlistcontainer_playlist_folder_name(_ptr, index, NULL, 0) + 1;
+	std::vector<char> buffer(count);
+	sp_playlistcontainer_playlist_folder_name(_ptr, index, buffer.data(), count);
+	return UTF8(buffer);
 }
 
-int SpotiFire::Playlistcontainer::remove_playlist(IntPtr pcPtr, Int32 index)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (int)sp_playlistcontainer_remove_playlist(pc, index);
+UInt64 PlaylistContainer::GetFolderId(int index) {
+	SPLock lock;
+	return sp_playlistcontainer_playlist_folder_id(_ptr, index);
 }
 
-int SpotiFire::Playlistcontainer::move_playlist(IntPtr pcPtr, Int32 index, Int32 newPosition, Boolean dryRun)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (int)sp_playlistcontainer_move_playlist(pc, index, newPosition, dryRun);
+//--------------------------------------------
+// Await
+bool PlaylistContainer::IsComplete::get() {
+	SPLock lock;
+	return sp_playlistcontainer_is_loaded(_ptr);
 }
 
-int SpotiFire::Playlistcontainer::add_folder(IntPtr pcPtr, Int32 index, String^ name)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	char* _name = SP_STRING(name);
+ref struct $PlaylistContainer$Continuation {
+	Action ^_action;
+	void Handler(PlaylistContainer ^pc, EventArgs ^args) {
+		_action();
+	}
+};
 
-	int ret = (int)sp_playlistcontainer_add_folder(pc, index, _name);
-	SP_FREE(_name);
-	return ret;
+bool PlaylistContainer::AddContinuation(Action ^continuation) {
+	SPLock lock;
+	if(IsComplete) {
+		return false;
+	}
+
+	$PlaylistContainer$Continuation ^c = gcnew $PlaylistContainer$Continuation();
+	c->_action = continuation;
+	Loaded += gcnew PlaylistContainerHandler<EventArgs ^>(c, &$PlaylistContainer$Continuation::Handler);
 }
 
-IntPtr SpotiFire::Playlistcontainer::owner(IntPtr pcPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (IntPtr)(void *)sp_playlistcontainer_owner(pc);
+//--------------------------------------------
+// Callbacks
+void PlaylistContainer::loaded() {
+	SPLock lock;
+	Loaded(this, gcnew EventArgs());
 }
-
-int SpotiFire::Playlistcontainer::add_ref(IntPtr pcPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (int)sp_playlistcontainer_add_ref(pc);
-}
-
-int SpotiFire::Playlistcontainer::release(IntPtr pcPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-
-	return (int)sp_playlistcontainer_release(pc);
-}
-
-array<IntPtr>^ SpotiFire::Playlistcontainer::get_unseen_tracks(IntPtr pcPtr, IntPtr plPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-	int count = sp_playlistcontainer_get_unseen_tracks(pc, pl, NULL, 0);
-	sp_track** tracks = new sp_track*[count];
-	sp_playlistcontainer_get_unseen_tracks(pc, pl, tracks, count);
-
-	array<IntPtr>^ ret = gcnew array<IntPtr>(count);
-	Marshal::Copy((IntPtr)(void *)tracks, ret, 0, count);
-	delete tracks;
-	return ret;
-}
-
-Int32 SpotiFire::Playlistcontainer::clear_unseen_tracks(IntPtr pcPtr, IntPtr plPtr)
-{
-	sp_playlistcontainer* pc = SP_TYPE(sp_playlistcontainer, pcPtr);
-	sp_playlist* pl = SP_TYPE(sp_playlist, plPtr);
-
-	return (Int32)sp_playlistcontainer_clear_unseen_tracks(pc, pl);
-}
-
