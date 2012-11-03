@@ -210,6 +210,12 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 	finally {
 
 	}
+
+	AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(this, &Session::process_exit);
+}
+
+void Session::process_exit(Object ^sender, EventArgs ^e) {
+	GC::SuppressFinalize(this);
 }
 
 Session::~Session() {
@@ -219,6 +225,7 @@ Session::~Session() {
 Session::!Session() {
 	SPLock lock;
 	marshal_context context;
+	sp_session_logout(_ptr);
 	_shutdown = true;
 	notifier->Set();
 	sp_session_release(_ptr);

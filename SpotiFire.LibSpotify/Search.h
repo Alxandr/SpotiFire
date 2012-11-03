@@ -45,8 +45,8 @@ namespace SpotiFire {
 		virtual property int TotalArtists { int get() sealed; }
 
 	private:
-		virtual property bool IsComplete { bool get() override sealed = ISpotifyAwaitable::IsComplete::get; }
-		virtual bool AddContinuation(Action ^continuationAction) override sealed = ISpotifyAwaitable::AddContinuation;
+		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
+		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
 
 	internal:
 		static Search ^Create(SpotiFire::Session ^session, String ^query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, int playlistOffset, int playlistCount, SearchType type);

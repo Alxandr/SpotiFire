@@ -45,6 +45,8 @@ namespace SpotiFire {
 		void music_delivery(MusicDeliveryEventArgs ^e);
 		void end_of_track();
 
+		void process_exit(Object ^sender, EventArgs ^e);
+
 	public:
 		virtual property ConnectionState ConnectionState { SpotiFire::ConnectionState get() sealed; }
 

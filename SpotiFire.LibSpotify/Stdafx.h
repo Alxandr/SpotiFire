@@ -59,6 +59,8 @@ namespace SpotiFire {
 
 #define ENUM(name, intval) name(intval)
 #define SPERR(err) gcnew String(sp_error_message(err))
+#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
+#define TPQN(wc) TPQ(wc, nullptr)
 
 ref struct $WaitCallback0 {
 	Action ^_cb;
@@ -72,7 +74,7 @@ ref struct $WaitCallback0 {
 __forceinline void __TP0(Action ^action) {
 	auto wc = gcnew $WaitCallback0(action);
 	auto _wc = gcnew WaitCallback(wc, &$WaitCallback0::Callback);
-	ThreadPool::QueueUserWorkItem(_wc);
+	TPQN(_wc);
 }
 #define TP0(object, func) __TP0(gcnew Action(object, &func))
 
@@ -92,7 +94,7 @@ generic<typename T1>
 __forceinline void __TP1(Action<T1> ^action, T1 val1) {
 	auto wc = gcnew $WaitCallback1<T1>(action, val1);
 	auto _wc = gcnew WaitCallback(wc, &$WaitCallback1<T1>::Callback);
-	ThreadPool::QueueUserWorkItem(_wc);
+	TPQN(_wc);
 }
 #define TP1(type1, object, func, val1) __TP1<type1>(gcnew Action<type1>(object, &func), val1)
 
@@ -114,6 +116,6 @@ generic<typename T1, typename T2>
 __forceinline void __TP2(System::Action<T1, T2> ^action, T1 val1, T2 val2) {
 	auto wc = gcnew $WaitCallback2<T1, T2>(action, val1, val2);
 	auto _wc = gcnew WaitCallback(wc, &$WaitCallback2<T1, T2>::Callback);
-	ThreadPool::QueueUserWorkItem(_wc);
+	TPQN(_wc);
 }
 #define TP2(type1, type2, object, func, val1, val2) __TP2<type1, type2>(gcnew System::Action<type1, type2>(object, &func), val1, val2)
