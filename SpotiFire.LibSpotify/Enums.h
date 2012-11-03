@@ -356,4 +356,15 @@ namespace SpotiFire {
 		/// <summary>	Track not available on artist's request. </summary>
 		BannedByArtist = 3,
 	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent type of search. </summary>
+	///
+	/// <remarks>	Aleksander, 03.11.2012. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class SearchType
+	{
+		Standard = 0,
+		Suggest = 1,
+	};
 }

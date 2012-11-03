@@ -42,25 +42,32 @@ namespace SpotiFire
             return AwaitHelper.GetAwaiter<Search>(search);
         }
 
+        public static Search Search(this Session session,
+            string query,
+            int trackOffset, int trackCount,
+            int albumOffset, int albumCount,
+            int artistOffset, int artistCount,
+            int playlistOffset, int playlistCount,
+            SearchType type)
+        {
+            return SpotiFire.Search.Create(session, query, trackOffset, trackCount, albumOffset, albumCount, artistOffset, artistCount, playlistOffset, playlistCount, type);
+        }
+
         public static Search SearchTracks(this Session session, string query, int trackOffset, int trackCount)
         {
-            throw new NotImplementedException();
-            //return session.Search(query, trackOffset, trackCount, 0, 0, 0, 0, 0, 0, SearchType.Standard);
+            return Search(session, query, trackOffset, trackCount, 0, 0, 0, 0, 0, 0, SearchType.Standard);
         }
         public static Search SearchAlbums(this Session session, string query, int albumOffset, int albumCount)
         {
-            throw new NotImplementedException();
-            //return session.Search(query, 0, 0, albumOffset, albumCount, 0, 0, 0, 0, SearchType.Standard);
+            return Search(session, query, 0, 0, albumOffset, albumCount, 0, 0, 0, 0, SearchType.Standard);
         }
         public static Search SearchArtists(this Session session, string query, int artistOffset, int artistCount)
         {
-            throw new NotImplementedException();
-            //return session.Search(query, 0, 0, 0, 0, artistOffset, artistCount, 0, 0, SearchType.Standard);
+            return Search(session, query, 0, 0, 0, 0, artistOffset, artistCount, 0, 0, SearchType.Standard);
         }
         public static Search SearchPlaylist(this Session session, string query, int playlistOffset, int playlistCount)
         {
-            throw new NotImplementedException();
-            //return session.Search(query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, SearchType.Standard);
+            return Search(session, query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, SearchType.Standard);
         }
 
         // ArtistBrowse methods made Synchronously

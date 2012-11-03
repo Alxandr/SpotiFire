@@ -40,12 +40,12 @@ namespace SpotiFire.WinFormsTest
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            //var search = await session.SearchTracks(textBox1.Text, 0, 100);
-            //List<CachedTrack> tracks = new List<CachedTrack>(search.Tracks.Count);
-            //foreach (var t in search.Tracks)
-            //    tracks.Add(await CachedTrack.Make(t));
+            var search = await session.SearchTracks(textBox1.Text, 0, 100);
+            List<CachedTrack> tracks = new List<CachedTrack>(search.Tracks.Count);
+            foreach (var t in search.Tracks)
+                tracks.Add(await CachedTrack.Make(t));
 
-            //dataGridView1.DataSource = tracks;
+            dataGridView1.DataSource = tracks;
         }
 
         private async void Form1_Load(object sender, EventArgs e)
