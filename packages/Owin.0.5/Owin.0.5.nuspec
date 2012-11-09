@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Owin</id>
+    <version>0.5</version>
+    <authors>Owin.Hosting contributors</authors>
+    <owners>Owin.Hosting contributors</owners>
+    <licenseUrl>https://github.com/owin-contrib/owin-hosting/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/owin-contrib/owin-hosting/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>OWIN startup interfaces</description>
+    <tags>OWIN</tags>
+  </metadata>
+</package>

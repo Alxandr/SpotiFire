@@ -88,64 +88,68 @@ namespace SpotiFire
             return AwaitHelper.GetAwaiter<PlaylistContainer>(pc);
         }
 
+        private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> _waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
+        private readonly static Timer _timer = new Timer(_timer_Tick, new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>(), Timeout.Infinite, 100);
+        private volatile static bool _running = false;
+
+        private static void _timer_Tick(object _state)
+        {
+            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = (List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>)_state;
+            lock (_waiting)
+            {
+                if (_waiting.Count > 0)
+                {
+                    waiting.AddRange(_waiting);
+                    _waiting.Clear();
+                }
+            }
+
+            if (waiting.Count > 0)
+            {
+                for (var i = 0; i < waiting.Count; i++)
+                {
+                    var w = waiting[i];
+                    if (w.Item1.IsLoaded && w.Item1.IsReady)
+                    {
+                        w.Item2.SetResult(w.Item1);
+                        waiting.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+            else
+            {
+                lock (_waiting)
+                {
+                    if (_waiting.Count == 0)
+                    {
+                        _timer.Change(Timeout.Infinite, 100);
+                        _running = false;
+                    }
+                }
+            }
+        }
+
         // Load made a task
-        private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
-        private static bool running = false;
         private static Task<IAsyncLoaded> Load(this IAsyncLoaded loadable)
         {
-            Action start = () =>
-            {
-                running = true;
-                ThreadPool.QueueUserWorkItem(delegate
-                {
-                    while (true)
-                    {
-                        Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>[] l;
-                        Thread.Sleep(100);
-                        lock (waiting)
-                            l = waiting.ToArray();
-
-                        HashSet<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> r = new HashSet<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
-
-                        foreach (var i in l)
-                            if (i.Item1.IsLoaded && i.Item1.IsReady)
-                            {
-                                i.Item2.SetResult(i.Item1);
-                                r.Add(i);
-                            }
-
-                        lock (waiting)
-                        {
-                            waiting.RemoveAll(e => r.Contains(e));
-                            if (waiting.Count == 0)
-                            {
-                                running = false;
-                                break;
-                            }
-                        }
-                    }
-                });
-            };
-
             TaskCompletionSource<IAsyncLoaded> tcs = new TaskCompletionSource<IAsyncLoaded>();
             if (loadable.IsLoaded && loadable.IsReady)
+            {
                 tcs.SetResult(loadable);
-            else if (running)
-                lock (waiting)
-                    if (running)
-                        waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
-                    else
-                    {
-                        waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
-                        start();
-                    }
+            }
             else
-                lock (waiting)
+            {
+                lock (_waiting)
                 {
-                    waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
-                    start();
+                    _waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
+                    if (!_running)
+                    {
+                        _running = true;
+                        _timer.Change(0, 100);
+                    }
                 }
-
+            }
             return tcs.Task;
         }
 

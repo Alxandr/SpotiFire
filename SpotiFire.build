@@ -1,24 +1,45 @@
 <?xml version="1.0"?>
 <project default="build-all" xmlns="http://nant.sourceforge.net/release/0.92/nant.xsd" name="SpotiFire">
-	<property name="project.version" value="0.5" />
+	<loadtasks assembly="${nant::get-base-directory()}/../../nantcontrib/NAnt.Contrib.Tasks.dll" />
 	<property name="project.config" value="debug" />
 	<property name="basedir" value="${project::get-base-directory()}" />
 	<property name="name" value="${project::get-name()}" />
 
 	<target name="init">
-		<call target="${project.config}" />
+		<call target="${project.config}" cascade="false" />
+	</target>
+
+	<target name="post-build">
+		<property name="post-target" value="post-${project.config}" />
+		<call target="${post-target}" if="${target::exists(post-target)}" cascade="false" />
 	</target>
 
 	<target name="debug">
 		<property name="project.config" value="debug" />
 	    <property name="build.debug" value="true" />
 	    <property name="basedir.suffix" value="-debug" />
+
+		<version buildtype="NoIncrement" revisiontype="Increment" prefix="build.number" />
 	</target>
 
 	<target name="release">
 		<property name="project.config" value="release" />
 		<property name="build.debug" value="true" />
 	    <property name="basedir.suffix" value="" />
+
+	    <version buildtype="Increment" revisiontype="Increment" prefix="build.number" />
+	</target>
+
+	<target name="post-release" depends="nuget-update">
+
+	</target>
+
+	<target name="nuget-update">
+		<property name="nuget" value="${basedir}/tools/nuget/nuget.exe" />
+		<exec program="${nuget}">
+			<arg value="Update" />
+			<arg value="-self" />
+		</exec>
 	</target>
 
 	<target name="build" depends="init">
@@ -26,9 +47,12 @@
 			<include name="**net40/*.dll" />
 		</assemblyfileset>
 
+		<property name="sp.build.dir" value="${basedir}/bin/${name}_${build.number.version}${basedir.suffix}" readonly="true" />
+		<property name="sp.build.obj" value="${basedir}/obj/${name}_${build.number.version}${basedir.suffix}" readonly="true" />
+		<property name="build.dir" value="${sp.build.dir}/SpotiFire" />
+		<property name="build.obj" value="${sp.build.obj}/SpotiFire" />
+		<property name="main.build.dir" value="${build.dir}" readonly="true" />
 
-		<property name="build.dir" value="${basedir}/bin/${name}_${project.version}${basedir.suffix}" />
-		<property name="build.obj" value="${basedir}/obj/${name}_${project.version}${basedir.suffix}" />
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${build.obj}" />
 		<property name="tmp.cpp" value="${build.obj}/tmp.cpp" />
@@ -44,6 +68,7 @@
 				<echo message="#include &quot;${filename}&quot;&#10;" append="true" file="${tmp.cpp}" />
 			</do>
 		</foreach>
+		<echo message="&#10;&#10;[assembly:System::CLSCompliantAttribute(true)];&#10;" append="true" file="${tmp.cpp}" />
 
 		<foreach item="File" property="filename">
 			<in>
@@ -64,6 +89,26 @@
 			</do>
 		</foreach>
 
+		<property name="tmp.cs" value="${build.obj}/tmp-assembly-info.cs" />
+		<asminfo output="${tmp.cs}" language="CSharp">
+			<imports>
+				<import namespace="System" />
+				<import namespace="System.Reflection" />
+				<import namespace="System.Runtime.CompilerServices" />
+				<import namespace="System.Runtime.InteropServices" />
+				<import namespace="System.Security.Permissions" />
+			</imports>
+			<attributes>
+				<attribute type="AssemblyTitleAttribute" value="SpotiFire" />
+				<attribute type="AssemblyVersionAttribute" value="${build.number.version}" />
+				<attribute type="AssemblyDescriptionAttribute" value="" />
+				<attribute type="AssemblyCopyrightAttribute" value="" />
+				<attribute type="ComVisibleAttribute" value="false" />
+				<attribute type="CLSCompliantAttribute" value="true" />
+				<attribute type="SecurityPermissionAttribute" value="SecurityAction.RequestMinimum, UnmanagedCode = true" asis="true" />
+			</attributes>
+		</asminfo>
+
 		<csc target="module" output="${build.obj}/SpotiFire.netmodule" doc="${build.obj}/managed.xml">
 			<modules basedir="${build.obj}">
 				<include name="tmp.obj" />
@@ -71,6 +116,8 @@
 			<references refid="all_refs" />
 			<sources basedir="${basedir}/SpotiFire.SpotifyLib">
 				<include name="**.cs" />
+				<include name="${tmp.cs}" />
+				<exclude name="Properties/AssemblyInfo.cs" />
 			</sources>
 			<nowarn>
 		        <warning number="1684" /> <!-- do not report warnings for extern members not found -->
@@ -120,14 +167,45 @@
 				<include name="*.xml" />
 			</fileset>
 		</copy>
+
+		<zip zipfile="${sp.build.dir}/SpotiFire.zip">
+			<fileset basedir="${build.dir}" prefix="SpotiFire">
+				<include name="**/*" />
+			</fileset>
+		</zip>
+
+		<call target="post-build" />
 	</target>
 
 	<target name="build-extras" depends="build">
-		<nant>
-			<buildfiles basedir="${basedir}">
-				<include name="*/*.build" />
-			</buildfiles>
-		</nant>
+		<foreach item="File" property="buildfile">
+			<in>
+				<items basedir="${basedir}">
+					<include name="*/*.build" />
+				</items>
+			</in>
+			<do>
+				<property name="build.name" value="${path::get-file-name-without-extension(buildfile)}" />
+				<property name="build.dir" value="${sp.build.dir}/${build.name}" />
+				<property name="build.obj" value="${sp.build.obj}/${build.name}" />
+
+
+				<mkdir dir="${build.dir}" />
+				<mkdir dir="${build.obj}" />
+
+				<copy todir="${build.dir}">
+					<fileset basedir="${main.build.dir}">
+						<include name="*" />
+					</fileset>
+				</copy>
+				<nant buildfile="${buildfile}" />
+				<zip zipfile="${sp.build.dir}/${build.name}.zip">
+					<fileset basedir="${build.dir}" prefix="${build.name}">
+						<include name="**/*" />
+					</fileset>
+				</zip>
+			</do>
+		</foreach>
 	</target>
 
 	<target name="build-all" depends="build build-extras" />

@@ -1,113 +1,24 @@
 
-C:\Users\Aleksander\Documents\GitHub\SpotiFire>tools\nant\nant  
+C:\Users\Aleksander\Documents\GitHub\SpotiFire>tools\nant\nant clean build 
 NAnt 0.92 (Build 0.92.4543.0; release; 09.06.2012)
 Copyright (C) 2001-2012 Gerry Shaw
 http://nant.sourceforge.net
 
 Buildfile: file:///C:/Users/Aleksander/Documents/GitHub/SpotiFire/SpotiFire.build
 Target framework: Microsoft .NET Framework 4.5
-Target(s) specified: build-all 
+Target(s) specified: clean build 
 
 
-init:
+clean:
 
+   [delete] Deleting directory 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\bin'.
 
-debug:
+BUILD FAILED
 
+C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.build(201,4):
+Cannot delete directory 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\bin'.
+    The directory is not empty.
+    
 
-build:
-
-   [delete] Deleting file C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\tmp.cpp.
-       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Playlistcontainer.cpp' has been updated, recompiling.
-       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
-       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmpAF8F.tmp.
-       [cl] /c
-       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/Playlistcontainer.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
-       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
-       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
-       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
-       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.LibSpotify\Playlistcontainer.cpp"
-       [cl] 
-       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmpAF8F.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
-       [cl] Playlistcontainer.cpp
-       [cl] 'C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.cpp' has been updated, recompiling.
-       [cl] Compiling 1 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug'.
-       [cl] Contents of C:\Users\Aleksander\AppData\Local\Temp\tmpB432.tmp.
-       [cl] /c
-       [cl] /clr /LN /doc"C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.xdc" /GS /EHa /MP /D _UNICODE /D UNICODE /D INTEGRATED
-       [cl] /FU "C:\Users\Aleksander\Documents\GitHub\SpotiFire\packages\NLog.2.0.0.2000\lib\net40\NLog.dll"
-       [cl] /Fd"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
-       [cl] /Fo"C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug/"
-       [cl] "C:\Users\Aleksander\Documents\GitHub\SpotiFire/obj/SpotiFire_0.5-debug/tmp.cpp"
-       [cl] 
-       [cl] Starting 'cl (@"C:\Users\Aleksander\AppData\Local\Temp\tmpB432.tmp" /nologo)' in 'C:\Users\Aleksander\Documents\GitHub\SpotiFire'
-       [cl] tmp.cpp
-      [csc] Compiling 9 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\obj\SpotiFire_0.5-debug\SpotiFire.netmodule'.
-     [link] Linking 19 files.
-     [link] Generating code
-     [link] Finished generating code
-     [exec] Microsoft (R)  XML Document Comments Merge Tool  Version 11.00.50727
-     [exec] Copyright (C)  Microsoft Corporation.  All rights reserved.
-     [exec] 
- [xmlstrip] Found '314' nodes matching XPath expression '/doc/members/member[not(contains(@name, 'SpotiFire'))]'.
- [xmlmerge] Found '1' nodes matching XPath expression '/doc/members'.
- [xmlmerge] Found '1' nodes matching XPath expression '/doc/members'.
-     [copy] Copying 3 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\bin\SpotiFire_0.5-debug'.
-
-build-extras:
-
-     [nant] C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.TestClient\Console.build 
-            Buildfile: file:///C:/Users/Aleksander/Documents/GitHub/SpotiFire/SpotiFire.TestClient/Console.build
-            Target framework: Microsoft .NET Framework 4.5
-            Target(s) specified: build 
-            
-            
-            build:
-            
-                  [csc] Compiling 6 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\bin\SpotiFire_0.5-debug\Console.exe'.
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Data.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Data.OracleClient.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.EnterpriseServices.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Transactions.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Web.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'mscorlib.dll' targets a different processor
-            
-            BUILD SUCCEEDED
-            
-            Total time: 0.4 seconds.
-            
-     [nant] C:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\WinForms.build 
-            Buildfile: file:///C:/Users/Aleksander/Documents/GitHub/SpotiFire/SpotiFire.WinFormsTest/WinForms.build
-            Target framework: Microsoft .NET Framework 4.5
-            Target(s) specified: build 
-            
-            
-            build:
-            
-                  [csc] Compiling 12 files to 'C:\Users\Aleksander\Documents\GitHub\SpotiFire\bin\SpotiFire_0.5-debug\WinForms.exe'.
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Data.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Data.OracleClient.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.EnterpriseServices.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Transactions.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'System.Web.dll' targets a different processor
-                  [csc] warning CS1607: Assembly generation -- Referenced assembly 'mscorlib.dll' targets a different processor
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(41,28): warning CS1998: This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(123,51): warning CS1998: This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(105,20): warning CS0649: Field 'SpotiFire.WinFormsTest.Form1.CachedTrack._name' is never assigned to, and will always have its default value null
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(106,18): warning CS0649: Field 'SpotiFire.WinFormsTest.Form1.CachedTrack._isStarred' is never assigned to, and will always have its default value false
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(107,18): warning CS0649: Field 'SpotiFire.WinFormsTest.Form1.CachedTrack._isAvail' is never assigned to, and will always have its default value false
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(108,20): warning CS0649: Field 'SpotiFire.WinFormsTest.Form1.CachedTrack._artist' is never assigned to, and will always have its default value null
-                  [csc] c:\Users\Aleksander\Documents\GitHub\SpotiFire\SpotiFire.WinFormsTest\Form1.cs(109,20): warning CS0649: Field 'SpotiFire.WinFormsTest.Form1.CachedTrack._duration' is never assigned to, and will always have its default value null
-            
-            BUILD SUCCEEDED
-            
-            Total time: 0.3 seconds.
-            
-
-build-all:
-
-
-BUILD SUCCEEDED
-
-Total time: 4.7 seconds.
+Total time: 0.1 seconds.
 

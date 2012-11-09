@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Gate</id>
+    <version>0.20</version>
+    <authors>Gate contributors</authors>
+    <owners>Gate contributors</owners>
+    <licenseUrl>https://github.com/owin/gate/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/owin/gate</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Gate is a utility library for locating, manufacturing, and hosting OWIN applications.</description>
+    <language>en-US</language>
+    <dependencies>
+      <dependency id="Owin" version="0.5" />
+    </dependencies>
+  </metadata>
+</package>
