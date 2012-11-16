@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NAnt.NuGet.Tasks</name>
+    </assembly>
+    <members>
+        <member name="M:NAnt.NuGet.Tasks.Common.PackageExtractor.InstallPackage(NuGet.IPackageManager,NuGet.IPackage)">
+            <summary>
+            Install a package with locking to allow multiple concurrent extractions to work without disk contention.
+            </summary>
+        </member>
+        <member name="M:NAnt.NuGet.Tasks.Common.PackageExtractor.GenerateUniqueToken(NuGet.IPackageManager,System.String,NuGet.SemanticVersion)">
+            <summary>
+            We want to base the lock name off of the full path of the package, however, the Mutex looks for files on disk if a path is given.
+            Additionally, it also fails if the string is longer than 256 characters. Therefore we obtain a base-64 encoded hash of the path.
+            </summary>
+            <seealso cref="!:http://social.msdn.microsoft.com/forums/en-us/clr/thread/D0B3BF82-4D23-47C8-8706-CC847157AC81"/>
+        </member>
+        <member name="M:NAnt.NuGet.Tasks.Types.NuGetContentSet.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NAnt.Core.Types.FileSet"/> class.
+            </summary>
+        </member>
+        <member name="M:NAnt.NuGet.Tasks.Types.NuGetContentSet.#ctor(NAnt.NuGet.Tasks.Types.NuGetContentSet)">
+            <summary>
+            copy constructor
+            </summary>
+            <param name="fs"></param>
+        </member>
+        <member name="M:NAnt.NuGet.Tasks.Types.NuGetContentSet.CopyTo(NAnt.NuGet.Tasks.Types.NuGetContentSet)">
+            <summary>
+            Copies all instance data of the <see cref="T:NAnt.Core.Types.FileSet"/> to a given
+            <see cref="T:NAnt.Core.Types.FileSet"/>.
+            </summary>
+        </member>
+    </members>
+</doc>

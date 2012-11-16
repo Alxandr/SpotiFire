@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<project default="build-all" xmlns="http://nant.sourceforge.net/release/0.92/nant.xsd" name="SpotiFire">
+<project default="build-all" xmlns="http://nant.sf.net/release/0.92/nant.xsd" name="SpotiFire">
 	<loadtasks assembly="${nant::get-base-directory()}/../../nantcontrib/NAnt.Contrib.Tasks.dll" />
+	<loadtasks assembly="${nant::get-base-directory()}/../../nant.nuget/NAnt.NuGet.Tasks.dll" />
 	<property name="project.config" value="debug" />
 	<property name="basedir" value="${project::get-base-directory()}" />
 	<property name="name" value="${project::get-name()}" />
@@ -30,16 +31,41 @@
 	    <version buildtype="Increment" revisiontype="Increment" prefix="build.number" />
 	</target>
 
-	<target name="post-release" depends="nuget-update">
-
-	</target>
-
-	<target name="nuget-update">
-		<property name="nuget" value="${basedir}/tools/nuget/nuget.exe" />
-		<exec program="${nuget}">
-			<arg value="Update" />
-			<arg value="-self" />
-		</exec>
+	<target name="post-release">
+		<nuget-pack id="SpotiFire" version="${build.number.version}" title="SpotiFire" authors="alxandr" owners="alxandr" outdir="${build.dir}/.nuget" property="nuget.package">
+			<description>User libspotify in your .NET application</description>
+			<content type="lib" framework="net45" basedir="${build.dir}">
+				<include name="Bass.Net.*" />
+				<include name="SpotiFire.*" />
+				<exclude name="*.pdb" />
+			</content>
+			<content type="content" basedir="${build.dir}">
+				<include name="bass.dll" />
+				<include name="libspotify.dll" />
+			</content>
+			<framework-assemblies>
+				<assembly name="System" />
+				<assembly name="Microsoft.CSharp" />
+				<assembly name="System.Core" />
+				<assembly name="System.Data" />
+				<assembly name="System.Data.DataSetExtensions" />
+				<assembly name="System.Drawing" />
+				<assembly name="System.Xml" />
+				<assembly name="System.Xml.Linq" />
+			</framework-assemblies>
+			<dependencies>
+				<dependency id="NLog" version="2.0.0.2000" />
+			</dependencies>
+		</nuget-pack>
+		<nuget-publish>
+			<packages>
+				<include name="${nuget.package}" />
+			</packages>
+			<feeds>
+				<local-feed path="C:\.nuget\.local\.feed" />
+				<server-feed apikey-file="C:\.nuget\api.key" />
+			</feeds>
+		</nuget-publish>
 	</target>
 
 	<target name="build" depends="init">
@@ -168,7 +194,7 @@
 			</fileset>
 		</copy>
 
-		<zip zipfile="${sp.build.dir}/SpotiFire.zip">
+		<zip zipfile="${sp.build.dir}/SpotiFire-${build.number.version}.zip">
 			<fileset basedir="${build.dir}" prefix="SpotiFire">
 				<include name="**/*" />
 			</fileset>
@@ -199,7 +225,7 @@
 					</fileset>
 				</copy>
 				<nant buildfile="${buildfile}" />
-				<zip zipfile="${sp.build.dir}/${build.name}.zip">
+				<zip zipfile="${sp.build.dir}/${build.name}-${build.number.version}.zip">
 					<fileset basedir="${build.dir}" prefix="${build.name}">
 						<include name="**/*" />
 					</fileset>
