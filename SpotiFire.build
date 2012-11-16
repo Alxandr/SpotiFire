@@ -23,17 +23,15 @@
 		<version buildtype="NoIncrement" revisiontype="Increment" prefix="build.number" />
 	</target>
 
-	<target name="release">
-		<property name="project.config" value="release" />
-		<property name="build.debug" value="true" />
-	    <property name="basedir.suffix" value="" />
-
-	    <version buildtype="Increment" revisiontype="Increment" prefix="build.number" />
-	</target>
-
-	<target name="post-release">
-		<nuget-pack id="SpotiFire" version="${build.number.version}" title="SpotiFire" authors="alxandr" owners="alxandr" outdir="${build.dir}/.nuget" property="nuget.package">
-			<description>User libspotify in your .NET application</description>
+	<target name="post-debug">
+		<nuget-pack id="SpotiFire"
+			        version="${build.number.version}-debug"
+			        title="SpotiFire"
+			        authors="alxandr"
+			        owners="alxandr"
+			        outdir="${build.dir}/.nuget"
+			        property="nuget.package"
+			        description="User libspotify in your .NET application">
 			<content type="lib" framework="net45" basedir="${build.dir}">
 				<include name="Bass.Net.*" />
 				<include name="SpotiFire.*" />
@@ -53,9 +51,55 @@
 				<assembly name="System.Xml" />
 				<assembly name="System.Xml.Linq" />
 			</framework-assemblies>
-			<dependencies>
-				<dependency id="NLog" version="2.0.0.2000" />
-			</dependencies>
+			<dependencies refid="nuget.dependencies" />
+		</nuget-pack>
+		<nuget-publish>
+			<packages>
+				<include name="${nuget.package}" />
+			</packages>
+			<feeds>
+				<local-feed path="C:\.nuget\.local\.feed" />
+			</feeds>
+		</nuget-publish>
+	</target>
+
+	<target name="release">
+		<property name="project.config" value="release" />
+		<property name="build.debug" value="true" />
+	    <property name="basedir.suffix" value="" />
+
+	    <version buildtype="Increment" revisiontype="Increment" prefix="build.number" />
+	</target>
+
+	<target name="post-release">
+		<nuget-pack id="SpotiFire"
+			        version="${build.number.version}"
+			        title="SpotiFire"
+			        authors="alxandr"
+			        owners="alxandr"
+			        outdir="${build.dir}/.nuget"
+			        property="nuget.package"
+			        description="User libspotify in your .NET application">
+			<content type="lib" framework="net45" basedir="${build.dir}">
+				<include name="Bass.Net.*" />
+				<include name="SpotiFire.*" />
+				<exclude name="*.pdb" />
+			</content>
+			<content type="content" basedir="${build.dir}">
+				<include name="bass.dll" />
+				<include name="libspotify.dll" />
+			</content>
+			<framework-assemblies>
+				<assembly name="System" />
+				<assembly name="Microsoft.CSharp" />
+				<assembly name="System.Core" />
+				<assembly name="System.Data" />
+				<assembly name="System.Data.DataSetExtensions" />
+				<assembly name="System.Drawing" />
+				<assembly name="System.Xml" />
+				<assembly name="System.Xml.Linq" />
+			</framework-assemblies>
+			<dependencies refid="nuget.dependencies" />
 		</nuget-pack>
 		<nuget-publish>
 			<packages>
@@ -69,8 +113,14 @@
 	</target>
 
 	<target name="build" depends="init">
+		<nuget-get-dependencies solution-dir="${basedir}" project-dir="${basedir}/SpotiFire.SpotifyLib" id="nuget.dependencies" allow-newer="true" />
+
+		<nuget-get-files solution-dir="${basedir}" files-property="nuget.files" references-property="nuget.references" framework="net45">
+			<dependencies refid="nuget.dependencies" />
+		</nuget-get-files>
+
 		<assemblyfileset id="all_refs" basedir="packages">
-			<include name="**net40/*.dll" />
+			<patternset refid="nuget.references" />
 		</assemblyfileset>
 
 		<property name="sp.build.dir" value="${basedir}/bin/${name}_${build.number.version}${basedir.suffix}" readonly="true" />
@@ -184,7 +234,7 @@
 		</copy>
 		<copy todir="${build.dir}" flatten="true">
 			<fileset basedir="packages">
-				<include name="**net40/**" />
+				<patternset refid="nuget.files" />
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}" flatten="true">

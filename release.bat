@@ -1,0 +1,1 @@
+@nant -D:project.config=release %*
