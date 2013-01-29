@@ -5,6 +5,7 @@
 	<property name="project.config" value="debug" unless="${property::exists('project.config')}" />
 	<property name="basedir" value="${project::get-base-directory()}" />
 	<property name="name" value="${project::get-name()}" />
+	<property name="cl.options" value="" />
 
 	<target name="init">
 		<call target="${project.config}" cascade="false" />
@@ -19,6 +20,7 @@
 		<property name="project.config" value="debug" />
 	    <property name="build.debug" value="true" />
 	    <property name="basedir.suffix" value="-debug" />
+	    <property name="cl.options" value="/GS /RTC /Yd /Zd /Zi" />
 
 		<version buildtype="NoIncrement" revisiontype="Increment" prefix="build.number" />
 	</target>
@@ -38,6 +40,7 @@
 		<property name="project.config" value="release" />
 		<property name="build.debug" value="true" />
 	    <property name="basedir.suffix" value="" />
+	    <property name="cl.options" value="/Ox" />
 
 	    <version buildtype="Increment" revisiontype="Increment" prefix="build.number" />
 	</target>
@@ -132,7 +135,7 @@
 			</in>
 			<do>
 				<property name="doc" value="${build.obj}/${path::get-file-name-without-extension(filename)}.xdc" />
-				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot; /GS /EHa /MP /Ob1 /D _UNICODE /D UNICODE /D INTEGRATED" verbose="false">
+				<cl outputdir="${build.obj}" options="/clr /LN /doc&quot;${doc}&quot; /EHa /MP ${cl.options} /D _UNICODE /D UNICODE /D INTEGRATED" verbose="false">
 					<sources>
 						<include name="${filename}" asis="true" />
 					</sources>
@@ -177,7 +180,7 @@
 		    </nowarn>
 		</csc>
 
-		<link output="${build.obj}/${name}.dll" options="/LTCG /FIXED /CLRIMAGETYPE:IJW /NOENTRY /DLL /ignore:4248">
+		<link output="${build.obj}/${name}.dll" options="/LTCG /FIXED:NO /CLRIMAGETYPE:IJW /NOENTRY /DLL /ignore:4248">
 			<sources basedir="${build.obj}">
 				<include name="*.obj" />
 				<include name="*.netmodule" />
