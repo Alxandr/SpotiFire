@@ -204,6 +204,10 @@ Search ^Search::Create(SpotiFire::Session ^session,
 	return ret;
 }
 
+
+
+//------------------------------------------
+// Await
 void Search::complete() {
 	array<Action ^> ^continuations = nullptr;
 	{
@@ -223,8 +227,6 @@ void Search::complete() {
 	}
 }
 
-//------------------------------------------
-// Await
 bool Search::IsComplete::get() {
 	SPLock lock;
 	return _complete;

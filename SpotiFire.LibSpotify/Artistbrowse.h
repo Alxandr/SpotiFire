@@ -26,7 +26,7 @@ namespace SpotiFire {
 		!ArtistBrowse(); // finalizer
 		~ArtistBrowse(); // destructor
 
-		//static ArtistBrowse ^Create(Session ^session, Artist ^album);
+		static ArtistBrowse ^Create(Session ^session, Artist ^album, ArtistBrowseType type);
 
 		// Events
 		void OnCompleted();

@@ -62,13 +62,15 @@ String ^ArtistBrowse::Biography::get() {
 	return UTF8(sp_artistbrowse_biography(_ptr));
 }
 
-//void SP_CALLCONV completed(sp_artistbrowse *browse, void *userdata);
-//ArtistBrowse ^ArtistBrowse::Create(Session ^session, SpotiFire::Artist ^artist) {
-//	SPLock lock;
-//	ArtistBrowse ^ret;
-//	ret = gcnew ArtistBrowse(session, sp_artistbrowse_create(session->_ptr, artist->_ptr, &completed, new gcroot<ArtistBrowse ^>(ret)));
-//	return ret;
-//}
+void SP_CALLCONV completed(sp_artistbrowse *browse, void *userdata);
+ArtistBrowse ^ArtistBrowse::Create(SpotiFire::Session ^session, SpotiFire::Artist ^artist, SpotiFire::ArtistBrowseType type) {
+	SPLock lock;
+	ArtistBrowse ^ret;
+	sp_artistbrowse *ptr = sp_artistbrowse_create(session->_ptr, artist->_ptr, (sp_artistbrowse_type)type, &completed, new gcroot<ArtistBrowse ^>(ret));
+	ret = gcnew ArtistBrowse(session, ptr);
+	sp_artistbrowse_release(ptr);
+	return ret;
+}
 
 //------------------ Event Handlers ------------------//
 

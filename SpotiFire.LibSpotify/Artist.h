@@ -25,6 +25,6 @@ namespace SpotiFire {
 		virtual property bool IsReady { bool get() sealed; }
 		virtual property bool IsLoaded { bool get() sealed; }
 		virtual property String ^Name { String^ get() sealed; }
-		virtual ArtistBrowse ^Browse() sealed;
+		virtual ArtistBrowse ^Browse(ArtistBrowseType type) sealed;
 	};
 }

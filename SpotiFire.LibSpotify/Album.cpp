@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
+#include <vector>
 
 #include "Album.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr

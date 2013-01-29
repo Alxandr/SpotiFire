@@ -13,23 +13,7 @@ namespace SpotiFire
         // Image methods
         public static Image GetImageFromId(this Session session, string id)
         {
-            throw new NotImplementedException();
-            //return Image.FromId(session, id);
-        }
-
-        public static System.Drawing.Image GetImage(this Image image)
-        {
-            if (image == null)
-                throw new ArgumentNullException("image");
-
-            if (!image.IsLoaded)
-                throw new InvalidOperationException("Can't convert to Image before data is loaded.");
-
-            if (image.Format != ImageFormat.Jpeg)
-                throw new InvalidOperationException("Can only parse Jpeg image data.");
-
-            throw new NotImplementedException();
-            //return System.Drawing.Image.FromStream(new MemoryStream(image.Data));
+            return Image.Create(session, id);
         }
 
         public static void Save(this Image image, string location)
@@ -86,6 +70,12 @@ namespace SpotiFire
         public static AwaitHelper.AwaitableAwaiter<PlaylistContainer> GetAwaiter(this PlaylistContainer pc)
         {
             return AwaitHelper.GetAwaiter<PlaylistContainer>(pc);
+        }
+
+        // Image
+        public static AwaitHelper.AwaitableAwaiter<Image> GetAwaiter(this Image image)
+        {
+            return AwaitHelper.GetAwaiter<Image>(image);
         }
 
         private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> _waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();

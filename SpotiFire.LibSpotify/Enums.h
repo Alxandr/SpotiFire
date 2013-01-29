@@ -367,4 +367,19 @@ namespace SpotiFire {
 		Standard = 0,
 		Suggest = 1,
 	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent type of artist-browse. </summary>
+	///
+	/// <remarks>	Aleksander, 29.01.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class ArtistBrowseType
+	{
+		/// <summary>	An enum constant representing the full option (depricated). </summary>
+		Full = 0,
+		/// <summary>	An enum constant representing the no tracks option. </summary>
+		NoTracks = 1,
+		/// <summary>	An enum constant representing the no albums option. </summary>
+		NoAlbums = 2,
+	};
 }

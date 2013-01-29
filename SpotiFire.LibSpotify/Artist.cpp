@@ -47,7 +47,6 @@ String ^Artist::Name::get() {
 	return UTF8(sp_artist_name(_ptr));
 }
 
-ArtistBrowse ^Artist::Browse() {
-	throw gcnew NotImplementedException("Artist::Browse");
-	//return ArtistBrowse::Create(_session, this);
+ArtistBrowse ^Artist::Browse(ArtistBrowseType type) {
+	return ArtistBrowse::Create(_session, this, type);
 }

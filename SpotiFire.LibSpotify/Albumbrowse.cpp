@@ -110,7 +110,9 @@ void SP_CALLCONV completed(sp_albumbrowse *browse, void *userdata);
 AlbumBrowse ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^album) {
 	SPLock lock;
 	AlbumBrowse ^ret;
-	ret = gcnew AlbumBrowse(session, sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, new gcroot<AlbumBrowse ^>(ret)));
+	sp_albumbrowse *ptr = sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, new gcroot<AlbumBrowse ^>(ret));
+	ret = gcnew AlbumBrowse(session, ptr);
+	sp_albumbrowse_release(ptr);
 	return ret;
 }
 
