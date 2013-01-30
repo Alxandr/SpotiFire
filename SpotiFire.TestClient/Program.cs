@@ -64,7 +64,7 @@ namespace SpotiFire.TestClient
             Console.WriteLine("Found track " + track.Name);
             await track.Album;
             var coverId = track.Album.CoverId;
-            var image = await session.GetImageFromId(coverId);
+            var image = await Image.FromId(session, coverId);
             var imageData = image.GetImage();
             imageData.Save("cover.jpg");
 

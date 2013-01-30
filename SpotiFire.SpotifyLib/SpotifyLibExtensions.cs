@@ -10,12 +10,6 @@ namespace SpotiFire
 
     public static class SessionExtensions
     {
-        // Image methods
-        public static Image GetImageFromId(this Session session, string id)
-        {
-            return Image.Create(session, id);
-        }
-
         public static void Save(this Image image, string location)
         {
             image.GetImage().Save(location);

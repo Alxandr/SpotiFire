@@ -1,14 +1,8 @@
 #include "stdafx.h"
 
 #include "Albumbrowse.h"
-#include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
-#include <string.h>
-static __forceinline String^ UTF8(const char *text)
-{
-	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
-}
 
 AlbumBrowse::AlbumBrowse(SpotiFire::Session ^session, sp_albumbrowse *ptr) {
 	SPLock lock;

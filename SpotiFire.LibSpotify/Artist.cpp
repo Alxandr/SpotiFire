@@ -1,14 +1,7 @@
 #include "stdafx.h"
 
 #include "Artist.h"
-#include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
-
-#include <string.h>
-static __forceinline String^ UTF8(const char *text)
-{
-	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
-}
 
 Artist::Artist(SpotiFire::Session ^session, sp_artist *ptr) {
 	SPLock lock;

@@ -1,15 +1,7 @@
 #include "stdafx.h"
-#include <vector>
 
 #include "Image.h"
-#include "include\libspotify\api.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
-
-#include <string.h>
-static __forceinline String^ UTF8(const char *text)
-{
-	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
-}
 
 static __forceinline const std::vector<byte> HTB(String ^hex)
 {
@@ -81,6 +73,10 @@ Image ^Image::Create(SpotiFire::Session ^session, String ^id) {
 	ret = gcnew Image(session, ptr);
 	sp_image_release(ptr);
 	return ret;
+}
+
+Image ^Image::FromId(SpotiFire::Session ^session, String ^id) {
+	return Image::Create(session, id);
 }
 
 //------------------ Event Handlers ------------------//

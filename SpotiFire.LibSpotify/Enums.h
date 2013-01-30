@@ -229,7 +229,6 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 20.10.2012. </remarks>
 	///-------------------------------------------------------------------------------------------------
-
 	public enum class ConnectionState
 	{
 		/// <summary>

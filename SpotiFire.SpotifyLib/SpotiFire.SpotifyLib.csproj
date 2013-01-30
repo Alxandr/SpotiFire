@@ -54,7 +54,6 @@
     <Compile Include="SpotifyLibExtensions.cs" />
     <Compile Include="Spotify.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpotifyException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\libspotify.dll">

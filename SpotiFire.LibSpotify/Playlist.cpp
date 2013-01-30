@@ -1,27 +1,11 @@
 #include "stdafx.h"
 
 #include "Playlist.h"
-#include "include\libspotify\api.h"
-#include <string.h>
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
 using namespace System::Runtime::InteropServices;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
-
-#include <string.h>
-#include <vector>
-static __forceinline String^ UTF8(const char *text)
-{
-	if(!text)
-		return nullptr;
-	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
-}
-
-static __forceinline String ^UTF8(const std::vector<char> text)
-{
-	return UTF8(text.data());
-}
 
 static __forceinline DateTime TIMESTAMP(int timestamp) {
 	DateTime dt(1970, 1, 1, 0, 0, 0, 0);

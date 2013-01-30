@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "Session.h"
-#include "include\libspotify\api.h"
 
 
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
@@ -12,10 +11,6 @@
 //#define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 
 #include <string.h>
-static __forceinline String^ UTF8(const char *text)
-{
-	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
-}
 
 SP_CALL logged_in(sp_session *session, sp_error);
 SP_CALL logged_out(sp_session *session);
@@ -263,34 +258,40 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 	return _login->Task;
 }
 
+Task<Error> ^Session::Relogin() {
+	_login = gcnew TaskCompletionSource<Error>();
+	sp_session_relogin(_ptr);
+	return _login->Task;
+}
+
 Task ^Session::Logout() {
 	_logout = gcnew TaskCompletionSource<bool>();
 	sp_session_logout(_ptr);
 	return _logout->Task;
 }
 
-Error Session::PlayerLoad(Track ^track) {
-	return ENUM(Error, sp_session_player_load(_ptr, track->_ptr));
+void Session::PlayerLoad(Track ^track) {
+	SP_ERR(sp_session_player_load(_ptr, track->_ptr));
 }
 
-Error Session::PlayerPause() {
-	return ENUM(Error, sp_session_player_play(_ptr, false));
+void Session::PlayerPause() {
+	SP_ERR(sp_session_player_play(_ptr, false));
 }
 
-Error Session::PlayerPlay() {
-	return ENUM(Error, sp_session_player_play(_ptr, true));
+void Session::PlayerPlay() {
+	SP_ERR(sp_session_player_play(_ptr, true));
 }
 
-Error Session::PlayerSeek(int offset) {
-	return ENUM(Error, sp_session_player_seek(_ptr, offset));
+void Session::PlayerSeek(int offset) {
+	SP_ERR(sp_session_player_seek(_ptr, offset));
 }
 
-Error Session::PlayerSeek(TimeSpan offset) {
-	return PlayerSeek(offset.TotalMilliseconds);
+void Session::PlayerSeek(TimeSpan offset) {
+	PlayerSeek(offset.TotalMilliseconds);
 }
 
-Error Session::PlayerUnload() {
-	return ENUM(Error, sp_session_player_unload(_ptr));
+void Session::PlayerUnload() {
+	SP_ERR(sp_session_player_unload(_ptr));
 }
 
 PlaylistContainer ^Session::PlaylistContainer::get() {

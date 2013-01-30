@@ -3,7 +3,6 @@
 #pragma once
 #include "Stdafx.h"
 
-#include <msclr\marshal.h>
 
 using namespace System;
 using namespace System::Threading::Tasks;

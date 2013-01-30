@@ -14,6 +14,11 @@ namespace SpotiFire {
 
 	public delegate void AlbumBrowseEventHandler(AlbumBrowse ^sender, EventArgs ^e);
 
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Album browse. </summary>
+	///
+	/// <remarks>	Aleksander, 30.01.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
 	public ref class AlbumBrowse sealed : ISpotifyObject
 	{
 	private:

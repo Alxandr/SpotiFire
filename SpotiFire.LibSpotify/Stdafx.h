@@ -4,21 +4,88 @@
 
 #pragma once
 
-
 #include <string.h>
+#include <vector>
+#include <msclr\marshal.h>
+
+#include "include\libspotify\api.h"
+
+using namespace System;
+using namespace System::Collections::Generic;
+
+#define ENUM(name, intval) name(intval)
+#define SPERR(err) gcnew String(sp_error_message(err))
+#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
+#define TPQN(wc) TPQ(wc, nullptr)
+
+static __forceinline String ^UTF8(const char *text)
+{
+	return gcnew String(text, 0, strlen(text), System::Text::Encoding::UTF8);
+}
+static __forceinline String ^UTF8(const std::vector<char> text)
+{
+	return UTF8(text.data());
+}
+
 #include "Enums.h"
+using namespace SpotiFire;
+
+namespace SpotiFire {
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Exception for signalling spotify errors. </summary>
+	///
+	/// <remarks>	Aleksander, 30.01.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public ref class SpotifyException : Exception {
+	private:
+		initonly
+		sp_error _error;
+
+	internal:
+		SpotifyException(sp_error error) {
+			_error = error;
+		}
+
+		SpotifyException(SpotiFire::Error error) {
+			_error = (sp_error)error;
+		}
+
+	public:
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the message. </summary>
+		///
+		/// <value>	The message. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property String ^Message {
+			String ^get() override sealed {
+				return UTF8(sp_error_message(_error));
+			}
+		}
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the error. </summary>
+		///
+		/// <value>	The error. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property Error Error {
+			SpotiFire::Error get() sealed {
+				return ENUM(SpotiFire::Error, _error);
+			}
+		}
+	};
+}
+
 #include "Interfaces.h"
 #include "Lists.h"
 #include "EventArgs.h"
 
-#include "include\libspotify\api.h"
-
 #include "Session.h"
+#include "Image.h"
 #include "Album.h"
 #include "Albumbrowse.h"
 #include "Artist.h"
 #include "Artistbrowse.h"
-#include "Image.h"
 #include "Playlist.h"
 #include "Playlistcontainer.h"
 #include "Search.h"
@@ -26,7 +93,8 @@
 #include "User.h"
 #include "Link.h"
 
-using namespace SpotiFire;
+
+
 
 namespace SpotiFire {
 	ref class Session;
@@ -57,10 +125,12 @@ namespace SpotiFire {
 	};
 }
 
-#define ENUM(name, intval) name(intval)
-#define SPERR(err) gcnew String(sp_error_message(err))
-#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
-#define TPQN(wc) TPQ(wc, nullptr)
+
+__forceinline void __SP_RETURN(sp_error error) {
+	if(error != SP_ERROR_OK)
+		throw gcnew SpotifyException(error);
+}
+#define SP_ERR(sp_ret_error) __SP_RETURN(sp_ret_error);
 
 ref struct $WaitCallback0 {
 	Action ^_cb;
