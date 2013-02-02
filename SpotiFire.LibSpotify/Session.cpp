@@ -85,7 +85,7 @@ SP_CALL message_to_user(sp_session *session, const char *message) {
 }
 
 SP_CALL playtoken_lost(sp_session *session) {
-
+	TP0(SESSION, Session::playtoken_lost);
 }
 
 SP_CALL log_message(sp_session *session, const char *message) {
@@ -167,6 +167,7 @@ void main_thread(Object ^arg) {
 }
 
 Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent) {
+	logger->Trace("Ctor");
 	SPLock lock;
 	marshal_context context;
 	sp_error err;
@@ -206,7 +207,7 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 
 	}
 
-	AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(this, &Session::process_exit);
+	//AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(this, &Session::process_exit);
 }
 
 void Session::process_exit(Object ^sender, EventArgs ^e) {
@@ -238,6 +239,7 @@ value struct $session$create {
 };
 
 Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent) {
+	logger->Trace("Create");
 	$session$create^ create = gcnew $session$create();
 	create->applicationKey = applicationKey;
 	create->cacheLocation = cacheLocation;
@@ -248,10 +250,12 @@ Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocat
 }
 
 ConnectionState Session::ConnectionState::get() {
+	logger->Trace("get_ConnectionState");
 	return ENUM(SpotiFire::ConnectionState, sp_session_connectionstate(_ptr));
 }
 
 Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
+	logger->Trace("Login");
 	marshal_context context;
 	_login = gcnew TaskCompletionSource<Error>();
 	sp_session_login(_ptr, context.marshal_as<const char *>(username), context.marshal_as<const char *>(password), remember, NULL);
@@ -259,30 +263,36 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 }
 
 Task<Error> ^Session::Relogin() {
+	logger->Trace("Relogin");
 	_login = gcnew TaskCompletionSource<Error>();
 	sp_session_relogin(_ptr);
 	return _login->Task;
 }
 
 Task ^Session::Logout() {
+	logger->Trace("Logout");
 	_logout = gcnew TaskCompletionSource<bool>();
 	sp_session_logout(_ptr);
 	return _logout->Task;
 }
 
 void Session::PlayerLoad(Track ^track) {
+	logger->Trace("PlayerLoad");
 	SP_ERR(sp_session_player_load(_ptr, track->_ptr));
 }
 
 void Session::PlayerPause() {
+	logger->Trace("PlayerPause");
 	SP_ERR(sp_session_player_play(_ptr, false));
 }
 
 void Session::PlayerPlay() {
+	logger->Trace("PlayerPlay");
 	SP_ERR(sp_session_player_play(_ptr, true));
 }
 
 void Session::PlayerSeek(int offset) {
+	logger->Trace("PlayerSeek");
 	SP_ERR(sp_session_player_seek(_ptr, offset));
 }
 
@@ -291,10 +301,12 @@ void Session::PlayerSeek(TimeSpan offset) {
 }
 
 void Session::PlayerUnload() {
+	logger->Trace("PlayerUnload");
 	SP_ERR(sp_session_player_unload(_ptr));
 }
 
 PlaylistContainer ^Session::PlaylistContainer::get() {
+	logger->Trace("get_PlaylistContainer");
 	if(_pc == nullptr) {
 		SPLock lock;
 		Interlocked::CompareExchange<SpotiFire::PlaylistContainer ^>(_pc, gcnew SpotiFire::PlaylistContainer(this, sp_session_playlistcontainer(_ptr)), nullptr);
@@ -303,6 +315,7 @@ PlaylistContainer ^Session::PlaylistContainer::get() {
 }
 
 Playlist ^Session::Starred::get() {
+	logger->Trace("get_Starred");
 	SPLock lock;
 	sp_playlist *ptr = sp_session_starred_create(_ptr);
 	auto ret = gcnew Playlist(this, ptr);
@@ -311,22 +324,32 @@ Playlist ^Session::Starred::get() {
 }
 
 void Session::PrefferedBitrate::set(BitRate bitRate) {
+	logger->Trace("set_PrefferedBitrate");
 	sp_session_preferred_bitrate(_ptr, (sp_bitrate)bitRate);
 }
 
 //------------------ Event Handlers ------------------//
 void Session::music_delivery(MusicDeliveryEventArgs ^args) {
+	logger->Trace("music_delivery");
 	MusicDelivered(this, args);
 }
 
 void Session::logged_in(Error error) {
+	logger->Trace("logged_in");
 	_login->SetResult(error);
 }
 
 void Session::logged_out() {
+	logger->Trace("logged_out");
 	_logout->SetResult(true);
 }
 
 void Session::end_of_track() {
+	logger->Trace("end_of_track");
 	EndOfTrack(this, gcnew SessionEventArgs());
+}
+
+void Session::playtoken_lost() {
+	logger->Trace("playtoken_lost");
+	PlayTokenLost(this, gcnew SessionEventArgs());
 }

@@ -65,7 +65,7 @@
 			        owners="alxandr"
 			        outdir="${build.dir}/.nuget"
 			        property="nuget.package"
-			        description="User libspotify in your .NET application">
+			        description="Use libspotify in your .NET application">
 			<content type="lib" framework="net45" basedir="${build.dir}">
 				<include name="SpotiFire.*" />
 				<exclude name="*.pdb" />
@@ -75,6 +75,7 @@
 			</content>
 			<content type="tools" basedir="${basedir}/nuget">
 				<include name="install.ps1" />
+				<include name="nudoc.xml" />
 			</content>
 			<framework-assemblies>
 				<assembly name="System" />

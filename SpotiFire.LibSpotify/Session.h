@@ -66,6 +66,7 @@ namespace SpotiFire {
 		void logged_out();
 		void music_delivery(MusicDeliveryEventArgs ^e);
 		void end_of_track();
+		void playtoken_lost();
 
 		void process_exit(Object ^sender, EventArgs ^e);
 

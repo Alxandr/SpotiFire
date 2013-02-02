@@ -58,6 +58,9 @@ namespace SpotiFire.TestClient
                 Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count);
                 await Task.Delay(TimeSpan.FromSeconds(2));
             }
+
+            await PlayPlaylistForever(session, await session.Starred);
+
             var playlist = await session.PlaylistContainer.Playlists[0];
             Console.WriteLine("Playing random from " + playlist.Name);
             var track = await playlist.Tracks[new Random().Next(playlist.Tracks.Count)];
@@ -77,19 +80,32 @@ namespace SpotiFire.TestClient
             Console.WriteLine("Found track " + track.Name);
             await session.Play(track);
 
-            //Console.WriteLine("Enter song search");
-            //var search = await session.SearchTracks(Console.ReadLine(), 0, 1);
-            //if (search.Tracks.Count > 0)
-            //{
-            //    track = await search.Tracks[0];
-            //    Console.WriteLine("Playing " + track.Name);
-            //    await session.Play(track);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("No matching tracks.");
-            //}
+            Console.WriteLine("Enter song search");
+            var search = await session.SearchTracks(Console.ReadLine(), 0, 1);
+            if (search.Tracks.Count > 0)
+            {
+                track = await search.Tracks[0];
+                Console.WriteLine("Playing " + track.Name);
+                await session.Play(track);
+            }
+            else
+            {
+                Console.WriteLine("No matching tracks.");
+            }
             await session.Logout();
+        }
+
+        static async Task PlayPlaylistForever(Session session, Playlist starred)
+        {
+            int num = 0;
+            var random = new Random();
+            var count = starred.Tracks.Count;
+            while (true)
+            {
+                var track = starred.Tracks[random.Next(count)];
+                Console.WriteLine(++num);
+                await session.Play(track);
+            }
         }
 
         static void session_MusicDeliver(Session sender, MusicDeliveryEventArgs e)
