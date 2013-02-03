@@ -59,7 +59,7 @@ namespace SpotiFire.TestClient
                 await Task.Delay(TimeSpan.FromSeconds(2));
             }
 
-            await PlayPlaylistForever(session, await session.Starred);
+            //await PlayPlaylistForever(session, await session.Starred);
 
             var playlist = await session.PlaylistContainer.Playlists[0];
             Console.WriteLine("Playing random from " + playlist.Name);

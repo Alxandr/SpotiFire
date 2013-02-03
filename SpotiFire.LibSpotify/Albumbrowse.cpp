@@ -40,7 +40,7 @@ Artist ^AlbumBrowse::Artist::get() {
 	return gcnew SpotiFire::Artist(_session, sp_albumbrowse_artist(_ptr));
 }
 
-bool AlbumBrowse::IsCompleted::get() {
+bool AlbumBrowse::IsLoaded::get() {
 	SPLock lock;
 	return sp_albumbrowse_is_loaded(_ptr);
 }
@@ -110,27 +110,44 @@ AlbumBrowse ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^
 	return ret;
 }
 
-//------------------ Event Handlers ------------------//
-
-ref struct $albumbrowse$completed {
-internal:
-	AlbumBrowse ^_browse;
-
-	$albumbrowse$completed(AlbumBrowse ^browse) {
-		_browse = browse;
-	}
-
-	void WaitCallback(Object ^state) {
-		_browse->OnCompleted();
-	}
-};
-
-void SP_CALLCONV completed(sp_albumbrowse *browse, void *userdata) {
-	AlbumBrowse ^b = SP_DATA(AlbumBrowse, userdata);
-	ThreadPool::QueueUserWorkItem(gcnew WaitCallback(gcnew $albumbrowse$completed(b), &$albumbrowse$completed::WaitCallback));
+//------------------------------------------
+// Await
+void SP_CALLCONV completed(sp_albumbrowse *albumbrowse, void *userdata) {
+	TP0(SP_DATA_REM(AlbumBrowse, albumbrowse), AlbumBrowse::complete);
 }
 
-void AlbumBrowse::OnCompleted() {
-	Completed(this, gcnew EventArgs());
+void AlbumBrowse::complete() {
+	array<Action ^> ^continuations = nullptr;
+	{
+		SPLock lock;
+		_complete = true;
+		if(_continuations != nullptr) {
+			continuations = gcnew array<Action ^>(_continuations->Count);
+			_continuations->CopyTo(continuations, 0);
+			_continuations->Clear();
+			_continuations = nullptr;
+		}
+	}
+	if(continuations != nullptr) {
+		for(int i = 0; i < continuations->Length; i++)
+			if(continuations[i])
+				continuations[i]();
+	}
 }
 
+bool AlbumBrowse::IsComplete::get() {
+	SPLock lock;
+	return _complete;
+}
+
+bool AlbumBrowse::AddContinuation(Action ^continuationAction) {
+	SPLock lock;
+	if(IsLoaded)
+		return false;
+
+	if(_continuations == nullptr)
+		_continuations = gcnew List<Action ^>;
+
+	_continuations->Add(continuationAction);
+	return true;
+}

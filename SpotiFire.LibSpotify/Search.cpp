@@ -168,10 +168,7 @@ int Search::TotalArtists::get() {
 	return sp_search_total_artists(_ptr);
 }
 
-void SP_CALLCONV $Search$complete(sp_search *search, void *userdata) {
-	TP0(SP_DATA_REM(Search, userdata), Search::complete);
-}
-
+void SP_CALLCONV search_complete(sp_search *search, void *userdata);
 Search ^Search::Create(SpotiFire::Session ^session,
 					   String ^query,
 					   int trackOffset, int trackCount,
@@ -190,7 +187,7 @@ Search ^Search::Create(SpotiFire::Session ^session,
 			artistOffset, artistCount, 
 			playlistOffset, playlistCount, 
 			(sp_search_type)type, 
-			&$Search$complete, root
+			&search_complete, root
 		)
 	);
 	*root = ret;
@@ -201,6 +198,10 @@ Search ^Search::Create(SpotiFire::Session ^session,
 
 //------------------------------------------
 // Await
+void SP_CALLCONV search_complete(sp_search *search, void *userdata) {
+	TP0(SP_DATA_REM(Search, userdata), Search::complete);
+}
+
 void Search::complete() {
 	array<Action ^> ^continuations = nullptr;
 	{

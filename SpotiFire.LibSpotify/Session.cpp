@@ -249,6 +249,10 @@ Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocat
 	return Task::Factory->StartNew(gcnew Func<Session ^>(create, &$session$create::run));
 }
 
+Session ^Session::SelfSession::get() {
+	return this;
+}
+
 ConnectionState Session::ConnectionState::get() {
 	logger->Trace("get_ConnectionState");
 	return ENUM(SpotiFire::ConnectionState, sp_session_connectionstate(_ptr));

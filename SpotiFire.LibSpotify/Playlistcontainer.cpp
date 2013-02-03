@@ -16,10 +16,7 @@ sp_playlistcontainer_callbacks _callbacks = {
 	&loaded, // loaded
 };
 
-void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata) {
-	TP0(SP_DATA(PlaylistContainer, userdata), PlaylistContainer::loaded);
-}
-
+void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata);
 PlaylistContainer::PlaylistContainer(SpotiFire::Session ^session, sp_playlistcontainer *ptr) {
 	SPLock lock;
 	_ptr = ptr;
@@ -40,6 +37,11 @@ PlaylistContainer::!PlaylistContainer() {
 
 Session ^PlaylistContainer::Session::get() {
 	return _session;
+}
+
+bool PlaylistContainer::IsLoaded::get() {
+	SPLock lock;
+	return sp_playlistcontainer_is_loaded(_ptr);
 }
 
 User ^PlaylistContainer::Owner::get() {
@@ -116,37 +118,42 @@ UInt64 PlaylistContainer::GetFolderId(int index) {
 
 //--------------------------------------------
 // Await
+void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata) {
+	TP0(SP_DATA(PlaylistContainer, userdata), PlaylistContainer::complete);
+}
+
+void PlaylistContainer::complete() {
+	array<Action ^> ^continuations = nullptr;
+	{
+		SPLock lock;
+		_complete = true;
+		if(_continuations != nullptr) {
+			continuations = gcnew array<Action ^>(_continuations->Count);
+			_continuations->CopyTo(continuations, 0);
+			_continuations->Clear();
+			_continuations = nullptr;
+		}
+	}
+	if(continuations != nullptr) {
+		for(int i = 0; i < continuations->Length; i++)
+			if(continuations[i])
+				continuations[i]();
+	}
+}
+
 bool PlaylistContainer::IsComplete::get() {
 	SPLock lock;
-	return sp_playlistcontainer_is_loaded(_ptr);
+	return _complete;
 }
 
-ref struct $PlaylistContainer$Continuation {
-	PlaylistContainer ^_pc;
-	Action ^_action;
-	PlaylistContainerHandler<EventArgs ^> ^_dlg;
-	void Handler(PlaylistContainer ^pc, EventArgs ^args) {
-		_action();
-		_pc->Loaded -= _dlg;
-	}
-};
-
-bool PlaylistContainer::AddContinuation(Action ^continuation) {
+bool PlaylistContainer::AddContinuation(Action ^continuationAction) {
 	SPLock lock;
-	if(IsComplete) {
+	if(IsLoaded)
 		return false;
-	}
 
-	$PlaylistContainer$Continuation ^c = gcnew $PlaylistContainer$Continuation();
-	c->_action = continuation;
-	c->_pc = this;
-	Loaded += c->_dlg = gcnew PlaylistContainerHandler<EventArgs ^>(c, &$PlaylistContainer$Continuation::Handler);
+	if(_continuations == nullptr)
+		_continuations = gcnew List<Action ^>;
+
+	_continuations->Add(continuationAction);
 	return true;
-}
-
-//--------------------------------------------
-// Callbacks
-void PlaylistContainer::loaded() {
-	SPLock lock;
-	Loaded(this, EventArgs::Empty);
 }

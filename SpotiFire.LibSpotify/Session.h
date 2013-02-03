@@ -41,7 +41,7 @@ namespace SpotiFire {
 	/// 
 	/// <remarks>	Aleksander, 30.01.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class Session : IDisposable
+	public ref class Session : ISpotifyObject
 	{
 	private:
 		Thread ^_mainThread;
@@ -69,6 +69,9 @@ namespace SpotiFire {
 		void playtoken_lost();
 
 		void process_exit(Object ^sender, EventArgs ^e);
+
+	private:
+		virtual property SpotiFire::Session ^SelfSession { SpotiFire::Session ^get() sealed = ISpotifyObject::Session::get; }
 
 	public:
 

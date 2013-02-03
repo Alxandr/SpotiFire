@@ -21,6 +21,11 @@ namespace SpotiFire {
 	///-------------------------------------------------------------------------------------------------
 	public delegate void ImageEventHandler(Image ^sender, EventArgs ^e);
 
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Image. </summary>
+	///
+	/// <remarks>	Aleksander, 03.02.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
 	public ref class Image sealed : ISpotifyObject, ISpotifyAwaitable
 	{
 	private:

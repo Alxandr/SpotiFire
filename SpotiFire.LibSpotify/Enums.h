@@ -8,7 +8,6 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 19.10.2012. </remarks>
 	///-------------------------------------------------------------------------------------------------
-
 	public enum class Error
 	{
 		/// <summary>
@@ -197,12 +196,15 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 20.10.2012. </remarks>
 	///-------------------------------------------------------------------------------------------------
-
 	public enum class AlbumType
     {
+        /// <summary>	An enum constant representing the album option. </summary>
         Album = 0,
+        /// <summary>	An enum constant representing the single option. </summary>
         Single = 1,
+        /// <summary>	An enum constant representing the compilation option. </summary>
         Compilation = 2,
+        /// <summary>	An enum constant representing the unknown option. </summary>
         Unknown = 3
     };
 
@@ -211,7 +213,6 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 20.10.2012. </remarks>
 	///-------------------------------------------------------------------------------------------------
-
 	public enum class BitRate
 	{
 		/// <summary>	Bitrate 160kbps. </summary>
@@ -280,14 +281,23 @@ namespace SpotiFire {
 	{
 		/// <summary>	Link type not valid - default until the library has parsed the link, or when parsing failed. </summary>
 		Invalid = 0,
+		/// <summary>	An enum constant representing the track option. </summary>
 		Track = 1,
+		/// <summary>	An enum constant representing the album option. </summary>
 		Album = 2,
+		/// <summary>	An enum constant representing the artist option. </summary>
 		Artist = 3,
+		/// <summary>	An enum constant representing the search option. </summary>
 		Search = 4,
+		/// <summary>	An enum constant representing the playlist option. </summary>
 		Playlist = 5,
+		/// <summary>	An enum constant representing the profile option. </summary>
 		Profile = 6,
+		/// <summary>	An enum constant representing the starred option. </summary>
 		Starred = 7,
+		/// <summary>	An enum constant representing the localtrack option. </summary>
 		Localtrack = 8,
+		/// <summary>	An enum constant representing the image option. </summary>
 		Image = 9
 	};
 
@@ -298,8 +308,11 @@ namespace SpotiFire {
 	///-------------------------------------------------------------------------------------------------
 	public enum class ImageSize
 	{
+		/// <summary>	An enum constant representing the normal option. </summary>
 		Normal = 0,
+		/// <summary>	An enum constant representing the small option. </summary>
 		Small = 1,
+		/// <summary>	An enum constant representing the large option. </summary>
 		Large = 2
 	};
 
