@@ -16,7 +16,7 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///
-	/// <typeparam name="typename TEventArgs">	Type of EventArgs used. </typeparam>
+	/// <typeparam name="TEventArgs">	Type of EventArgs used. </typeparam>
 	/// <param name="sender">	The sender. </param>
 	/// <param name="args">  	The EventArgs to process. </param>
 	///-------------------------------------------------------------------------------------------------

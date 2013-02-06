@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace SpotiFire
 {
+    ///-------------------------------------------------------------------------------------------------
+    /// <summary>   Await helper. </summary>
+    ///
+    /// <remarks>   Aleksander, 03.02.2013. </remarks>
+    ///-------------------------------------------------------------------------------------------------
     public static class AwaitHelper
     {
         internal static void OnComplete(ISpotifyAwaitable awaitable, Action continuation, bool continueOnCapturedContext, bool flowExecutionContext)
@@ -186,6 +191,13 @@ namespace SpotiFire
             }, null);
         }
 
+        ///-------------------------------------------------------------------------------------------------
+        /// <summary>   Awaitable awaiter. </summary>
+        ///
+        /// <remarks>   Aleksander, 03.02.2013. </remarks>
+        ///
+        /// <typeparam name="T">    Generic type parameter. </typeparam>
+        ///-------------------------------------------------------------------------------------------------
         public struct AwaitableAwaiter<T> : ICriticalNotifyCompletion
             where T : ISpotifyObject
         {

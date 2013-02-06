@@ -1,4 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <nudoc>
-  <assembly name="SpotiFire.dll" />
+  <member>
+    <summary>The spotify-library for .NET.</summary>
+  </member>
+  <assembly name="SpotiFire.dll">
+    <members>
+      <member name="A:SpotiFire.dll">
+        <summary>Contains all types and methods used in SpotiFire.</summary>
+      </member>
+      <member name="N:SpotiFire">
+        <summary>Main SpotiFire namespace.</summary>
+      </member>
+    </members>
+  </assembly>
 </nudoc>
