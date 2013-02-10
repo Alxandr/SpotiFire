@@ -206,30 +206,53 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual property BitRate PrefferedBitrate { void set(BitRate bitRate) sealed; }
 
-		/// <summary>	Event queue for all listeners interested in ConnectionError events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in ConnectionError events. </summary>
 		event SessionEventHandler ^ConnectionError;
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>
+		///
+		/// <remarks>	The EndOfTrack event provides a way for applications to be notified whenever
+		/// 			a track has finished playing. Actions that can be taken after this are for
+		/// 			instance playing another track, or exiting the application. </remarks>
+		///-------------------------------------------------------------------------------------------------
 		event SessionEventHandler ^EndOfTrack;
-		/// <summary>	Event queue for all listeners interested in Exception events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in Exception events. </summary>
 		event SessionEventHandler ^Exception;
-		/// <summary>	Event queue for all listeners interested in LogMessage events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in LogMessage events. </summary>
 		event SessionEventHandler ^LogMessage;
-		/// <summary>	Event queue for all listeners interested in MessageToUser events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in MessageToUser events. </summary>
 		event SessionEventHandler ^MessageToUser;
-		/// <summary>	Event queue for all listeners interested in MetadataUpdated events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in MetadataUpdated events. </summary>
 		event SessionEventHandler ^MetadataUpdated;
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in PlayTokenLost events. </summary>
+		///
+		/// <remarks>	The PlayTokenLost event provides a way for applications to be notified whenever
+		/// 			the spotify playtoken is lost. The spotify playtoken is a way for spotify
+		/// 			to make sure that the same account only plays music at one place at a time
+		/// 			(to prevent "sharing" of accounts). The playtoken is lost when the same user
+		/// 			starts to play music on another machine (or another application on the same machine). </remarks>
+		///-------------------------------------------------------------------------------------------------
 		event SessionEventHandler ^PlayTokenLost;
-		/// <summary>	Event queue for all listeners interested in StartPlayback events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in StartPlayback events. </summary>
 		event SessionEventHandler ^StartPlayback;
-		/// <summary>	Event queue for all listeners interested in StopPlayback events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in StopPlayback events. </summary>
 		event SessionEventHandler ^StopPlayback;
-		/// <summary>	Event queue for all listeners interested in StreamingError events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in StreamingError events. </summary>
 		event SessionEventHandler ^StreamingError;
-		/// <summary>	Event queue for all listeners interested in UserinfoUpdated events. </summary>
+		/// <summary>	[Not implemented] Event queue for all listeners interested in UserinfoUpdated events. </summary>
 		event SessionEventHandler ^UserinfoUpdated;
 
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MusicDelivered events. </summary>
+		///
+		/// <remarks>	Event-listeners on this MusicDelivered <strong>must not</strong> (ever) block.
+		/// 			They should simply take the samples delivered, and queue them for playback,
+		/// 			and then return the number of frames that were queued. SpotiFire (and libspotify)
+		/// 			will stop working if any listeners on the MusicDelivered event blocks. </remarks>
+		///-------------------------------------------------------------------------------------------------
 		event MusicDeliveryEventHandler ^MusicDelivered;
 	};
 }

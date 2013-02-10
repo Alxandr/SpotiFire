@@ -240,7 +240,7 @@ value struct $session$create {
 
 Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent) {
 	logger->Trace("Create");
-	$session$create^ create = gcnew $session$create();
+	$session$create ^create = gcnew $session$create();
 	create->applicationKey = applicationKey;
 	create->cacheLocation = cacheLocation;
 	create->settingsLocation = settingsLocation;

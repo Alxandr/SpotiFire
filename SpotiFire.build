@@ -20,7 +20,7 @@
 		<property name="project.config" value="debug" />
 	    <property name="build.debug" value="true" />
 	    <property name="basedir.suffix" value="-debug" />
-	    <property name="cl.options" value="/GS /RTC /Yd /Zd /Zi" />
+	    <property name="cl.options" value="/GS /Zi" />
 
 		<version buildtype="NoIncrement" revisiontype="Increment" prefix="build.number" />
 	</target>
@@ -61,6 +61,7 @@
 		<nuget-pack id="SpotiFire"
 			        version="${build.number.version}${basedir.suffix}"
 			        title="SpotiFire"
+			        url="https://github.com/Alxandr/SpotiFire"
 			        authors="alxandr"
 			        owners="alxandr"
 			        outdir="${build.dir}/.nuget"

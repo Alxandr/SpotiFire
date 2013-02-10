@@ -157,7 +157,43 @@ namespace SpotiFire
             return ((IAsyncLoaded)playlist).Load().ContinueWith(task => (Playlist)task.Result).GetAwaiter();
         }
 
-        // play through track
+        ///-------------------------------------------------------------------------------------------------
+        /// <summary>   A Session extension method that plays a single track and notifies it's completion. </summary>
+        ///
+        /// <remarks>   <para>This single extension-method takes care of unloading (in case there are any other tracks
+        ///             playing), loading, and starting playback of a single track. Then, when the track is complete,
+        ///             it signals the task. This enables for easy programming of behaviour such as playing through an
+        ///             entire playlist, or simply playing random songs non-stop. Queueing is also easily implemented
+        ///             with this method. However, this method is not meant to be used in combinations with the ability
+        ///             to change what track you are currently listening to. If your application (one way or another)
+        ///             allows the user (or some AI) to select a new song, whilst there is one playing, you SHOULD not
+        ///             use this method, as it can have un-wanted sideeffects (in the magnitude of your application
+        ///             crashing and dying horribly).</para>
+        ///             
+        ///              <para>The inner workings of this method is implemented using the <see cref="Session.EndOfTrack"/>
+        ///              event. Every time you call this method an event-handler is attatched to the <see cref="Session.EndOfTrack"/>
+        ///              event. This means that if you call this method again (before the song is finished),
+        ///              it will attatch a second event-handler, and then a third, and so forth. This can probably
+        ///              be resolved (one way or another), but for now, this functionality is <strong><u>not supported</u></strong>.</para> </remarks>
+        ///
+        /// <param name="session">  The session to act on. </param>
+        /// <param name="track">    The track. </param>
+        ///
+        /// <returns>   A task that is signalled when the track completes. </returns>
+        /// 
+        /// <example>
+        ///          Play through an enumerable of tracks:
+        ///          <code>
+        ///             <code lang="cs"><![CDATA[
+        /// private async Task PlayAll(Session session, IEnumerable<Track> tracks)
+        /// {
+        ///     foreach(var t in tracks)
+        ///         await session.Play(t);
+        /// }
+        ///             ]]></code>
+        ///          </code>
+        /// </example>
+        ///-------------------------------------------------------------------------------------------------
         public static Task Play(this Session session, Track track)
         {
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
