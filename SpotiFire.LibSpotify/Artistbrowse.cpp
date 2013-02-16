@@ -63,7 +63,7 @@ ArtistBrowse ^ArtistBrowse::Create(SpotiFire::Session ^session, SpotiFire::Artis
 	sp_artistbrowse *ptr = sp_artistbrowse_create(session->_ptr, artist->_ptr, (sp_artistbrowse_type)type, &completed, box);
 	ArtistBrowse ^ret = gcnew ArtistBrowse(session, ptr);
 	sp_artistbrowse_release(ptr);
-	*box = gcroot<ArtistBrowse ^>(ret);
+	*box = ret;
 	return ret;
 }
 

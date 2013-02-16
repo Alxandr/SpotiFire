@@ -107,7 +107,7 @@ AlbumBrowse ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^
 	sp_albumbrowse *ptr = sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, box);
 	AlbumBrowse ^ret = gcnew AlbumBrowse(session, ptr);
 	sp_albumbrowse_release(ptr);
-	*box = gcroot<AlbumBrowse ^>(ret);
+	*box = ret;
 	return ret;
 }
 
