@@ -178,7 +178,7 @@ Search ^Search::Create(SpotiFire::Session ^session,
 					   SearchType type) {
 	SPLock lock;
 	marshal_context context;
-	gcroot<Search ^> *root = new gcroot<Search ^>();
+	gcroot<Search ^> *box = new gcroot<Search ^>();
 	Search ^ret = gcnew Search(session, 
 		sp_search_create(
 			session->_ptr, context.marshal_as<const char *>(query), 
@@ -187,10 +187,11 @@ Search ^Search::Create(SpotiFire::Session ^session,
 			artistOffset, artistCount, 
 			playlistOffset, playlistCount, 
 			(sp_search_type)type, 
-			&search_complete, root
+			&search_complete, box
 		)
 	);
-	*root = ret;
+	*box = ret;
+	sp_search_release(ret->_ptr);
 	return ret;
 }
 

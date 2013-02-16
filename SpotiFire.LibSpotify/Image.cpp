@@ -68,9 +68,8 @@ System::Drawing::Image ^Image::GetImage() {
 
 Image ^Image::Create(SpotiFire::Session ^session, String ^id) {
 	SPLock lock;
-	Image ^ret;
 	sp_image *ptr = sp_image_create(session->_ptr, HTB(id).data());
-	ret = gcnew Image(session, ptr);
+	Image ^ret = gcnew Image(session, ptr);
 	sp_image_release(ptr);
 	return ret;
 }

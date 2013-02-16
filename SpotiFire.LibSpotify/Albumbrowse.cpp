@@ -103,17 +103,18 @@ IList<Track ^> ^AlbumBrowse::Tracks::get() {
 void SP_CALLCONV completed(sp_albumbrowse *browse, void *userdata);
 AlbumBrowse ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^album) {
 	SPLock lock;
-	AlbumBrowse ^ret;
-	sp_albumbrowse *ptr = sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, new gcroot<AlbumBrowse ^>(ret));
-	ret = gcnew AlbumBrowse(session, ptr);
+	gcroot<AlbumBrowse ^> *box = new gcroot<AlbumBrowse ^>();
+	sp_albumbrowse *ptr = sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, box);
+	AlbumBrowse ^ret = gcnew AlbumBrowse(session, ptr);
 	sp_albumbrowse_release(ptr);
+	*box = gcroot<AlbumBrowse ^>(ret);
 	return ret;
 }
 
 //------------------------------------------
 // Await
 void SP_CALLCONV completed(sp_albumbrowse *albumbrowse, void *userdata) {
-	TP0(SP_DATA_REM(AlbumBrowse, albumbrowse), AlbumBrowse::complete);
+	TP0(SP_DATA_REM(AlbumBrowse, userdata), AlbumBrowse::complete);
 }
 
 void AlbumBrowse::complete() {

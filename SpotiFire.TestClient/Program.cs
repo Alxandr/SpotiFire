@@ -66,6 +66,7 @@ namespace SpotiFire.TestClient
             var track = await playlist.Tracks[new Random().Next(playlist.Tracks.Count)];
             Console.WriteLine("Found track " + track.Name);
             await track.Album;
+
             var coverId = track.Album.CoverId;
             var image = await Image.FromId(session, coverId);
             var imageData = image.GetImage();

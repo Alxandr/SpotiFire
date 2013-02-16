@@ -59,17 +59,18 @@ String ^ArtistBrowse::Biography::get() {
 void SP_CALLCONV completed(sp_artistbrowse *browse, void *userdata);
 ArtistBrowse ^ArtistBrowse::Create(SpotiFire::Session ^session, SpotiFire::Artist ^artist, SpotiFire::ArtistBrowseType type) {
 	SPLock lock;
-	ArtistBrowse ^ret;
-	sp_artistbrowse *ptr = sp_artistbrowse_create(session->_ptr, artist->_ptr, (sp_artistbrowse_type)type, &completed, new gcroot<ArtistBrowse ^>(ret));
-	ret = gcnew ArtistBrowse(session, ptr);
+	gcroot<ArtistBrowse ^> *box = new gcroot<ArtistBrowse ^>();
+	sp_artistbrowse *ptr = sp_artistbrowse_create(session->_ptr, artist->_ptr, (sp_artistbrowse_type)type, &completed, box);
+	ArtistBrowse ^ret = gcnew ArtistBrowse(session, ptr);
 	sp_artistbrowse_release(ptr);
+	*box = gcroot<ArtistBrowse ^>(ret);
 	return ret;
 }
 
 //------------------------------------------
 // Await
 void SP_CALLCONV completed(sp_artistbrowse *artistbrowse, void *userdata) {
-	TP0(SP_DATA_REM(ArtistBrowse, artistbrowse), ArtistBrowse::complete);
+	TP0(SP_DATA_REM(ArtistBrowse, userdata), ArtistBrowse::complete);
 }
 
 void ArtistBrowse::complete() {
