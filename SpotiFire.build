@@ -6,6 +6,7 @@
 	<property name="basedir" value="${project::get-base-directory()}" />
 	<property name="name" value="${project::get-name()}" />
 	<property name="cl.options" value="" />
+	<property name="csc.optimize" value="false" />
 
 	<target name="init">
 		<call target="${project.config}" cascade="false" />
@@ -41,6 +42,7 @@
 		<property name="build.debug" value="true" />
 	    <property name="basedir.suffix" value="" />
 	    <property name="cl.options" value="/Ox" />
+	    <property name="csc.optimize" value="true" />
 
 	    <version buildtype="Increment" revisiontype="Increment" prefix="build.number" />
 	</target>
@@ -166,7 +168,7 @@
 			</attributes>
 		</asminfo>
 
-		<csc target="module" output="${build.obj}/SpotiFire.netmodule" doc="${build.obj}/managed.xml">
+		<csc target="module" output="${build.obj}/SpotiFire.netmodule" doc="${build.obj}/managed.xml" optimize="${csc.optimize}">
 			<modules basedir="${build.obj}">
 				<include name="tmp.obj" />
 			</modules>

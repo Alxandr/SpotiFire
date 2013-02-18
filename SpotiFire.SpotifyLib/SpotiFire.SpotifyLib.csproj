@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AwaitHelper.cs" />
     <Compile Include="LinkExtensions.cs" />
+    <Compile Include="PlayQueue.cs" />
     <Compile Include="SpotifyLibExtensions.cs" />
     <Compile Include="Spotify.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
