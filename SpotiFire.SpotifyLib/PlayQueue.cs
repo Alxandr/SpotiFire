@@ -12,6 +12,97 @@ namespace SpotiFire
     /// <summary>   A spotify playqueue, mimicing the functionallity of the standard Play Queue in Spotify. </summary>
     ///
     /// <remarks>   Aleksander, 18.02.2013. </remarks>
+    /// 
+    /// <example>
+    /// Shuffle and play all the tracks from a single playlist:
+    /// <code>
+    ///     <code lang="cs"><![CDATA[
+    /// static async Task PlayQueueTest()
+    /// {
+    ///    Console.WriteLine("Enter username and password (a line for each)");
+    ///    Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
+    ///    session.MusicDelivered += session_MusicDeliver;
+    ///
+    ///    await session.Login(Console.ReadLine(), Console.ReadLine(), false);
+    ///    session.PrefferedBitrate = BitRate.Bitrate320k;
+    ///
+    ///    await session.PlaylistContainer;
+    ///    while (session.PlaylistContainer.Playlists.Count < 1)
+    ///    {
+    ///        Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count);
+    ///        await Task.Delay(TimeSpan.FromSeconds(2));
+    ///    }
+    ///
+    ///    AutoResetEvent are = new AutoResetEvent(false);
+    ///
+    ///    PlayQueue queue = new PlayQueue();
+    ///    session.EndOfTrack += (s, e) =>
+    ///    {
+    ///        if (!queue.IsEmpty)
+    ///        {
+    ///            var track = queue.Dequeue();
+    ///            session.PlayerUnload();
+    ///            session.PlayerLoad(track);
+    ///            session.PlayerPlay();
+    ///        }
+    ///        else
+    ///        {
+    ///            are.Set();
+    ///        }
+    ///    };
+    ///
+    ///    var playlist = await session.PlaylistContainer.Playlists[0];
+    ///    queue.Seed = playlist.Tracks;
+    ///    if (!queue.IsEmpty)
+    ///    {
+    ///        var track = queue.Dequeue();
+    ///        session.PlayerUnload();
+    ///        session.PlayerLoad(track);
+    ///        session.PlayerPlay();
+    ///        are.WaitOne();
+    ///    }
+    /// }
+    ///     ]]></code>
+    ///     <code lang="vb"><![CDATA[
+    /// Shared Async Function PlayQueueTest() As Task
+    ///    Console.WriteLine("Enter username and password (a line for each)")
+    ///    Dim session As Session = Await Spotify.CreateSession(key, cache, settings, userAgent)
+    ///    session.MusicDelivered += session_MusicDeliver
+    ///    Await Login(Console.ReadLine(), Console.ReadLine(), False)
+    ///    session.PrefferedBitrate = BitRate.Bitrate320k
+    ///    Await session.PlaylistContainer
+    ///
+    ///    While session.PlaylistContainer.Playlists.Count < 1
+    ///        Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count)
+    ///        Await Task.Delay(TimeSpan.FromSeconds(2))
+    ///    End While
+    ///
+    ///    Dim are As AutoResetEvent = New AutoResetEvent(False)
+    ///    Dim queue As PlayQueue = New PlayQueue()
+    ///    session.EndOfTrack += Function(s, e)
+    ///                              If Not queue.IsEmpty Then
+    ///                                  Dim track = queue.Dequeue()
+    ///                                  session.PlayerUnload()
+    ///                                  session.PlayerLoad(track)
+    ///                                  session.PlayerPlay()
+    ///                              Else
+    ///                                  are.[Set]()
+    ///                              End If
+    ///                          End Function
+    ///
+    ///    Dim playlist As Playlist = Await session.PlaylistContainer.Playlists(0)
+    ///    queue.Seed = playlist.Tracks
+    ///    If Not queue.IsEmpty Then
+    ///        Dim track = queue.Dequeue()
+    ///        session.PlayerUnload()
+    ///        session.PlayerLoad(track)
+    ///        session.PlayerPlay()
+    ///        are.WaitOne()
+    ///    End If
+    /// End Function
+    ///     ]]></code>
+    /// </code>
+    /// </example>
     ///-------------------------------------------------------------------------------------------------
     public class PlayQueue : IEnumerable<Track>, ICollection, IEnumerable
     {

@@ -255,11 +255,13 @@ Session ^Session::SelfSession::get() {
 
 ConnectionState Session::ConnectionState::get() {
 	logger->Trace("get_ConnectionState");
+	SPLock lock;
 	return ENUM(SpotiFire::ConnectionState, sp_session_connectionstate(_ptr));
 }
 
 Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 	logger->Trace("Login");
+	SPLock lock;
 	marshal_context context;
 	_login = gcnew TaskCompletionSource<Error>();
 	sp_session_login(_ptr, context.marshal_as<const char *>(username), context.marshal_as<const char *>(password), remember, NULL);
@@ -268,6 +270,7 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 
 Task<Error> ^Session::Relogin() {
 	logger->Trace("Relogin");
+	SPLock lock;
 	_login = gcnew TaskCompletionSource<Error>();
 	sp_session_relogin(_ptr);
 	return _login->Task;
@@ -275,28 +278,51 @@ Task<Error> ^Session::Relogin() {
 
 Task ^Session::Logout() {
 	logger->Trace("Logout");
+	SPLock lock;
 	_logout = gcnew TaskCompletionSource<bool>();
 	sp_session_logout(_ptr);
 	return _logout->Task;
 }
 
+void Session::ForgetMe() {
+	logger->Trace("ForgetMe");
+	SPLock lock;
+	SP_ERR(sp_session_forget_me(_ptr));
+}
+
+void Session::FlushCaches() {
+	logger->Trace("FlushCaches");
+	SPLock lock;
+	SP_ERR(sp_session_flush_caches(_ptr));
+}
+
 void Session::PlayerLoad(Track ^track) {
 	logger->Trace("PlayerLoad");
+	SPLock lock;
 	SP_ERR(sp_session_player_load(_ptr, track->_ptr));
 }
 
 void Session::PlayerPause() {
 	logger->Trace("PlayerPause");
+	SPLock lock;
 	SP_ERR(sp_session_player_play(_ptr, false));
 }
 
 void Session::PlayerPlay() {
 	logger->Trace("PlayerPlay");
+	SPLock lock;
 	SP_ERR(sp_session_player_play(_ptr, true));
+}
+
+void Session::PlayerPrefetch(Track ^track) {
+	logger->Trace("PlayerPrefetch");
+	SPLock lock;
+	SP_ERR(sp_session_player_prefetch(_ptr, track->_ptr));
 }
 
 void Session::PlayerSeek(int offset) {
 	logger->Trace("PlayerSeek");
+	SPLock lock;
 	SP_ERR(sp_session_player_seek(_ptr, offset));
 }
 
@@ -306,6 +332,7 @@ void Session::PlayerSeek(TimeSpan offset) {
 
 void Session::PlayerUnload() {
 	logger->Trace("PlayerUnload");
+	SPLock lock;
 	SP_ERR(sp_session_player_unload(_ptr));
 }
 
@@ -327,9 +354,74 @@ Playlist ^Session::Starred::get() {
 	return ret;
 }
 
-void Session::PrefferedBitrate::set(BitRate bitRate) {
-	logger->Trace("set_PrefferedBitrate");
-	sp_session_preferred_bitrate(_ptr, (sp_bitrate)bitRate);
+String ^Session::UserName::get() {
+	logger->Trace("get_UserName");
+	SPLock lock;
+	return UTF8(sp_session_user_name(_ptr));
+}
+
+String ^Session::RememberedUser::get() {
+	logger->Trace("get_RememberedUser");
+	SPLock lock;
+	int length = sp_session_remembered_user(_ptr, NULL, 0);
+	if(length == -1)
+		return nullptr;
+	std::vector<char> data(length);
+	return UTF8(data);
+}
+
+void Session::CacheSize::set(int size) {
+	logger->Trace("set_CacheSize");
+	SPLock lock;
+	SP_ERR(sp_session_set_cache_size(_ptr, size));
+}
+
+bool Session::VolumeNormalization::get() {
+	logger->Trace("get_VolumeNormalization");
+	SPLock lock;
+	return sp_session_get_volume_normalization(_ptr);
+}
+
+void Session::VolumeNormalization::set(bool value) {
+	logger->Trace("set_VolumeNormalization");
+	SPLock lock;
+	SP_ERR(sp_session_set_volume_normalization(_ptr, value));
+}
+
+bool Session::PrivateSession::get() {
+	logger->Trace("get_PrivateSession");
+	SPLock lock;
+	return sp_session_is_private_session(_ptr);
+}
+
+void Session::PrivateSession::set(bool value) {
+	logger->Trace("set_PrivateSession");
+	SPLock lock;
+	SP_ERR(sp_session_set_private_session(_ptr, value));
+}
+
+void Session::PreferredBitrate::set(BitRate bitRate) {
+	logger->Trace("set_PreferredBitrate");
+	SPLock lock;
+	SP_ERR(sp_session_preferred_bitrate(_ptr, (sp_bitrate)bitRate));
+}
+
+void Session::PreferredOfflineBitrate::set(BitRate bitRate) {
+	logger->Trace("set_PreferredOfflineBitrate");
+	SPLock lock;
+	SP_ERR(sp_session_preferred_offline_bitrate(_ptr, (sp_bitrate)bitRate, false /*TODO: incorporate?*/));
+}
+
+void Session::ConnectionType::set(SpotiFire::ConnectionType type) {
+	logger->Trace("set_ConnectionType");
+	SPLock lock;
+	SP_ERR(sp_session_set_connection_type(_ptr, (sp_connection_type)type));
+}
+
+void Session::ConnectionRules::set(SpotiFire::ConnectionRules rules) {
+	logger->Trace("set_ConnectionRules");
+	SPLock lock;
+	SP_ERR(sp_session_set_connection_rules(_ptr, (sp_connection_rules)rules));
 }
 
 //------------------ Event Handlers ------------------//

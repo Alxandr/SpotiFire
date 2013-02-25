@@ -7,6 +7,7 @@
 	<property name="name" value="${project::get-name()}" />
 	<property name="cl.options" value="" />
 	<property name="csc.optimize" value="false" />
+	<property name="publish" value="true" />
 
 	<target name="init">
 		<call target="${project.config}" cascade="false" />
@@ -27,7 +28,7 @@
 	</target>
 
 	<target name="post-debug" depends="nuget-pack">
-		<nuget-publish>
+		<nuget-publish if="${publish}">
 			<packages>
 				<include name="${nuget.package}" />
 			</packages>
@@ -48,7 +49,7 @@
 	</target>
 
 	<target name="post-release" depends="nuget-pack">
-		<nuget-publish>
+		<nuget-publish if="${publish}">
 			<packages>
 				<include name="${nuget.package}" />
 			</packages>

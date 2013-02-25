@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpotiFire.TestClient
@@ -40,7 +41,53 @@ namespace SpotiFire.TestClient
 
         static void Main(string[] args)
         {
-            Run().Wait();
+            PlayQueueTest().Wait();
+        }
+
+        static async Task PlayQueueTest()
+        {
+            Console.WriteLine("Enter username and password (a line for each)");
+            Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
+            session.MusicDelivered += session_MusicDeliver;
+
+            await session.Login(Console.ReadLine(), Console.ReadLine(), false);
+            session.PreferredBitrate = BitRate.Bitrate320k;
+
+            await session.PlaylistContainer;
+            while (session.PlaylistContainer.Playlists.Count < 1)
+            {
+                Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count);
+                await Task.Delay(TimeSpan.FromSeconds(2));
+            }
+
+            AutoResetEvent are = new AutoResetEvent(false);
+
+            PlayQueue queue = new PlayQueue();
+            session.EndOfTrack += (s, e) =>
+            {
+                if (!queue.IsEmpty)
+                {
+                    var track = queue.Dequeue();
+                    session.PlayerUnload();
+                    session.PlayerLoad(track);
+                    session.PlayerPlay();
+                }
+                else
+                {
+                    are.Set();
+                }
+            };
+
+            var playlist = await session.PlaylistContainer.Playlists[0];
+            queue.Seed = playlist.Tracks;
+            if (!queue.IsEmpty)
+            {
+                var track = queue.Dequeue();
+                session.PlayerUnload();
+                session.PlayerLoad(track);
+                session.PlayerPlay();
+                are.WaitOne();
+            }
         }
 
         static async Task Run()
@@ -50,7 +97,7 @@ namespace SpotiFire.TestClient
             session.MusicDelivered += session_MusicDeliver;
 
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
-            session.PrefferedBitrate = BitRate.Bitrate320k;
+            session.PreferredBitrate = BitRate.Bitrate320k;
 
             await session.PlaylistContainer;
             while (session.PlaylistContainer.Playlists.Count < 1)

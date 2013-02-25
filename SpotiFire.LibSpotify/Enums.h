@@ -394,4 +394,74 @@ namespace SpotiFire {
 		/// <summary>	An enum constant representing the no albums option. </summary>
 		NoAlbums = 2,
 	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent a type of internet-connection. </summary>
+	///
+	/// <remarks>	Aleksander, 24.02.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class ConnectionType
+	{
+		/// <summary>	An enum constant representing the unknown option. </summary>
+		Unknown,
+		/// <summary>	An enum constant representing the none option. </summary>
+		None,
+		/// <summary>	An enum constant representing the mobile option. </summary>
+		Mobile,
+		/// <summary>	An enum constant representing the mobile roaming option. </summary>
+		MobileRoaming,
+		/// <summary>	An enum constant representing the wifi option. </summary>
+		Wifi,
+		/// <summary>	An enum constant representing the wired option. </summary>
+		Wired
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent connection rules.  </summary>
+	///
+	/// <remarks>	Connection rules, bitwise OR of flags. The default is The default is Network | AllowSync. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	[System::Flags]
+	public enum class ConnectionRules
+	{
+		/// <summary>	An enum constant representing the none option. </summary>
+		None = 0x0,
+		/// <summary>	An enum constant representing the network option. </summary>
+		Network = 0x1,
+		/// <summary>	An enum constant representing the network if roaming option. </summary>
+		NetworkIfRoaming = 0x2,
+		/// <summary>	An enum constant representing the allow synchronise over mobile option. </summary>
+		AllowSyncOverMobile = 0x4,
+		/// <summary>	An enum constant representing the allow synchronise over wifi option. </summary>
+		AllowSyncOverWifi = 0x8
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent a social provider. </summary>
+	///
+	/// <remarks>	Aleksander, 24.02.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class SocialProvider
+	{
+		/// <summary>	An enum constant representing the spotify option. </summary>
+		Spotify,
+		/// <summary>	An enum constant representing the facebook option. </summary>
+		Facebook,
+		/// <summary>	An enum constant representing the last fm option. </summary>
+		LastFm
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Values that represent . </summary>
+	///
+	/// <remarks>	Aleksander, 24.02.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public enum class ScrobblingState
+	{
+		UseGlobalSetting = 0,
+		LocalEnabled,
+		LocalDisabled,
+		GlobalEnabled,
+		GlobalDisabled
+	};
 }

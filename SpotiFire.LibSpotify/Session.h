@@ -83,6 +83,20 @@ namespace SpotiFire {
 		virtual property ConnectionState ConnectionState { SpotiFire::ConnectionState get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Sets the type of the connection. </summary>
+		///
+		/// <value>	The type of the connection. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property ConnectionType ConnectionType { void set(SpotiFire::ConnectionType type) sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Sets the connection rules. </summary>
+		///
+		/// <value>	The connection rules. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property ConnectionRules ConnectionRules { void set(SpotiFire::ConnectionRules rules) sealed; }
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Logs in the specified username/password combo. This initiates the login in the background.
 		/// 			An application MUST NEVER store the user's password in clear text. If automatic relogin is
 		/// 			required, use <see cref="Relogin" />. </summary>
@@ -124,6 +138,20 @@ namespace SpotiFire {
 		/// <returns>	The pending logout-task. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual Task ^Logout() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Forget me. </summary>
+		///
+		/// <remarks>	Aleksander, 24.02.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		virtual void ForgetMe() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Flushes the caches.  </summary>
+		///
+		/// <remarks>	This will make libspotify write all data that is meant to be stored on disk to the disk immediately. libspotify does this periodically by itself and also on logout. So under normal conditions this should never need to be used. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		virtual void FlushCaches() sealed;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Loads the specified track. </summary>
@@ -186,6 +214,15 @@ namespace SpotiFire {
 		virtual void PlayerUnload() sealed;
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Prefetch a track. </summary>
+		///
+		/// <remarks>	Instruct libspotify to start loading of a track into its cache. This could be done by an application just before the current track ends. </remarks>
+		///
+		/// <param name="track">	The track to be prefetched. </param>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerPrefetch(Track ^track) sealed;
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the playlist container. </summary>
 		///
 		/// <value>	The playlist container for the currently signed in user. </value>
@@ -200,11 +237,53 @@ namespace SpotiFire {
 		virtual property SpotiFire::Playlist ^Starred { SpotiFire::Playlist ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Sets the preffered bitrate. </summary>
+		/// <summary>	Sets the preferred bitrate. </summary>
 		///
-		/// <value>	The preffered bitrate. </value>
+		/// <value>	The preferred bitrate. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property BitRate PrefferedBitrate { void set(BitRate bitRate) sealed; }
+		virtual property BitRate PreferredBitrate { void set(BitRate bitRate) sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Sets the preferred offline bitrate. </summary>
+		///
+		/// <value>	The preferred offline bitrate. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property BitRate PreferredOfflineBitrate { void set(BitRate bitRate) sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets or sets a value indicating whether to use volume normalization. </summary>
+		///
+		/// <value>	true if volume normalization is on, false if not. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property bool VolumeNormalization { bool get() sealed; void set(bool value) sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets or sets a value indicating whether the private session. </summary>
+		///
+		/// <value>	true if private session, false if not. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property bool PrivateSession { bool get() sealed; void set(bool value) sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the name of the user. </summary>
+		///
+		/// <value>	The name of the user. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property String ^UserName { String ^get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the remembered user. </summary>
+		///
+		/// <value>	The remembered user. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property String ^RememberedUser { String ^get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Set maximum cache size. </summary>
+		///
+		/// <value>	Maximum cache size in megabytes. Setting it to 0 (the default) will let libspotify automatically resize the cache (10% of disk free space). </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property int CacheSize { void set(int cahceSize) sealed; }
 
 		/// <summary>	[Not implemented] Event queue for all listeners interested in ConnectionError events. </summary>
 		event SessionEventHandler ^ConnectionError;
