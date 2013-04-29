@@ -82,7 +82,7 @@ namespace SpotiFire.TestClient
             queue.Seed = playlist.Tracks;
             if (!queue.IsEmpty)
             {
-                var track = queue.Dequeue();
+                var track = await queue.Dequeue();
                 session.PlayerUnload();
                 session.PlayerLoad(track);
                 session.PlayerPlay();
