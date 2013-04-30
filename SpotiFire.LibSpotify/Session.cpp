@@ -198,14 +198,13 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 		_mainThread = gcnew Thread(gcnew ParameterizedThreadStart(&main_thread));
 		_mainThread->IsBackground = true;
 		_mainThread->Start(this);
-
 	}
 	catch(System::Exception ^e) {
 		logger->ErrorException("Error occured during creating of session", e);
 		throw;
 	}
 	finally {
-		logger->Debug("Started.");
+		
 	}
 
 	//AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(this, &Session::process_exit);
