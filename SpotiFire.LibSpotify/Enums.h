@@ -1,10 +1,12 @@
 #pragma once
 #include "Stdafx.h"
+using namespace System::Runtime::CompilerServices;
 
 namespace SpotiFire {
 
+	
 	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Values that errors given from libspotify . </summary>
+	/// <summary>	Values that errors given from libspotify can have. </summary>
 	///
 	/// <remarks>	Aleksander, 19.10.2012. </remarks>
 	///-------------------------------------------------------------------------------------------------
@@ -189,6 +191,25 @@ namespace SpotiFire {
         /// An operating system error
         /// </summary>
         SYSTEM_FAILURE = 41,
+	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	The ErrorExtension class containing all the extension method for the Error Enum. </summary>
+	///
+	/// <remarks>	EraYaN, 30.04.2013 </remarks>
+	///-------------------------------------------------------------------------------------------------
+	[ExtensionAttribute]
+	public ref class ErrorExtensions abstract sealed {
+		public:        
+			///-------------------------------------------------------------------------------------------------
+			/// <summary>	Using libspotify to convert Error to a nice string in English. </summary>
+			///
+			/// <remarks>	EraYaN, 30.04.2013 </remarks>
+			///-------------------------------------------------------------------------------------------------
+			[ExtensionAttribute]
+			static String ^Message(SpotiFire::Error _error) {				
+				return UTF8(sp_error_message((sp_error)_error));				
+			}
 	};
 
 	///-------------------------------------------------------------------------------------------------

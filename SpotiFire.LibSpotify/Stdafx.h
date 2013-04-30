@@ -74,6 +74,7 @@ namespace SpotiFire {
 			}
 		}
 	};
+	
 }
 
 #include "Interfaces.h"
