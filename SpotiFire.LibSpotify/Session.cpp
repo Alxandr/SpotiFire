@@ -264,7 +264,8 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 	logger->Trace("Login");
 	SPLock lock;
 	marshal_context context;
-	_login = gcnew TaskCompletionSource<Error>();
+	_login = gcnew TaskCompletionSource<Error>(); 
+	//One could init _logout here too. So no NUllReferenceException is triggered or one could use an if where using _logout.
 	sp_session_login(_ptr, context.marshal_as<const char *>(username), context.marshal_as<const char *>(password), remember, NULL);
 	return _login->Task;
 }
@@ -438,7 +439,9 @@ void Session::logged_in(Error error) {
 
 void Session::logged_out() {
 	logger->Trace("logged_out");
-	_logout->SetResult(true);
+	if(_logout){
+		_logout->SetResult(true);
+	}
 }
 
 void Session::end_of_track() {

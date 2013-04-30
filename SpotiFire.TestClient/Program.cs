@@ -58,7 +58,6 @@ namespace SpotiFire.TestClient
                     Console.WriteLine("An error occurred while logging in.\n{0}", err.Message());
                 }
             } while (err != Error.OK);
-            err = null;
 
             session.PreferredBitrate = BitRate.Bitrate320k;
 

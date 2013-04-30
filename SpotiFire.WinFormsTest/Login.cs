@@ -35,7 +35,7 @@ namespace SpotiFire.WinFormsTest
             }
             else
             {
-                MessageBox.Show(result.Message(), "An error occurred while logging in.", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(result.Message(), "An error occurred while logging in.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 maskedTextBox1.Text = "";
             }
         }
