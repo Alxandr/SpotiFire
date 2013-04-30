@@ -39,7 +39,7 @@ namespace SpotiFire {
 	public ref class SpotifyException : Exception {
 	private:
 		initonly
-		sp_error _error;
+			sp_error _error;
 
 	internal:
 		SpotifyException(sp_error error) {
@@ -74,7 +74,7 @@ namespace SpotiFire {
 			}
 		}
 	};
-	
+
 }
 
 #include "Interfaces.h"
@@ -93,8 +93,6 @@ namespace SpotiFire {
 #include "Track.h"
 #include "User.h"
 #include "Link.h"
-
-
 
 
 namespace SpotiFire {

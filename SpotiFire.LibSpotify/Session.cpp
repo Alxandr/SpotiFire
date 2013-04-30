@@ -198,7 +198,7 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 		_mainThread = gcnew Thread(gcnew ParameterizedThreadStart(&main_thread));
 		_mainThread->IsBackground = true;
 		_mainThread->Start(this);
-		
+
 	}
 	catch(System::Exception ^e) {
 		logger->ErrorException("Error occured during creating of session", e);
@@ -264,8 +264,7 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 	logger->Trace("Login");
 	SPLock lock;
 	marshal_context context;
-	_login = gcnew TaskCompletionSource<Error>(); 
-	//One could init _logout here too. So no NUllReferenceException is triggered or one could use an if where using _logout.
+	_login = gcnew TaskCompletionSource<Error>();	
 	sp_session_login(_ptr, context.marshal_as<const char *>(username), context.marshal_as<const char *>(password), remember, NULL);
 	return _login->Task;
 }
@@ -434,12 +433,14 @@ void Session::music_delivery(MusicDeliveryEventArgs ^args) {
 
 void Session::logged_in(Error error) {
 	logger->Trace("logged_in");
-	_login->SetResult(error);
+	if(_login) {
+		_login->SetResult(error);
+	}
 }
 
 void Session::logged_out() {
 	logger->Trace("logged_out");
-	if(_logout){
+	if(_logout) {
 		_logout->SetResult(true);
 	}
 }
