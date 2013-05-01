@@ -92,6 +92,19 @@
 				<assembly name="System.Xml.Linq" />
 			</framework-assemblies>
 			<dependencies refid="nuget.dependencies" />
+			<symbols>
+				<sources type="src" basedir="${basedir}">
+					<include name="SpotiFire.SpotifyLib/**/*.cs" />
+					<include name="SpotiFire.LibSpotify/*.h" />
+					<include name="SpotiFire.LibSpotify/*.cpp" />
+					<exclude name="**/obj/**" />
+				</sources>
+				<sources type="lib" framework="net45" basedir="${build.dir}">
+					<include name="SpotiFire.dll" />
+					<include name="SpotiFire.xml" />
+					<include name="SpotiFire.pdb" />
+		        </sources>
+			</symbols>
 		</nuget-pack>
 	</target>
 

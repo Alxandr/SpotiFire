@@ -114,5 +114,12 @@ namespace SpotiFire.WpfTest
                 session.PlayerPlay();
             }
         }
+
+        protected async override void OnClosed(EventArgs e)
+        {
+            session.PlayerUnload();
+            base.OnClosed(e);
+            await session.Logout();
+        }
     }
 }

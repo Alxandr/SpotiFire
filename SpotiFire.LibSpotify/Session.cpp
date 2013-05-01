@@ -246,7 +246,8 @@ Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocat
 	create->settingsLocation = settingsLocation;
 	create->userAgent = userAgent;
 
-	return Task::Factory->StartNew(gcnew Func<Session ^>(create, &$session$create::run));
+	return Task::Factory->StartNew(gcnew Func<Session ^>(create, &$session$create::run),
+		CancellationToken::None, System::Threading::Tasks::TaskCreationOptions::None, TaskScheduler::Default);
 }
 
 Session ^Session::SelfSession::get() {

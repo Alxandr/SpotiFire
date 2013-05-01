@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<project default="build" xmlns="http://nant.sourceforge.net/release/0.92/nant.xsd" name="WPF">
+	<target name="build">
+		<msbuild project="WPF.proj"> <!-- projects containg XAML *requires* the use of msbuild -->
+			<property name="AssemblyName" value="${project::get-name()}" readonly="true" />
+			<property name="BuildProjectReferences" value="false" readonly="true" />
+			<property name="Platform" value="x86" readonly="true" />
+			<property name="OutputPath" value="${build.dir}" readonly="true" />
+			<property name="ReferencePath" value="${build.dir}" readonly="true" />
+		</msbuild>
+	</target>
+</project>
