@@ -3,8 +3,9 @@
 
 namespace SpotiFire {
 
+	
 	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Values that errors given from libspotify . </summary>
+	/// <summary>	Values that errors given from libspotify can have. </summary>
 	///
 	/// <remarks>	Aleksander, 19.10.2012. </remarks>
 	///-------------------------------------------------------------------------------------------------

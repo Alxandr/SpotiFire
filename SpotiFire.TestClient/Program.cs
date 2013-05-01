@@ -49,8 +49,16 @@ namespace SpotiFire.TestClient
             Console.WriteLine("Enter username and password (a line for each)");
             Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
             session.MusicDelivered += session_MusicDeliver;
+            Error err;
+            do
+            {
+                err = await session.Login(Console.ReadLine(), Console.ReadLine(), false);
+                if (err != Error.OK)
+                {
+                    Console.WriteLine("An error occurred while logging in.\n{0}", err.Message());
+                }
+            } while (err != Error.OK);
 
-            await session.Login(Console.ReadLine(), Console.ReadLine(), false);
             session.PreferredBitrate = BitRate.Bitrate320k;
 
             await session.PlaylistContainer;

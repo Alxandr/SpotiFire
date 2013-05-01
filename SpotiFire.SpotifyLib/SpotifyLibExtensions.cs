@@ -210,7 +210,7 @@ namespace SpotiFire
             session.PlayerPlay();
 
             return tcs.Task;
-        }
+        }        
     }
 
 }
