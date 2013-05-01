@@ -204,7 +204,7 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 		throw;
 	}
 	finally {
-
+		
 	}
 
 	//AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(this, &Session::process_exit);
@@ -264,7 +264,7 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 	logger->Trace("Login");
 	SPLock lock;
 	marshal_context context;
-	_login = gcnew TaskCompletionSource<Error>();
+	_login = gcnew TaskCompletionSource<Error>();	
 	sp_session_login(_ptr, context.marshal_as<const char *>(username), context.marshal_as<const char *>(password), remember, NULL);
 	return _login->Task;
 }
@@ -433,12 +433,16 @@ void Session::music_delivery(MusicDeliveryEventArgs ^args) {
 
 void Session::logged_in(Error error) {
 	logger->Trace("logged_in");
-	_login->SetResult(error);
+	if(_login) {
+		_login->SetResult(error);
+	}
 }
 
 void Session::logged_out() {
 	logger->Trace("logged_out");
-	_logout->SetResult(true);
+	if(_logout) {
+		_logout->SetResult(true);
+	}
 }
 
 void Session::end_of_track() {
