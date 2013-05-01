@@ -420,7 +420,7 @@ namespace SpotiFire
         void CopyToInternal(Array array, int arrayIndex)
         {
             Populate();
-            int size, length;
+            //int size, length; //unused
 
             if (array == null)
                 throw new ArgumentNullException("array");
@@ -540,7 +540,7 @@ namespace SpotiFire
         ///-------------------------------------------------------------------------------------------------
         public Track Dequeue()
         {
-            Track t;
+            //Track t; //unused
             if (_immidiateSize != 0)
             {
                 return Dequeue(ref _immidiate, ref _immidiateHead, ref _immidiateTail, ref _immidiateSize);
