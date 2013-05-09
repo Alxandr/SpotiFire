@@ -93,6 +93,7 @@ namespace SpotiFire {
 #include "Track.h"
 #include "User.h"
 #include "Link.h"
+#include "Toplist.h"
 
 
 namespace SpotiFire {
@@ -188,3 +189,15 @@ __forceinline void __TP2(System::Action<T1, T2> ^action, T1 val1, T2 val2) {
 	TPQN(_wc);
 }
 #define TP2(type1, type2, object, func, val1, val2) __TP2<type1, type2>(gcnew System::Action<type1, type2>(object, &func), val1, val2)
+
+#define SP_DATA(type, data) (*(gcroot<type ^> *)data)
+#define GC_CAST(type, gcroot) (type ^)gcroot
+
+template<typename T1>
+__forceinline T1 __SP_DATA_GET_AND_FREE(void *data) {
+	gcroot<T1> *root = (gcroot<T1> *)data;
+	T1 ret = *root;
+	delete root;
+	return ret;
+}
+#define SP_DATA_REM(type, data) __SP_DATA_GET_AND_FREE<type ^>(data)

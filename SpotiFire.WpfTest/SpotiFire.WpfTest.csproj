@@ -37,6 +37,9 @@
     <Reference Include="Bass.Net">
       <HintPath>..\Bass.Net.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\packages\NAudio.1.6\lib\net20\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -68,7 +71,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BASSPlayer.cs" />
+    <Compile Include="IPlayer.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
@@ -78,6 +81,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NAudioPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -95,6 +99,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -103,12 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\bass.dll">
-      <Link>bass.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpotiFire.LibSpotify\SpotiFire.LibSpotify.vcxproj">

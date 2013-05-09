@@ -35,6 +35,9 @@
     <Reference Include="Bass.Net">
       <HintPath>..\Bass.Net.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\packages\NAudio.1.6\lib\net20\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -45,12 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BASSPlayer.cs" />
+    <Compile Include="IPlayer.cs" />
+    <Compile Include="NAudioPlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpotiFire.LibSpotify\SpotiFire.LibSpotify.vcxproj">
@@ -61,12 +66,6 @@
       <Project>{cbf5614b-af79-4228-8265-7dc2baf9a626}</Project>
       <Name>SpotiFire.SpotifyLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\bass.dll">
-      <Link>bass.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

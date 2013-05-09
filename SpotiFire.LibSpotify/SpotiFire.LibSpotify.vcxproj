@@ -55,6 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <CompileAsManaged>true</CompileAsManaged>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -102,6 +103,7 @@
     <ClInclude Include="Search.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="Toplist.h" />
     <ClInclude Include="Track.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
@@ -123,6 +125,7 @@
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Toplist.cpp" />
     <ClCompile Include="Track.cpp" />
     <ClCompile Include="User.cpp" />
   </ItemGroup>

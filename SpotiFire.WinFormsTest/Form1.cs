@@ -15,7 +15,7 @@ namespace SpotiFire.WinFormsTest
     {
         Session session;
         
-        static BASSPlayer player = new BASSPlayer();
+        static IPlayer player = new NAudioPlayer();
 
         private PlaylistContainer pc;
 
@@ -144,6 +144,8 @@ namespace SpotiFire.WinFormsTest
         {
             var row = e.RowIndex;
             var track = ((IList<CachedTrack>)dataGridView1.DataSource)[row]._track;
+            session.PlayerUnload();
+            player.Reset();
             session.PlayerLoad(track);
             session.PlayerPlay();
         }

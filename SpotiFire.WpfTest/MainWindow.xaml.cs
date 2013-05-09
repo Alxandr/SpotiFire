@@ -22,7 +22,7 @@ namespace SpotiFire.WpfTest
     {
         Session session;
         
-        static BASSPlayer player = new BASSPlayer();
+        static IPlayer player = new NAudioPlayer();
 
         private PlaylistContainer pc;
 
@@ -34,6 +34,7 @@ namespace SpotiFire.WpfTest
         private void SetupSession()
         {
             session.MusicDelivered += session_MusicDeliverd;
+            session.PreferredBitrate = BitRate.Bitrate320k;
         }
 
         void session_MusicDeliverd(Session sender, MusicDeliveryEventArgs e)
@@ -110,6 +111,7 @@ namespace SpotiFire.WpfTest
 
                 await track;
                 session.PlayerUnload();
+                player.Reset();
                 session.PlayerLoad(track);
                 session.PlayerPlay();
             }

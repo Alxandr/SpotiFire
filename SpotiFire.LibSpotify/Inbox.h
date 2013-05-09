@@ -13,8 +13,13 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
+	[System::Runtime::CompilerServices::ExtensionAttribute]
 	public ref class Inbox sealed : ISpotifyObject
 	{
+	private:
+		static Logger ^logger = LogManager::GetCurrentClassLogger();
+
+	internal:
 		Session ^_session;
 		sp_inbox *_ptr;
 
@@ -49,6 +54,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	A task representing the pending operation. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual Task ^PostTracks(String ^user, array<Track ^> ^tracks, String ^message) sealed;
+		[System::Runtime::CompilerServices::ExtensionAttribute]
+		static Task ^PostTracks(SpotiFire::Session ^session, String ^user, array<Track ^> ^tracks, String ^message);
 	};
 }

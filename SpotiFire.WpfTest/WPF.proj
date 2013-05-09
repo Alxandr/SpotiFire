@@ -13,7 +13,7 @@
 	</PropertyGroup>
 
     <ItemGroup>
-    	<Reference Include="Bass.Net" />
+    	<Reference Include="NAudio" />
     	<Reference Include="SpotiFire" />
     	<Reference Include="System" />
     	<Reference Include="System.Data" />
@@ -47,7 +47,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BASSPlayer.cs" />
+    <Compile Include="IPlayer.cs" />
+    <Compile Include="NAudioPlayer.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>

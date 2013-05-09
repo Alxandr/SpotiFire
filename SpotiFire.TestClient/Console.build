@@ -1,6 +1,15 @@
 <?xml version="1.0"?>
 <project default="build" xmlns="http://nant.sourceforge.net/release/0.92/nant.xsd" name="Console">
 	<target name="build">
+		<nuget-get-dependencies solution-dir="${basedir}" project-dir="${project.dir}" id="nuget.dependencies" allow-newer="true" />
+		<nuget-get-files solution-dir="${basedir}" files-property="nuget.files" references-property="nuget.references" framework="net45">
+			<dependencies refid="nuget.dependencies" />
+		</nuget-get-files>
+		<copy todir="${build.dir}" flatten="true">
+			<fileset basedir="packages">
+				<patternset refid="nuget.files" />
+			</fileset>
+		</copy>
 		<csc target="exe" output="${build.dir}\${project::get-name()}.exe" platform="x86">
 			<references basedir="${build.dir}">
 				<include name="*.dll" />

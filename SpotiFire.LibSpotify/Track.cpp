@@ -1,11 +1,6 @@
 #include "stdafx.h"
 
 #include "Track.h"
-#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
-
-using namespace System::Runtime::InteropServices;
-#define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
-#define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
 Track::Track(SpotiFire::Session ^session, sp_track *ptr) {
 	SPLock lock;

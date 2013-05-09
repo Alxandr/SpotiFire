@@ -261,6 +261,7 @@
 				<property name="build.name" value="${path::get-file-name-without-extension(buildfile)}" />
 				<property name="build.dir" value="${sp.build.dir}/${build.name}" />
 				<property name="build.obj" value="${sp.build.obj}/${build.name}" />
+				<property name="project.dir" value="${path::get-directory-name(buildfile)}" />
 
 
 				<mkdir dir="${build.dir}" />
