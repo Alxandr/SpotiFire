@@ -67,6 +67,7 @@ namespace SpotiFire {
 		void music_delivery(MusicDeliveryEventArgs ^e);
 		void end_of_track();
 		void playtoken_lost();
+		void connectionstate_updated();
 
 		void process_exit(Object ^sender, EventArgs ^e);
 
@@ -287,6 +288,17 @@ namespace SpotiFire {
 
 		/// <summary>	[Not implemented] Event queue for all listeners interested in ConnectionError events. </summary>
 		event SessionEventHandler ^ConnectionError;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in ConnectionstateUpdated events. </summary>
+		///
+		/// <remarks>	Called when the connection state has updated - such as when logging in, going offline, etc. </remarks>	
+		/// <remarks>	The ConnectionstateUpdated event provides a way for applications to be notified
+		///				whenever the connection status of the Session has been updated. Actions that can
+		///				be taken after this are for instance notifying the client and automatically
+		///				trying to login again. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^ConnectionstateUpdated;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>

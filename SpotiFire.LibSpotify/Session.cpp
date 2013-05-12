@@ -26,6 +26,7 @@ SP_CALL streaming_error(sp_session *session, sp_error error);
 SP_CALL userinfo_updated(sp_session *session);
 SP_CALL start_playback(sp_session *session);
 SP_CALL stop_playback(sp_session *session);
+SP_CALL connectionstate_updated(sp_session *session);
 //SP_CALL get_audio_buffer_stats(sp_session *session, sp_audio_buffer_stats *stats);
 
 static bool _shutdown;
@@ -48,7 +49,7 @@ static sp_session_callbacks _callbacks = {
 	NULL, // offline status updated
 	NULL, // offline error
 	NULL, // credentials blob updated
-	NULL, // connectionstate updated
+	&connectionstate_updated, // connectionstate updated
 	NULL, // scrobble error
 	NULL, // private session mode change
 };
@@ -78,6 +79,10 @@ SP_CALL metadata_updated(sp_session *session) {
 
 SP_CALL connection_error(sp_session *session, sp_error error) {
 
+}
+
+SP_CALL connectionstate_updated(sp_session *session) {
+	TP0(SESSION, Session::connectionstate_updated);
 }
 
 SP_CALL message_to_user(sp_session *session, const char *message) {
@@ -429,6 +434,11 @@ void Session::ConnectionRules::set(SpotiFire::ConnectionRules rules) {
 void Session::music_delivery(MusicDeliveryEventArgs ^args) {
 	logger->Trace("music_delivery");
 	MusicDelivered(this, args);
+}
+
+void Session::connectionstate_updated() {
+	logger->Trace("connectionstate_updated");
+	ConnectionstateUpdated(this, gcnew SessionEventArgs());
 }
 
 void Session::logged_in(Error error) {
