@@ -119,4 +119,67 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		property array<byte> ^Samples { array<byte> ^get(); }
 	};
+	
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Additional information for audio buffer stats events. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public ref class AudioBufferStatsEventArgs : EventArgs
+	{
+	private:
+		int _samples;
+		int _stutters;
+
+	public:
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Default constructor. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		AudioBufferStatsEventArgs(void);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets or sets the number of samples in buffer. </summary>
+		///
+		/// <value>	The number of samples in buffer. </value>
+		///-------------------------------------------------------------------------------------------------
+		property int Samples { int get(); void set(int value); }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets or sets the number of stutters (audio dropouts) since last query. </summary>
+		///
+		/// <value>	The number of stutters. </value>
+		///-------------------------------------------------------------------------------------------------
+		property int Stutters { int get(); void set(int value); }
+	};
+	
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Additional information for private session mode events. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public ref class PrivateSessionModeEventArgs : EventArgs
+	{
+	private:
+		bool _private;
+
+	public:
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Constructor that takes the state of the private session. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		PrivateSessionModeEventArgs(bool isPrivate);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the state of the private session. </summary>
+		///
+		/// <value>	The state. </value>
+		///-------------------------------------------------------------------------------------------------
+		property bool Private { bool get(); }
+	};
+	
 }
