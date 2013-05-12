@@ -52,3 +52,30 @@ int MusicDeliveryEventArgs::Frames::get() {
 array<byte> ^MusicDeliveryEventArgs::Samples::get() {
 	return _samples;
 }
+
+AudioBufferStatsEventArgs::AudioBufferStatsEventArgs() {
+}
+
+int AudioBufferStatsEventArgs::Samples::get() {
+	return _samples;
+}
+
+void AudioBufferStatsEventArgs::Samples::set(int value) {
+	_samples = value;
+}
+
+int AudioBufferStatsEventArgs::Stutters::get() {
+	return _stutters;
+}
+
+void AudioBufferStatsEventArgs::Stutters::set(int value) {
+	_stutters = value;
+}
+
+PrivateSessionModeEventArgs::PrivateSessionModeEventArgs(bool isPrivate) {
+	_private = isPrivate;
+}
+
+bool PrivateSessionModeEventArgs::Private::get() {
+	return _private;
+}

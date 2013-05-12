@@ -37,6 +37,27 @@ namespace SpotiFire {
 	public delegate void MusicDeliveryEventHandler(Session^ sender, MusicDeliveryEventArgs^ e);
 
 	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Delegate for handling AudioBufferStats events. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
+	///
+	/// <param name="sender">	[in,out] If non-null, the sender. </param>
+	/// <param name="e">	 	[in,out] If non-null, the AudioBufferStatsEventArgs to process. </param>
+	///-------------------------------------------------------------------------------------------------
+	public delegate void AudioBufferStatsEventHandler(Session^ sender, AudioBufferStatsEventArgs^ e);
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Delegate for handling PrivateSessionMode events. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
+	///
+	/// <param name="sender">	[in,out] If non-null, the sender. </param>
+	/// <param name="e">	 	[in,out] If non-null, the PrivateSessionModeEventArgs to process.
+	///							</param>
+	///-------------------------------------------------------------------------------------------------
+	public delegate void PrivateSessionModeEventHandler(Session^ sender, PrivateSessionModeEventArgs^ e);
+
+	///-------------------------------------------------------------------------------------------------
 	/// <summary>	The main Spotify object. Used to communicate with Spotify's server, and playing music, amongst other things. </summary>
 	/// 
 	/// <remarks>	Aleksander, 30.01.2013. </remarks>
@@ -64,9 +85,24 @@ namespace SpotiFire {
 		// Session callbacks
 		void logged_in(Error error);
 		void logged_out();
+		void metadata_updated();
+		void connection_error(Error error);
+		void message_to_user(String ^message);
 		void music_delivery(MusicDeliveryEventArgs ^e);
-		void end_of_track();
 		void playtoken_lost();
+		void log_message(String ^message);
+		void end_of_track();
+		void streaming_error(Error error);
+		void userinfo_updated();
+		void start_playback();
+		void stop_playback();
+		void get_audio_buffer_stats(AudioBufferStatsEventArgs ^stats);
+		void offline_status_updated();
+		void offline_error(Error error);
+		void credentials_blob_updated(String ^blob);
+		void connectionstate_updated();
+		void scrobble_error(Error error);
+		void private_session_mode_changed(bool isPrivate);
 
 		void process_exit(Object ^sender, EventArgs ^e);
 
@@ -285,45 +321,36 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual property int CacheSize { void set(int cahceSize) sealed; }
 
-		/// <summary>	[Not implemented] Event queue for all listeners interested in ConnectionError events. </summary>
-		event SessionEventHandler ^ConnectionError;
-
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>
+		/// <summary>	Event queue for all listeners interested in MetadataUpdated events. </summary>
 		///
-		/// <remarks>	The EndOfTrack event provides a way for applications to be notified whenever
-		/// 			a track has finished playing. Actions that can be taken after this are for
-		/// 			instance playing another track, or exiting the application. </remarks>
+		/// <remarks>	The MetadataUpdated event provides a way for applications to be notified whenever
+		/// 			metadata has been updated. If you have metadata cached outside of libspotify, you
+		///				should purge your caches and fetch new versions. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^EndOfTrack;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in Exception events. </summary>
-		event SessionEventHandler ^Exception;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in LogMessage events. </summary>
-		event SessionEventHandler ^LogMessage;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in MessageToUser events. </summary>
-		event SessionEventHandler ^MessageToUser;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in MetadataUpdated events. </summary>
 		event SessionEventHandler ^MetadataUpdated;
 
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Event queue for all listeners interested in PlayTokenLost events. </summary>
+		/// <summary>	Event queue for all listeners interested in ConnectionError events. </summary>
 		///
-		/// <remarks>	The PlayTokenLost event provides a way for applications to be notified whenever
-		/// 			the spotify playtoken is lost. The spotify playtoken is a way for spotify
-		/// 			to make sure that the same account only plays music at one place at a time
-		/// 			(to prevent "sharing" of accounts). The playtoken is lost when the same user
-		/// 			starts to play music on another machine (or another application on the same machine). </remarks>
+		/// <remarks>	Called when a connection error has occured. </remarks>	
+		/// <remarks>	The ConnectionError event provides a way for applications to be notified
+		///				whenever a connection error has occured. Actions that can be taken after this are
+		///				for instance notifying the client and automatically trying to login again.
+		///				</remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^PlayTokenLost;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in StartPlayback events. </summary>
-		event SessionEventHandler ^StartPlayback;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in StopPlayback events. </summary>
-		event SessionEventHandler ^StopPlayback;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in StreamingError events. </summary>
-		event SessionEventHandler ^StreamingError;
-		/// <summary>	[Not implemented] Event queue for all listeners interested in UserinfoUpdated events. </summary>
-		event SessionEventHandler ^UserinfoUpdated;
+		event SessionEventHandler ^ConnectionError;
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in MessageToUser events. </summary>
+		///
+		/// <remarks>	Called when the access point wants to display a message to the user. </remarks>	
+		/// <remarks>	The MessageToUser event provides a way for applications to be notified
+		///				whenever a message should be displayed to the user. Actions that can be taken
+		///				after this are for instance notifying the client of the message. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^MessageToUser;
+		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MusicDelivered events. </summary>
 		///
@@ -333,5 +360,158 @@ namespace SpotiFire {
 		/// 			will stop working if any listeners on the MusicDelivered event blocks. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		event MusicDeliveryEventHandler ^MusicDelivered;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in PlayTokenLost events. </summary>
+		///
+		/// <remarks>	The PlayTokenLost event provides a way for applications to be notified whenever
+		/// 			the spotify playtoken is lost. The spotify playtoken is a way for spotify
+		/// 			to make sure that the same account only plays music at one place at a time
+		/// 			(to prevent "sharing" of accounts). The playtoken is lost when the same user
+		/// 			starts to play music on another machine (or another application on the same
+		///				machine). </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^PlayTokenLost;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in LogMessage events. </summary>
+		///
+		/// <remarks>	The LogMessage event provides a way for applications to be notified whenever
+		/// 			libspotify requests some log data to be logged. The application may log the given
+		///				data. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^LogMessage;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>
+		///
+		/// <remarks>	The EndOfTrack event provides a way for applications to be notified whenever
+		/// 			a track has finished playing. Actions that can be taken after this are for
+		/// 			instance playing another track, or exiting the application. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^EndOfTrack;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in StreamingError events. </summary>
+		///
+		/// <remarks>	Called when streaming cannot start or continue. </remarks>	
+		/// <remarks>	The StreamingError event provides a way for applications to be notified
+		///				whenever a streaming error has occured. Actions that can be taken after this are
+		///				for instance trying to stream again, or notifying the user of the error.
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^StreamingError;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in UserinfoUpdated events. </summary>
+		///
+		/// <remarks>	Called after user info (anything related to sp_user objects) have been updated.
+		///				</remarks>	
+		/// <remarks>	The UserinfoUpdated event provides a way for applications to be notified
+		///				whenever a modification of the user object has occured. Actions that can be taken
+		///				after this are for instance updating the info on the user page of the application.
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^UserinfoUpdated;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in StartPlayback events. </summary>
+		///
+		/// <remarks>	Called when audio playback should start. </remarks>	
+		/// <remarks>	The StartPlayback event provides a way for applications to be notified
+		///				whenever audio playback should start. For this to work correctly the application
+		///				must also implement GetAudioBufferStats. Event-listeners on this StartPlayback 
+		///				<strong>must not</strong> (ever) block. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^StartPlayback;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in StopPlayback events. </summary>
+		///
+		/// <remarks>	Called when audio playback should stop. </remarks>	
+		/// <remarks>	The StartPlayback event provides a way for applications to be notified
+		///				whenever audio playback should stop. For this to work correctly the application
+		///				must also implement GetAudioBufferStats. Event-listeners on this StopPlayback 
+		///				<strong>must not</strong> (ever) block. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^StopPlayback;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in GetAudioBufferStats events. </summary>
+		///
+		/// <remarks>	Called to query application about its audio buffer. </remarks>	
+		/// <remarks>	The GetAudioBufferStats event provides a way for applications to inform libspotify
+		///				about the audio buffer of the application. Event-listeners on this
+		///				GetAudioBufferStats <strong>must not</strong> (ever) block. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event AudioBufferStatsEventHandler ^GetAudioBufferStats;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in OfflineError events. </summary>
+		///
+		/// <remarks>	Called when an offline synchronization error has occured. </remarks>	
+		/// <remarks>	The OfflineError event provides a way for applications to be notified
+		///				whenever an offline synchronisation error has occured. Actions that can be taken
+		///				after this are for instance notifying the user of any synchronisation errors.
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^OfflineError;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in OfflineStatusUpdated events. </summary>
+		///
+		/// <remarks>	Called when offline synchronization status is updated. </remarks>	
+		/// <remarks>	The OfflineStatusUpdated event provides a way for applications to be notified
+		///				whenever the offline synchronisation error status is updated. Actions that can be
+		///				taken after this are for instance notifying the user of which tracks are currently
+		///				available offline. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^OfflineStatusUpdated;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in CredentialsBlobUpdated events. </summary>
+		///
+		/// <remarks>	Called when storable credentials have been updated. </remarks>	
+		/// <remarks>	The CredentialsBlobUpdated event provides a way for applications to be notified
+		///				whenever the storable credentials have been updated, which usually happens when a
+		///				connection to the AP has been established. Actionstaken after this are for
+		///				instance storing the blob on disk. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^CredentialsBlobUpdated;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in ConnectionstateUpdated events.
+		///				</summary>
+		///
+		/// <remarks>	Called when the connection state has updated - such as when logging in, going
+		///				offline, etc. </remarks>	
+		/// <remarks>	The ConnectionstateUpdated event provides a way for applications to be notified
+		///				whenever the connection status of the Session has been updated. Actions that can
+		///				be taken after this are for instance notifying the client and automatically
+		///				trying to login again. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^ConnectionstateUpdated;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in ScrobbleError events.
+		///				</summary>
+		///
+		/// <remarks>	Called when there is a scrobble error event. </remarks>	
+		/// <remarks>	The ScrobbleError event provides a way for applications to be notified
+		///				whenever a scrobble error has occured. Actions that can be taken after this are
+		///				for instance notifying the user about this change. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event SessionEventHandler ^ScrobbleError;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in PrivateSessionModeChanged events.
+		///				</summary>
+		///
+		/// <remarks>	Called when there is a change in the private session mode. </remarks>	
+		/// <remarks>	The PrivateSessionModeChanged event provides a way for applications to be notified
+		///				whenever a change in the private session mode has occured. Actions that can be
+		///				taken after this are for instance notifying the user about this change. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PrivateSessionModeEventHandler ^PrivateSessionModeChanged;
 	};
 }
