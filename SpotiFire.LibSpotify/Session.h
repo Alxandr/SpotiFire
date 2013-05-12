@@ -68,6 +68,7 @@ namespace SpotiFire {
 		void end_of_track();
 		void playtoken_lost();
 		void connectionstate_updated();
+		void connection_error(Error error);
 
 		void process_exit(Object ^sender, EventArgs ^e);
 
@@ -286,13 +287,23 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual property int CacheSize { void set(int cahceSize) sealed; }
 
-		/// <summary>	[Not implemented] Event queue for all listeners interested in ConnectionError events. </summary>
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in ConnectionError events. </summary>
+		///
+		/// <remarks>	Called when a connection error has occured. </remarks>	
+		/// <remarks>	The ConnectionError event provides a way for applications to be notified
+		///				whenever a connection error has occured. Actions that can be taken after this are
+		///				for instance notifying the client and automatically trying to login again.
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
 		event SessionEventHandler ^ConnectionError;
 
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Event queue for all listeners interested in ConnectionstateUpdated events. </summary>
+		/// <summary>	Event queue for all listeners interested in ConnectionstateUpdated events.
+		///				</summary>
 		///
-		/// <remarks>	Called when the connection state has updated - such as when logging in, going offline, etc. </remarks>	
+		/// <remarks>	Called when the connection state has updated - such as when logging in, going
+		///				offline, etc. </remarks>	
 		/// <remarks>	The ConnectionstateUpdated event provides a way for applications to be notified
 		///				whenever the connection status of the Session has been updated. Actions that can
 		///				be taken after this are for instance notifying the client and automatically

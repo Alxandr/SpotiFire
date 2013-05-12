@@ -78,7 +78,7 @@ SP_CALL metadata_updated(sp_session *session) {
 }
 
 SP_CALL connection_error(sp_session *session, sp_error error) {
-
+	TP1(Error, SESSION, Session::connection_error, ENUM(Error, error));
 }
 
 SP_CALL connectionstate_updated(sp_session *session) {
@@ -439,6 +439,11 @@ void Session::music_delivery(MusicDeliveryEventArgs ^args) {
 void Session::connectionstate_updated() {
 	logger->Trace("connectionstate_updated");
 	ConnectionstateUpdated(this, gcnew SessionEventArgs());
+}
+
+void Session::connection_error(Error error) {
+	logger->Trace("connection_error");
+	ConnectionError(this, gcnew SessionEventArgs(error));
 }
 
 void Session::logged_in(Error error) {
