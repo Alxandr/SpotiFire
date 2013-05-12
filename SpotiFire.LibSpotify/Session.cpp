@@ -26,8 +26,13 @@ SP_CALL streaming_error(sp_session *session, sp_error error);
 SP_CALL userinfo_updated(sp_session *session);
 SP_CALL start_playback(sp_session *session);
 SP_CALL stop_playback(sp_session *session);
+SP_CALL get_audio_buffer_stats(sp_session *session, sp_audio_buffer_stats *stats);
+SP_CALL offline_status_updated(sp_session *session);
+SP_CALL offline_error(sp_session *session, sp_error error);
+SP_CALL credentials_blob_updated(sp_session *session, const char *blob);
 SP_CALL connectionstate_updated(sp_session *session);
-//SP_CALL get_audio_buffer_stats(sp_session *session, sp_audio_buffer_stats *stats);
+SP_CALL scrobble_error(sp_session *session, sp_error error);
+SP_CALL private_session_mode_changed(sp_session *session, bool isPrivate);
 
 static bool _shutdown;
 static sp_session_callbacks _callbacks = {
@@ -45,13 +50,13 @@ static sp_session_callbacks _callbacks = {
 	&userinfo_updated, // userinfo updated
 	&start_playback, // start playback
 	&stop_playback, // stop playback
-	NULL, //&get_audio_buffer_stats, // get audio buffer stats
-	NULL, // offline status updated
-	NULL, // offline error
-	NULL, // credentials blob updated
+	&get_audio_buffer_stats, // get audio buffer stats
+	&offline_status_updated, // offline status updated
+	&offline_error, // offline error
+	&credentials_blob_updated, // credentials blob updated
 	&connectionstate_updated, // connectionstate updated
-	NULL, // scrobble error
-	NULL, // private session mode change
+	&scrobble_error, // scrobble error
+	&private_session_mode_changed, // private session mode change
 };
 
 static sp_session_config _config = {
@@ -73,60 +78,28 @@ static sp_session_config _config = {
 	NULL, // tracefile
 };
 
-SP_CALL metadata_updated(sp_session *session) {
-
-}
-
-SP_CALL connection_error(sp_session *session, sp_error error) {
-	TP1(Error, SESSION, Session::connection_error, ENUM(Error, error));
-}
-
-SP_CALL connectionstate_updated(sp_session *session) {
-	TP0(SESSION, Session::connectionstate_updated);
-}
-
-SP_CALL message_to_user(sp_session *session, const char *message) {
-
-}
-
-SP_CALL playtoken_lost(sp_session *session) {
-	TP0(SESSION, Session::playtoken_lost);
-}
-
-SP_CALL log_message(sp_session *session, const char *message) {
-
-}
-
-SP_CALL end_of_track(sp_session *session) {
-	TP0(SESSION, Session::end_of_track);
-}
-
-SP_CALL streaming_error(sp_session *session, sp_error error) {
-
-}
-
-SP_CALL userinfo_updated(sp_session *session) {
-
-}
-
-SP_CALL start_playback(sp_session *session) {
-
-}
-
-SP_CALL stop_playback(sp_session *session) {
-
-}
-
-SP_CALL notify_main_thread(sp_session *session) {
-	Session::notifier->Set();
-}
-
 SP_CALL logged_in(sp_session *session, sp_error error) {
 	TP1(Error, SESSION, Session::logged_in, ENUM(Error, error));
 }
 
 SP_CALL logged_out(sp_session *session) {
 	TP0(SESSION, Session::logged_out);
+}
+
+SP_CALL metadata_updated(sp_session *session) {
+	TP0(SESSION, Session::metadata_updated);
+}
+
+SP_CALL connection_error(sp_session *session, sp_error error) {
+	TP1(Error, SESSION, Session::connection_error, ENUM(Error, error));
+}
+
+SP_CALL message_to_user(sp_session *session, const char *message) {
+	TP1(String^, SESSION, Session::message_to_user, gcnew String(message));
+}
+
+SP_CALL notify_main_thread(sp_session *session) {
+	Session::notifier->Set();
 }
 
 int _stdcall music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
@@ -144,6 +117,67 @@ int _stdcall music_delivery(sp_session *session, const sp_audioformat *format, c
 	s->music_delivery(e);
 
 	return e->ConsumedFrames;
+}
+
+SP_CALL playtoken_lost(sp_session *session) {
+	TP0(SESSION, Session::playtoken_lost);
+}
+
+SP_CALL log_message(sp_session *session, const char *message) {
+	TP1(String^, SESSION, Session::log_message, gcnew String(message));
+}
+
+SP_CALL end_of_track(sp_session *session) {
+	TP0(SESSION, Session::end_of_track);
+}
+
+SP_CALL streaming_error(sp_session *session, sp_error error) {
+	TP1(Error, SESSION, Session::streaming_error, ENUM(Error, error));
+}
+
+SP_CALL userinfo_updated(sp_session *session) {
+	TP0(SESSION, Session::userinfo_updated);
+}
+
+SP_CALL start_playback(sp_session *session) {
+	TP0(SESSION, Session::start_playback);
+}
+
+SP_CALL stop_playback(sp_session *session) {
+	TP0(SESSION, Session::stop_playback);
+}
+
+SP_CALL get_audio_buffer_stats(sp_session *session, sp_audio_buffer_stats *stats) {
+	Session ^s = SESSION;
+	auto e = gcnew AudioBufferStatsEventArgs();
+	s->get_audio_buffer_stats(e);
+
+	stats->samples = e->Samples;
+	stats->stutter = e->Stutters;
+}
+
+SP_CALL offline_status_updated(sp_session *session) {
+	TP0(SESSION, Session::offline_status_updated);
+}
+
+SP_CALL offline_error(sp_session *session, sp_error error) {
+	TP1(Error, SESSION, Session::offline_error, ENUM(Error, error));
+}
+
+SP_CALL credentials_blob_updated(sp_session *session, const char *blob) {
+	TP1(String^, SESSION, Session::credentials_blob_updated, gcnew String(blob));
+}
+
+SP_CALL connectionstate_updated(sp_session *session) {
+	TP0(SESSION, Session::connectionstate_updated);
+}
+
+SP_CALL scrobble_error(sp_session *session, sp_error error) {
+	TP1(Error, SESSION, Session::scrobble_error, ENUM(Error, error));
+}
+
+SP_CALL private_session_mode_changed(sp_session *session, bool isPrivate) {
+	TP1(bool, SESSION, Session::private_session_mode_changed, isPrivate);
 }
 
 void main_thread(Object ^arg) {
@@ -431,21 +465,6 @@ void Session::ConnectionRules::set(SpotiFire::ConnectionRules rules) {
 }
 
 //------------------ Event Handlers ------------------//
-void Session::music_delivery(MusicDeliveryEventArgs ^args) {
-	logger->Trace("music_delivery");
-	MusicDelivered(this, args);
-}
-
-void Session::connectionstate_updated() {
-	logger->Trace("connectionstate_updated");
-	ConnectionstateUpdated(this, gcnew SessionEventArgs());
-}
-
-void Session::connection_error(Error error) {
-	logger->Trace("connection_error");
-	ConnectionError(this, gcnew SessionEventArgs(error));
-}
-
 void Session::logged_in(Error error) {
 	logger->Trace("logged_in");
 	if(_login) {
@@ -460,12 +479,92 @@ void Session::logged_out() {
 	}
 }
 
-void Session::end_of_track() {
-	logger->Trace("end_of_track");
-	EndOfTrack(this, gcnew SessionEventArgs());
+void Session::metadata_updated() {
+	logger->Trace("metadata_updated");
+	MetadataUpdated(this, gcnew SessionEventArgs());
+}
+
+void Session::connection_error(Error error) {
+	logger->Trace("connection_error");
+	ConnectionError(this, gcnew SessionEventArgs(error));
+}
+
+void Session::message_to_user(String ^message) {
+	logger->Trace("message_to_user");
+	MessageToUser(this, gcnew SessionEventArgs(message));
+}
+
+void Session::music_delivery(MusicDeliveryEventArgs ^args) {
+	logger->Trace("music_delivery");
+	MusicDelivered(this, args);
 }
 
 void Session::playtoken_lost() {
 	logger->Trace("playtoken_lost");
 	PlayTokenLost(this, gcnew SessionEventArgs());
+}
+
+void Session::log_message(String ^message) {
+	logger->Trace("log_message");
+	LogMessage(this, gcnew SessionEventArgs(message));
+}
+
+void Session::end_of_track() {
+	logger->Trace("end_of_track");
+	EndOfTrack(this, gcnew SessionEventArgs());
+}
+
+void Session::streaming_error(Error error) {
+	logger->Trace("streaming_error");
+	StreamingError(this, gcnew SessionEventArgs(error));
+}
+
+void Session::userinfo_updated() {
+	logger->Trace("userinfo_updated");
+	UserinfoUpdated(this, gcnew SessionEventArgs());
+}
+
+void Session::start_playback() {
+	logger->Trace("start_playback");
+	StartPlayback(this, gcnew SessionEventArgs());
+}
+
+void Session::stop_playback() {
+	logger->Trace("stop_playback");
+	StopPlayback(this, gcnew SessionEventArgs());
+}
+
+void Session::get_audio_buffer_stats(AudioBufferStatsEventArgs ^args) {
+	logger->Trace("get_audio_buffer_stats");
+	GetAudioBufferStats(this, args);
+}
+
+void Session::offline_error(Error error) {
+	logger->Trace("offline_error");
+	OfflineError(this, gcnew SessionEventArgs(error));
+}
+
+void Session::offline_status_updated() {
+	logger->Trace("offline_status_updated");
+	OfflineStatusUpdated(this, gcnew SessionEventArgs());
+}
+
+void Session::credentials_blob_updated(String ^blob) {
+	logger->Trace("credentials_blob_updated");
+	CredentialsBlobUpdated(this, gcnew SessionEventArgs(blob));
+}
+
+void Session::connectionstate_updated() {
+	logger->Trace("connectionstate_updated");
+	ConnectionstateUpdated(this, gcnew SessionEventArgs());
+}
+
+void Session::scrobble_error(Error error) {
+	logger->Trace("scrobble_error");
+	ScrobbleError(this, gcnew SessionEventArgs(error));
+}
+
+void Session::private_session_mode_changed(bool isPrivate) {
+	logger->Trace("private_session_mode_changed");
+	PrivateSessionModeChanged(this, gcnew PrivateSessionModeEventArgs(isPrivate));
 }
