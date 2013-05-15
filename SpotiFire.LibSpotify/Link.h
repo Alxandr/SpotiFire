@@ -13,7 +13,7 @@ namespace SpotiFire {
 	public ref class Link sealed : ISpotifyObject
 	{
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_link *_ptr;
 
 		Link(Session ^session, sp_link *ptr);

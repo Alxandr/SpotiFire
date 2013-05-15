@@ -18,10 +18,12 @@ namespace SpotiFire {
 	///-------------------------------------------------------------------------------------------------
 	public ref class Playlist sealed : ISpotifyObject, IAsyncLoaded
 	{
-	internal:
-		Session ^_session;
-		sp_playlist *_ptr;
+	private:
 		IList<Track ^> ^_tracks;
+
+	internal:
+		initonly Session ^_session;
+		sp_playlist *_ptr;
 
 		Playlist(Session ^session, sp_playlist *ptr);
 		!Playlist(); // finalizer

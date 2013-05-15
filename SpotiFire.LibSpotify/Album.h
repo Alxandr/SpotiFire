@@ -19,7 +19,7 @@ namespace SpotiFire {
 	public ref class Album sealed : ISpotifyObject, IAsyncLoaded
 	{
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_album *_ptr;
 
 		Album(Session ^session, sp_album *ptr);

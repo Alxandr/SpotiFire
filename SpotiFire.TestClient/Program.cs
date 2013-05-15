@@ -44,65 +44,66 @@ namespace SpotiFire.TestClient
             Run().Wait();
         }
 
-        static async Task PlayQueueTest()
-        {
-            Console.WriteLine("Enter username and password (a line for each)");
-            Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
-            session.MusicDelivered += session_MusicDeliver;
-            Error err;
-            do
-            {
-                err = await session.Login(Console.ReadLine(), Console.ReadLine(), false);
-                if (err != Error.OK)
-                {
-                    Console.WriteLine("An error occurred while logging in.\n{0}", err.Message());
-                }
-            } while (err != Error.OK);
+        //static async Task PlayQueueTest()
+        //{
+        //    Console.WriteLine("Enter username and password (a line for each)");
+        //    Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
+        //    session.MusicDelivered += session_MusicDeliver;
+        //    Error err;
+        //    do
+        //    {
+        //        err = await session.Login(Console.ReadLine(), Console.ReadLine(), false);
+        //        if (err != Error.OK)
+        //        {
+        //            Console.WriteLine("An error occurred while logging in.\n{0}", err.Message());
+        //        }
+        //    } while (err != Error.OK);
 
-            session.PreferredBitrate = BitRate.Bitrate320k;
+        //    session.PreferredBitrate = BitRate.Bitrate320k;
 
-            await session.PlaylistContainer;
-            while (session.PlaylistContainer.Playlists.Count < 1)
-            {
-                Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count);
-                await Task.Delay(TimeSpan.FromSeconds(2));
-            }
+        //    await session.PlaylistContainer;
+        //    while (session.PlaylistContainer.Playlists.Count < 1)
+        //    {
+        //        Console.WriteLine("Found {0} playlists, retrying in 2 sec.", session.PlaylistContainer.Playlists.Count);
+        //        await Task.Delay(TimeSpan.FromSeconds(2));
+        //    }
 
-            AutoResetEvent are = new AutoResetEvent(false);
+        //    AutoResetEvent are = new AutoResetEvent(false);
 
-            PlayQueue queue = new PlayQueue();
-            session.EndOfTrack += (s, e) =>
-            {
-                if (!queue.IsEmpty)
-                {
-                    var track = queue.Dequeue();
-                    session.PlayerUnload();
-                    session.PlayerLoad(track);
-                    session.PlayerPlay();
-                }
-                else
-                {
-                    are.Set();
-                }
-            };
+        //    PlayQueue queue = new PlayQueue();
+        //    session.EndOfTrack += (s, e) =>
+        //    {
+        //        if (!queue.IsEmpty)
+        //        {
+        //            var track = queue.Dequeue();
+        //            session.PlayerUnload();
+        //            session.PlayerLoad(track);
+        //            session.PlayerPlay();
+        //        }
+        //        else
+        //        {
+        //            are.Set();
+        //        }
+        //    };
 
-            var playlist = await session.PlaylistContainer.Playlists[0];
-            queue.Seed = playlist.Tracks;
-            if (!queue.IsEmpty)
-            {
-                var track = await queue.Dequeue();
-                session.PlayerUnload();
-                session.PlayerLoad(track);
-                session.PlayerPlay();
-                are.WaitOne();
-            }
-        }
+        //    var playlist = await session.PlaylistContainer.Playlists[0];
+        //    queue.Seed = playlist.Tracks;
+        //    if (!queue.IsEmpty)
+        //    {
+        //        var track = await queue.Dequeue();
+        //        session.PlayerUnload();
+        //        session.PlayerLoad(track);
+        //        session.PlayerPlay();
+        //        are.WaitOne();
+        //    }
+        //}
 
         static async Task Run()
         {
             Console.WriteLine("Enter username and password (a line for each)");
             Session session = await Spotify.CreateSession(key, cache, settings, userAgent);
             session.MusicDelivered += session_MusicDeliver;
+            session.Buffer.Ready += Buffer_Ready;
 
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
             session.PreferredBitrate = BitRate.Bitrate320k;
@@ -118,6 +119,7 @@ namespace SpotiFire.TestClient
             var toptrack = await toplist.Tracks[0];
             Console.WriteLine("Most popular track on spotify: " + toptrack.Name);
             await session.Play(toptrack);
+            Console.WriteLine("Done");
 
             PlayQueue queue = new PlayQueue();
 
@@ -164,6 +166,11 @@ namespace SpotiFire.TestClient
             await session.Logout();
         }
 
+        static void Buffer_Ready(MusicBuffer sender, EventArgs e)
+        {
+            player.Reset(sender);
+        }
+
         static async Task PlayPlaylistForever(Session session, Playlist starred)
         {
             int num = 0;
@@ -179,14 +186,15 @@ namespace SpotiFire.TestClient
 
         static void session_MusicDeliver(Session sender, MusicDeliveryEventArgs e)
         {
-            if (e.Samples.Length > 0)
-            {
-                e.ConsumedFrames = player.EnqueueSamples(e.Channels, e.Rate, e.Samples, e.Frames);
-            }
-            else
-            {
-                e.ConsumedFrames = 0;
-            }
+            Console.WriteLine("Music delivered");
+            //if (e.Samples.Length > 0)
+            //{
+            //    e.ConsumedFrames = player.EnqueueSamples(e.Channels, e.Rate, e.Samples, e.Frames);
+            //}
+            //else
+            //{
+            //    e.ConsumedFrames = 0;
+            //}
         }
     }
 }

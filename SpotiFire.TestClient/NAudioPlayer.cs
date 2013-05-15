@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,30 +9,37 @@ namespace SpotiFire.TestClient
 {
     class NAudioPlayer : IPlayer
     {
-        NAudio.Wave.BufferedWaveProvider buffer;
+        DirectSoundOut _dso;
+        NAudioWaveProvider _wp;
+        WaveFormat _wf;
 
-        public int EnqueueSamples(int channels, int rate, byte[] samples, int frames)
+        public void Reset(MusicBuffer buffer)
         {
-            if (buffer == null)
-            {
-                buffer = new NAudio.Wave.BufferedWaveProvider(new NAudio.Wave.WaveFormat(rate, channels));
-                NAudio.Wave.DirectSoundOut dso = new NAudio.Wave.DirectSoundOut(70);
-                dso.Init(buffer);
-                dso.Play();
-            }
-            int space = buffer.BufferLength - buffer.BufferedBytes;
-            if (space > samples.Length)
-            {
-                buffer.AddSamples(samples, 0, samples.Length);
-                return frames;
-            }
-            return 0;
-        }
+            Console.WriteLine("Reset");
 
-        public void Reset()
-        {
-            if (buffer != null)
-                buffer.ClearBuffer();
+            lock (this)
+            {
+                if (_wp != null)
+                {
+                    if (!_wf.Equals(_wp.WaveFormat))
+                    {
+                        _dso.Dispose();
+                        _dso = null;
+                    }
+                }
+                else
+                {
+                    _wp = new NAudioWaveProvider(buffer);
+                }
+                _wf = _wp.WaveFormat;
+
+                if (_dso == null)
+                {
+                    _dso = new DirectSoundOut(100);
+                    _dso.Init(_wp);
+                    _dso.Play();
+                }
+            }
         }
     }
 }

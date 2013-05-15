@@ -89,6 +89,7 @@
     <ClInclude Include="Albumbrowse.h" />
     <ClInclude Include="Artist.h" />
     <ClInclude Include="Artistbrowse.h" />
+    <ClInclude Include="Delegates.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="EventArgs.h" />
     <ClInclude Include="Interfaces.h" />
@@ -97,6 +98,8 @@
     <ClInclude Include="include\libspotify\api.h" />
     <ClInclude Include="Link.h" />
     <ClInclude Include="Lists.h" />
+    <ClInclude Include="MusicBuffer.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Playlist.h" />
     <ClInclude Include="Playlistcontainer.h" />
     <ClInclude Include="resource.h" />
@@ -118,6 +121,8 @@
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Inbox.cpp" />
     <ClCompile Include="Link.cpp" />
+    <ClCompile Include="MusicBuffer.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Playlist.cpp" />
     <ClCompile Include="Playlistcontainer.cpp" />
     <ClCompile Include="Search.cpp" />

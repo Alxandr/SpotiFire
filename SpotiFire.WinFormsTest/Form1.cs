@@ -30,12 +30,12 @@ namespace SpotiFire.WinFormsTest
 
         private void SetupSession()
         {
-            session.MusicDelivered += session_MusicDeliverd;
+            session.Buffer.Ready += Buffer_Ready;
         }
 
-        void session_MusicDeliverd(Session sender, MusicDeliveryEventArgs e)
+        void Buffer_Ready(MusicBuffer sender, EventArgs e)
         {
-            e.ConsumedFrames = player.EnqueueSamples(e.Channels, e.Rate, e.Samples, e.Frames);
+            player.Reset(sender);
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -144,10 +144,9 @@ namespace SpotiFire.WinFormsTest
         {
             var row = e.RowIndex;
             var track = ((IList<CachedTrack>)dataGridView1.DataSource)[row]._track;
-            session.PlayerUnload();
-            player.Reset();
-            session.PlayerLoad(track);
-            session.PlayerPlay();
+            //session.PlayerUnload();
+            //session.PlayerLoad(track);
+            //session.PlayerPlay();
         }
     }
 }

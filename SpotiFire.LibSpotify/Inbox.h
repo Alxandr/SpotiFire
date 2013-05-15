@@ -20,7 +20,7 @@ namespace SpotiFire {
 		static Logger ^logger = LogManager::GetCurrentClassLogger();
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_inbox *_ptr;
 
 		Inbox(Session ^session, sp_inbox *ptr);

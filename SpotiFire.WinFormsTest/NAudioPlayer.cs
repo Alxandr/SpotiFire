@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,30 +10,67 @@ namespace SpotiFire.WinFormsTest
 {
     class NAudioPlayer : IPlayer
     {
-        NAudio.Wave.BufferedWaveProvider buffer;
+        DirectSoundOut _dso;
+        SpotifyWaveProvider _wp;
+        WaveFormat _wf;
 
-        public int EnqueueSamples(int channels, int rate, byte[] samples, int frames)
+        public void Reset(MusicBuffer buffer)
         {
-            if (buffer == null)
+            Debug.WriteLine("Reset");
+
+            lock (this)
             {
-                buffer = new NAudio.Wave.BufferedWaveProvider(new NAudio.Wave.WaveFormat(rate, channels));
-                NAudio.Wave.DirectSoundOut dso = new NAudio.Wave.DirectSoundOut(70);
-                dso.Init(buffer);
-                dso.Play();
+                if (_wp != null)
+                {
+                    if (!_wf.Equals(_wp.WaveFormat))
+                    {
+                        _dso.Dispose();
+                        _dso = null;
+                    }
+                }
+                else
+                {
+                    _wp = new SpotifyWaveProvider(buffer);
+                }
+                _wf = _wp.WaveFormat;
+
+                if (_dso == null)
+                {
+                    _dso = new DirectSoundOut(70);
+                    _dso.Init(_wp);
+                    _dso.Play();
+                }
+                else
+                {
+                    _dso.Stop();
+                    _dso.Play();
+                }
             }
-            int space = buffer.BufferLength - buffer.BufferedBytes;
-            if (space > samples.Length)
-            {
-                buffer.AddSamples(samples, 0, samples.Length);
-                return frames;
-            }
-            return 0;
         }
 
-        public void Reset()
+        class SpotifyWaveProvider : IWaveProvider
         {
-            if (buffer != null)
-                buffer.ClearBuffer();
+            readonly MusicBuffer _buffer;
+            public SpotifyWaveProvider(MusicBuffer buffer)
+            {
+                _buffer = buffer;
+            }
+
+            public int Read(byte[] buffer, int offset, int count)
+            {
+                return _buffer.Read(buffer, offset, count);
+            }
+
+            public WaveFormat WaveFormat
+            {
+                get
+                {
+                    int sampleRate;
+                    int channels;
+                    _buffer.GetFormat(out channels, out sampleRate);
+                    return new WaveFormat(sampleRate, channels);
+                }
+            }
         }
     }
 }

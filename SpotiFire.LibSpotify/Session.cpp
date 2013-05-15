@@ -104,19 +104,9 @@ SP_CALL notify_main_thread(sp_session *session) {
 
 int _stdcall music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
 	Session ^s = SESSION;
-	array<byte> ^samples;
-	if(num_frames > 0) {
-		samples = gcnew array<byte>(num_frames * format->channels * 2);
-		pin_ptr<byte> data_array_start = &samples[0];
-		memcpy(data_array_start, frames, samples->Length);
-	} else {
-		samples = gcnew array<byte>(0);
-	}
-
-	auto e = gcnew MusicDeliveryEventArgs(format->channels, format->sample_rate, samples, num_frames);
-	s->music_delivery(e);
-
-	return e->ConsumedFrames;
+	if(s->_buffer->Write(format, frames, num_frames))
+		return num_frames;
+	return 0;
 }
 
 SP_CALL playtoken_lost(sp_session *session) {
@@ -148,12 +138,9 @@ SP_CALL stop_playback(sp_session *session) {
 }
 
 SP_CALL get_audio_buffer_stats(sp_session *session, sp_audio_buffer_stats *stats) {
+	Session::logger->Trace("get_audio_buffer_stats");
 	Session ^s = SESSION;
-	auto e = gcnew AudioBufferStatsEventArgs();
-	s->get_audio_buffer_stats(e);
-
-	stats->samples = e->Samples;
-	stats->stutter = e->Stutters;
+	s->Buffer->GetStatus(stats);
 }
 
 SP_CALL offline_status_updated(sp_session *session) {
@@ -246,6 +233,8 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 		
 	}
 
+	_buffer = gcnew MusicBuffer(this);
+	_player = gcnew SpotiFire::Player(this);
 	//AppDomain::CurrentDomain->ProcessExit += gcnew EventHandler(this, &Session::process_exit);
 }
 
@@ -291,6 +280,14 @@ Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocat
 
 Session ^Session::SelfSession::get() {
 	return this;
+}
+
+MusicBuffer ^Session::Buffer::get() {
+	return _buffer;
+}
+
+Player ^Session::Player::get() {
+	return _player;
 }
 
 ConnectionState Session::ConnectionState::get() {
@@ -511,7 +508,8 @@ void Session::log_message(String ^message) {
 
 void Session::end_of_track() {
 	logger->Trace("end_of_track");
-	EndOfTrack(this, gcnew SessionEventArgs());
+	_player->InternalEndOfTrack();
+	//EndOfTrack(this, gcnew SessionEventArgs());
 }
 
 void Session::streaming_error(Error error) {
@@ -532,11 +530,6 @@ void Session::start_playback() {
 void Session::stop_playback() {
 	logger->Trace("stop_playback");
 	StopPlayback(this, gcnew SessionEventArgs());
-}
-
-void Session::get_audio_buffer_stats(AudioBufferStatsEventArgs ^args) {
-	logger->Trace("get_audio_buffer_stats");
-	GetAudioBufferStats(this, args);
 }
 
 void Session::offline_error(Error error) {

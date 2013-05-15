@@ -110,16 +110,16 @@ namespace SpotiFire.WpfTest
                     return;
 
                 await track;
-                session.PlayerUnload();
-                player.Reset();
-                session.PlayerLoad(track);
-                session.PlayerPlay();
+                //session.PlayerUnload();
+                //player.Reset();
+                //session.PlayerLoad(track);
+                //session.PlayerPlay();
             }
         }
 
         protected async override void OnClosed(EventArgs e)
         {
-            session.PlayerUnload();
+            //session.PlayerUnload();
             base.OnClosed(e);
             await session.Logout();
         }

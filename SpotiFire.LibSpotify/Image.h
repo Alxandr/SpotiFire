@@ -33,7 +33,7 @@ namespace SpotiFire {
 		bool _complete;
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_image *_ptr;
 
 		Image(Session ^session, sp_image *ptr);

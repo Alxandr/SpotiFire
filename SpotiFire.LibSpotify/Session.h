@@ -2,6 +2,8 @@
 
 #pragma once
 #include "Stdafx.h"
+#include "MusicBuffer.h"
+#include "Player.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -10,52 +12,6 @@ using namespace NLog;
 
 
 namespace SpotiFire {
-
-	ref class Session;
-	ref class Track;
-	ref class PlaylistContainer;
-	ref class Playlist;
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Delegate for handling Session events. </summary>
-	///
-	/// <remarks>	Aleksander, 30.01.2013. </remarks>
-	///
-	/// <param name="sender">	[in,out] If non-null, the sender. </param>
-	/// <param name="e">	 	[in,out] If non-null, the SessionEventArgs to process. </param>
-	///-------------------------------------------------------------------------------------------------
-	public delegate void SessionEventHandler(Session^ sender, SessionEventArgs^ e);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Delegate for handling MusicDelivery events. </summary>
-	///
-	/// <remarks>	Aleksander, 30.01.2013. </remarks>
-	///
-	/// <param name="sender">	[in,out] If non-null, the sender. </param>
-	/// <param name="e">	 	[in,out] If non-null, the MusicDeliveryEventArgs to process. </param>
-	///-------------------------------------------------------------------------------------------------
-	public delegate void MusicDeliveryEventHandler(Session^ sender, MusicDeliveryEventArgs^ e);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Delegate for handling AudioBufferStats events. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
-	///
-	/// <param name="sender">	[in,out] If non-null, the sender. </param>
-	/// <param name="e">	 	[in,out] If non-null, the AudioBufferStatsEventArgs to process. </param>
-	///-------------------------------------------------------------------------------------------------
-	public delegate void AudioBufferStatsEventHandler(Session^ sender, AudioBufferStatsEventArgs^ e);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Delegate for handling PrivateSessionMode events. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 12.05.2013. </remarks>
-	///
-	/// <param name="sender">	[in,out] If non-null, the sender. </param>
-	/// <param name="e">	 	[in,out] If non-null, the PrivateSessionModeEventArgs to process.
-	///							</param>
-	///-------------------------------------------------------------------------------------------------
-	public delegate void PrivateSessionModeEventHandler(Session^ sender, PrivateSessionModeEventArgs^ e);
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	The main Spotify object. Used to communicate with Spotify's server, and playing music, amongst other things. </summary>
@@ -72,6 +28,8 @@ namespace SpotiFire {
 		PlaylistContainer ^_pc;
 
 	internal:
+		initonly MusicBuffer ^_buffer;
+		initonly Player ^_player;
 		static Task<Session^> ^Create(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent);
 
 		static Logger ^logger = LogManager::GetCurrentClassLogger();
@@ -96,7 +54,6 @@ namespace SpotiFire {
 		void userinfo_updated();
 		void start_playback();
 		void stop_playback();
-		void get_audio_buffer_stats(AudioBufferStatsEventArgs ^stats);
 		void offline_status_updated();
 		void offline_error(Error error);
 		void credentials_blob_updated(String ^blob);
@@ -106,10 +63,81 @@ namespace SpotiFire {
 
 		void process_exit(Object ^sender, EventArgs ^e);
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Loads the specified track. </summary>
+		///
+		/// <remarks>	Aleksander, 30.01.2013. </remarks>
+		/// 
+		/// <exception cref="SpotifyException">Thrown on error.</exception>
+		///
+		/// <param name="track">	The track to be loaded. </param>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerLoad(SpotiFire::Track ^track) sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Pauses the currently playing track. </summary>
+		/// 
+		/// <exception cref="SpotifyException">Thrown on error.</exception>
+		///
+		/// <remarks>	Aleksander, 30.01.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerPause() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Starts playback of the currently loaded track. </summary>
+		///
+		/// <exception cref="SpotifyException">Thrown on error.</exception>
+		/// 
+		/// <remarks>	Aleksander, 30.01.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerPlay() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Seeks to a given position in the loaded track. </summary>
+		///
+		/// <remarks>	Aleksander, 30.01.2013. </remarks>
+		/// 
+		/// <exception cref="SpotifyException">Thrown on error.</exception>
+		///
+		/// <param name="offset">	The offset (in milliseconds) from the start of the track. </param>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerSeek(int offset) sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Seeks to a given position in the loaded track. </summary>
+		///
+		/// <remarks>	Aleksander, 30.01.2013. </remarks>
+		/// 
+		/// <exception cref="SpotifyException">Thrown on error.</exception>
+		///
+		/// <param name="offset">	The offset from the start of the track. </param>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerSeek(TimeSpan offset) sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Unload the currently loaded track. </summary>
+		///
+		/// <exception cref="SpotifyException">Thrown on error.</exception>
+		/// 
+		/// <remarks>	Aleksander, 30.01.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerUnload() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Prefetch a track. </summary>
+		///
+		/// <remarks>	Instruct libspotify to start loading of a track into its cache. This could be done by an application just before the current track ends. </remarks>
+		///
+		/// <param name="track">	The track to be prefetched. </param>
+		///-------------------------------------------------------------------------------------------------
+		virtual void PlayerPrefetch(Track ^track) sealed;
+
 	private:
 		virtual property SpotiFire::Session ^SelfSession { SpotiFire::Session ^get() sealed = ISpotifyObject::Session::get; }
 
 	public:
+
+		virtual property Player ^Player { SpotiFire::Player ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the state of the connection. </summary>
@@ -190,75 +218,6 @@ namespace SpotiFire {
 		virtual void FlushCaches() sealed;
 
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Loads the specified track. </summary>
-		///
-		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
-		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		///
-		/// <param name="track">	The track to be loaded. </param>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerLoad(SpotiFire::Track ^track) sealed;
-
-		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Pauses the currently playing track. </summary>
-		/// 
-		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		///
-		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerPause() sealed;
-
-		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Starts playback of the currently loaded track. </summary>
-		///
-		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		/// 
-		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerPlay() sealed;
-
-		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Seeks to a given position in the loaded track. </summary>
-		///
-		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
-		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		///
-		/// <param name="offset">	The offset (in milliseconds) from the start of the track. </param>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerSeek(int offset) sealed;
-
-		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Seeks to a given position in the loaded track. </summary>
-		///
-		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
-		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		///
-		/// <param name="offset">	The offset from the start of the track. </param>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerSeek(TimeSpan offset) sealed;
-
-		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Unload the currently loaded track. </summary>
-		///
-		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		/// 
-		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerUnload() sealed;
-
-		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Prefetch a track. </summary>
-		///
-		/// <remarks>	Instruct libspotify to start loading of a track into its cache. This could be done by an application just before the current track ends. </remarks>
-		///
-		/// <param name="track">	The track to be prefetched. </param>
-		///-------------------------------------------------------------------------------------------------
-		virtual void PlayerPrefetch(Track ^track) sealed;
-
-		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the playlist container. </summary>
 		///
 		/// <value>	The playlist container for the currently signed in user. </value>
@@ -320,6 +279,8 @@ namespace SpotiFire {
 		/// <value>	Maximum cache size in megabytes. Setting it to 0 (the default) will let libspotify automatically resize the cache (10% of disk free space). </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property int CacheSize { void set(int cahceSize) sealed; }
+
+		virtual property MusicBuffer ^Buffer { MusicBuffer ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MetadataUpdated events. </summary>
@@ -383,15 +344,6 @@ namespace SpotiFire {
 		event SessionEventHandler ^LogMessage;
 		
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>
-		///
-		/// <remarks>	The EndOfTrack event provides a way for applications to be notified whenever
-		/// 			a track has finished playing. Actions that can be taken after this are for
-		/// 			instance playing another track, or exiting the application. </remarks>
-		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^EndOfTrack;
-		
-		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StreamingError events. </summary>
 		///
 		/// <remarks>	Called when streaming cannot start or continue. </remarks>	
@@ -436,7 +388,7 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		event SessionEventHandler ^StopPlayback;
 
-		///-------------------------------------------------------------------------------------------------
+		/*///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in GetAudioBufferStats events. </summary>
 		///
 		/// <remarks>	Called to query application about its audio buffer. </remarks>	
@@ -444,7 +396,7 @@ namespace SpotiFire {
 		///				about the audio buffer of the application. Event-listeners on this
 		///				GetAudioBufferStats <strong>must not</strong> (ever) block. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event AudioBufferStatsEventHandler ^GetAudioBufferStats;
+		event AudioBufferStatsEventHandler ^GetAudioBufferStats;*/
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in OfflineError events. </summary>

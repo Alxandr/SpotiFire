@@ -80,6 +80,7 @@ namespace SpotiFire {
 #include "Interfaces.h"
 #include "Lists.h"
 #include "EventArgs.h"
+#include "Delegates.h"
 
 #include "Session.h"
 #include "Image.h"
@@ -120,8 +121,19 @@ namespace SpotiFire {
 		SPLock() { System::Threading::Monitor::Enter(libspotify::Mutex); }
 		~SPLock() { System::Threading::Monitor::Exit(libspotify::Mutex); }
 	private:
-		SPLock(const SPLock^ nocopy) {};
-		SPLock^ operator=(const SPLock^ nocopy) {return nullptr;};
+		SPLock(const SPLock ^nocopy) {}
+		SPLock ^operator=(const SPLock ^nocopy) {return nullptr;}
+	};
+
+	ref class ObjLock sealed {
+	private:
+		Object ^_o;
+	internal:
+		ObjLock(Object ^o) { _o = o; System::Threading::Monitor::Enter(_o); }
+		~ObjLock() { System::Threading::Monitor::Exit(_o); _o = nullptr; }
+	private:
+		ObjLock(const ObjLock ^nocopy) {}
+		ObjLock ^operator=(const ObjLock ^nocopy) {return nullptr;}
 	};
 }
 

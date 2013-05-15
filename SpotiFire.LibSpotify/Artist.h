@@ -18,7 +18,7 @@ namespace SpotiFire {
 	public ref class Artist sealed : ISpotifyObject, IAsyncLoaded
 	{
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_artist *_ptr;
 
 		Artist(Session ^session, sp_artist *ptr);

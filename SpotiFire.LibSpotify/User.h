@@ -16,7 +16,7 @@ namespace SpotiFire {
 	public ref class User sealed : ISpotifyObject, IAsyncLoaded
 	{
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_user *_ptr;
 
 		User(Session ^session, sp_user *ptr);

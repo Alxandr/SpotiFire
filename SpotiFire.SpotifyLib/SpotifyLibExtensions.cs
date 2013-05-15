@@ -200,14 +200,12 @@ namespace SpotiFire
             SessionEventHandler handler = null;
             handler = (s, e) =>
             {
-                session.EndOfTrack -= handler;
+                session.Player.EndOfTrack -= handler;
                 tcs.SetResult(null);
             };
 
-            session.PlayerUnload();
-            session.EndOfTrack += handler;
-            session.PlayerLoad(track);
-            session.PlayerPlay();
+            session.Player.Play(track);
+            session.Player.EndOfTrack += handler;
 
             return tcs.Task;
         }        

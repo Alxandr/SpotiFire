@@ -12,6 +12,7 @@ using namespace msclr::interop;
 namespace SpotiFire {
 
     ref class Session;
+    ref class Track;
 
     ///-------------------------------------------------------------------------------------------------
     /// <summary>	Interface for all spotify-objects. </summary>
@@ -77,5 +78,17 @@ namespace SpotiFire {
         /// <returns>	true if it succeeds, false if it fails. </returns>
         ///-------------------------------------------------------------------------------------------------
         bool AddContinuation(Action ^continuationAction);
+    };
+
+    public interface class ISpotifyBuffer {
+    public:
+        int Read(array<byte> ^buffer, int offset, int count);
+    };
+
+    public interface class IPlayQueue {
+    public:
+        Track ^Dequeue();
+        Track ^Peek();
+        property bool IsEmpty { bool get(); }
     };
 }

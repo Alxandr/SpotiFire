@@ -18,7 +18,7 @@ namespace SpotiFire {
 		static Logger ^logger = LogManager::GetCurrentClassLogger();
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_toplistbrowse *_ptr;
 
 		ToplistBrowse(Session ^session, sp_toplistbrowse *ptr);

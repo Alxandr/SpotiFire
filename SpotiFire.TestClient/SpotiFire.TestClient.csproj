@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="IPlayer.cs" />
     <Compile Include="NAudioPlayer.cs" />
+    <Compile Include="NAudioWaveProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -35,7 +35,7 @@ namespace SpotiFire {
 		bool _complete;
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_artistbrowse *_ptr;
 
 		ArtistBrowse(Session ^session, sp_artistbrowse *ptr);

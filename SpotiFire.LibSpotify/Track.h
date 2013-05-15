@@ -19,7 +19,7 @@ namespace SpotiFire {
 		IList<Artist ^> ^_artists;
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_track *_ptr;
 
 		Track(Session ^session, sp_track *ptr);

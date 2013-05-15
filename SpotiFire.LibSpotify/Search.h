@@ -25,7 +25,7 @@ namespace SpotiFire {
 		bool _complete;
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_search *_ptr;
 
 		Search(Session ^session, sp_search *ptr);

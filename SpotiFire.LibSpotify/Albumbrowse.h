@@ -37,7 +37,7 @@ namespace SpotiFire {
 		bool _complete;
 
 	internal:
-		Session ^_session;
+		initonly Session ^_session;
 		sp_albumbrowse *_ptr;
 
 		AlbumBrowse(Session ^session, sp_albumbrowse *ptr);
