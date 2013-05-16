@@ -39,3 +39,23 @@ String ^User::CanonicalName::get() {
 String ^User::DisplayName::get() {
 	return UTF8(sp_user_display_name(_ptr));
 }
+
+int User::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool User::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (User^ left, User^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (User^ left, User^ right) {
+	SPLock lock;
+	return !(left == right);
+}

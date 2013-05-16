@@ -143,3 +143,23 @@ Link ^Link::CreatePortrait(ArtistBrowse ^artistBrowse, int index) {
 	SPLock lock;
 	return CREATE(artistBrowse->_session, sp_link_create_from_artistbrowse_portrait(artistBrowse->_ptr, index));
 }
+
+int Link::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Link::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Link^ left, Link^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Link^ left, Link^ right) {
+	SPLock lock;
+	return !(left == right);
+}

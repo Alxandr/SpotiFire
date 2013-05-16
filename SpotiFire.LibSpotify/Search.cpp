@@ -238,3 +238,23 @@ bool Search::AddContinuation(Action ^continuationAction) {
 	_continuations->Add(continuationAction);
 	return true;
 }
+
+int Search::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Search::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Search^ left, Search^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Search^ left, Search^ right) {
+	SPLock lock;
+	return !(left == right);
+}

@@ -81,3 +81,23 @@ AlbumBrowse ^Album::Browse() {
 	SPLock lock;
 	return AlbumBrowse::Create(_session, this);
 }
+
+int Album::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Album::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Album^ left, Album^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Album^ left, Album^ right) {
+	SPLock lock;
+	return !(left == right);
+}

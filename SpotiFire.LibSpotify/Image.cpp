@@ -138,3 +138,23 @@ bool Image::AddContinuation(Action ^continuationAction) {
 	_continuations->Add(continuationAction);
 	return true;
 }
+
+int Image::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Image::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Image^ left, Image^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Image^ left, Image^ right) {
+	SPLock lock;
+	return !(left == right);
+}

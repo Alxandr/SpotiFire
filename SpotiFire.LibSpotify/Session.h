@@ -322,6 +322,26 @@ namespace SpotiFire {
 		virtual property int CacheSize { void set(int cahceSize) sealed; }
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the hash code for this session. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <returns>	The hash code. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual int GetHashCode() override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if this session is considered to be the same as the given object. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="other">	The object to compare. </param>
+		///
+		/// <returns>	true if the given object is equal to the session, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual bool Equals(Object^ other) override;
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MetadataUpdated events. </summary>
 		///
 		/// <remarks>	The MetadataUpdated event provides a way for applications to be notified whenever
@@ -514,4 +534,28 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		event PrivateSessionModeEventHandler ^PrivateSessionModeChanged;
 	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Checks if the given sessions should be considered equal. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+	///
+	/// <param name="left">	The session on the left-hand side of the operator. </param>
+	/// <param name="right">	The session on the right-hand side of the operator. </param>
+	///
+	/// <returns>	true if the given sessions are equal, otherwise false. </returns>
+	///-------------------------------------------------------------------------------------------------
+	bool operator== (Session^ left, Session^ right);
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Checks if the given sessions should not be considered equal. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+	///
+	/// <param name="left">	The session on the left-hand side of the operator. </param>
+	/// <param name="right">	The session on the right-hand side of the operator. </param>
+	///
+	/// <returns>	true if the given sessions are not equal, otherwise false. </returns>
+	///-------------------------------------------------------------------------------------------------
+	bool operator!= (Session^ left, Session^ right);
 }

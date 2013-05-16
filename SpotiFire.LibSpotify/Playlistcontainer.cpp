@@ -157,3 +157,23 @@ bool PlaylistContainer::AddContinuation(Action ^continuationAction) {
 	_continuations->Add(continuationAction);
 	return true;
 }
+
+int PlaylistContainer::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool PlaylistContainer::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (PlaylistContainer^ left, PlaylistContainer^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (PlaylistContainer^ left, PlaylistContainer^ right) {
+	SPLock lock;
+	return !(left == right);
+}

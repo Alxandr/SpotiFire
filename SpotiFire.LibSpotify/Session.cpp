@@ -464,6 +464,26 @@ void Session::ConnectionRules::set(SpotiFire::ConnectionRules rules) {
 	SP_ERR(sp_session_set_connection_rules(_ptr, (sp_connection_rules)rules));
 }
 
+int Session::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Session::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Session^ left, Session^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Session^ left, Session^ right) {
+	SPLock lock;
+	return !(left == right);
+}
+
 //------------------ Event Handlers ------------------//
 void Session::logged_in(Error error) {
 	logger->Trace("logged_in");

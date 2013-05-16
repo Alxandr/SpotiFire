@@ -102,5 +102,49 @@ namespace SpotiFire {
 		/// <returns>	null if it fails, else. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual AlbumBrowse ^Browse() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the hash code for this album. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <returns>	The hash code. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual int GetHashCode() override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if this album is considered to be the same as the given object. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="other">	The object to compare. </param>
+		///
+		/// <returns>	true if the given object is equal to the album, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual bool Equals(Object^ other) override;
 	};
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Checks if the given albums should be considered equal. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+	///
+	/// <param name="left">	The album on the left-hand side of the operator. </param>
+	/// <param name="right">	The album on the right-hand side of the operator. </param>
+	///
+	/// <returns>	true if the given albums are equal, otherwise false. </returns>
+	///-------------------------------------------------------------------------------------------------
+	bool operator== (Album^ left, Album^ right);
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Checks if the given albums should not be considered equal. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+	///
+	/// <param name="left">	The album on the left-hand side of the operator. </param>
+	/// <param name="right">	The album on the right-hand side of the operator. </param>
+	///
+	/// <returns>	true if the given albums are not equal, otherwise false. </returns>
+	///-------------------------------------------------------------------------------------------------
+	bool operator!= (Album^ left, Album^ right);
 }

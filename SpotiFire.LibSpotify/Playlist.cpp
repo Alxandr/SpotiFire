@@ -149,6 +149,26 @@ bool Playlist::IsReady::get() {
 	return true;
 }
 
+int Playlist::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Playlist::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Playlist^ left, Playlist^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Playlist^ left, Playlist^ right) {
+	SPLock lock;
+	return !(left == right);
+}
+
 //---------------------------------------------
 // Track meta-properties
 

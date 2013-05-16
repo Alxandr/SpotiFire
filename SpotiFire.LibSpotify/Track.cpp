@@ -121,3 +121,23 @@ String ^Track::Name::get() {
 	SPLock lock;
 	return UTF8(sp_track_name(_ptr));
 }
+
+int Track::GetHashCode() {
+	SPLock lock;
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Track::Equals(Object^ other) {
+	SPLock lock;
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool SpotiFire::operator== (Track^ left, Track^ right) {
+	SPLock lock;
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool SpotiFire::operator!= (Track^ left, Track^ right) {
+	SPLock lock;
+	return !(left == right);
+}
