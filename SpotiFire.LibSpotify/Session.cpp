@@ -387,6 +387,7 @@ Playlist ^Session::Starred::get() {
 	SPLock lock;
 	sp_playlist *ptr = sp_session_starred_create(_ptr);
 	auto ret = gcnew Playlist(this, ptr);
+	_ReadWriteBarrier();
 	sp_playlist_release(ptr);
 	return ret;
 }

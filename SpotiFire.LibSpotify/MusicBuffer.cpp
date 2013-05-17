@@ -117,8 +117,8 @@ void MusicBuffer::DiscardBuffer() {
 // TrackBuffer
 
 TrackBuffer::TrackBuffer(int channels, int sampleRate) {
-	_size = sampleRate * channels * 2 * 15; // 15 seconds buffer
-	_buffer = (char *)malloc(_size);
+	int size = sampleRate * channels * 2 * 15; // 15 seconds buffer
+	_buffer = gcnew array<byte>(size);
 	_writePosition = 0;
 	_readPosition = 0;
 	_byteCount = 0;
@@ -127,29 +127,27 @@ TrackBuffer::TrackBuffer(int channels, int sampleRate) {
 }
 
 TrackBuffer::~TrackBuffer() {
-	free(_buffer);
-	_buffer = NULL;
+	_buffer = nullptr;
 }
 
 TrackBuffer::!TrackBuffer() {
-	free(_buffer);
-	_buffer = NULL;
+	_buffer = nullptr;
 }
 
 bool TrackBuffer::Write(const sp_audioformat *format, const void *frames, int num_frames) {
 	int dataLength = num_frames * format->channels * 2;
-	if(dataLength > _size - _byteCount)
+	if(dataLength > _buffer->Length - _byteCount)
 		return false;
 
 	const char *data = reinterpret_cast<const char *>(frames);
 
-	int writeToEnd = Math::Min(_size - _writePosition, dataLength);
-	memcpy(_buffer + _writePosition, data, writeToEnd);
+	int writeToEnd = Math::Min(_buffer->Length - _writePosition, dataLength);
+	arrcpy(_buffer, _writePosition, data, 0, writeToEnd);
 	_writePosition += writeToEnd;
-	_writePosition %= _size;
+	_writePosition %= _buffer->Length;
 	if(writeToEnd < dataLength) {
 		System::Diagnostics::Debug::Assert(_writePosition == 0, "Must have wrapped around");
-		memcpy(_buffer + _writePosition, data + writeToEnd, dataLength - writeToEnd);
+		arrcpy(_buffer, _writePosition, data, writeToEnd, dataLength - writeToEnd);
 		_writePosition += dataLength - writeToEnd;
 	}
 	_byteCount += dataLength;
@@ -161,15 +159,15 @@ int TrackBuffer::Read(array<byte> ^buffer, int offset, int count) {
 		count = _byteCount;
 
 	int read = 0;
-	int readToEnd = Math::Min(_size - _readPosition, count);
-	arrcpy(buffer, offset, _buffer, _readPosition, readToEnd);
+	int readToEnd = Math::Min(_buffer->Length - _readPosition, count);
+	Array::Copy(_buffer, _readPosition, buffer, offset, readToEnd);
 	read = readToEnd;
 	_readPosition += readToEnd;
-	_readPosition %= _size;
+	_readPosition %= _buffer->Length;
 
 	if(read < count) {
 		System::Diagnostics::Debug::Assert(_readPosition == 0, "Must have wrapped around");
-		arrcpy(buffer, offset + read, _buffer, _readPosition, count - read);
+		Array::Copy(_buffer, _readPosition, buffer, offset + read, count - read);
 		_readPosition += count - read;
 		read = count;
 	}

@@ -42,8 +42,7 @@ namespace SpotiFire {
 
 	ref class TrackBuffer sealed : ISpotifyBuffer {
 	private:
-		char *_buffer;
-		int _size;
+		array<byte> ^_buffer;
 		int _writePosition;
 		int _readPosition;
 		int _byteCount;

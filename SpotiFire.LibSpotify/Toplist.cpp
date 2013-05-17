@@ -132,6 +132,7 @@ void toplistBrowseReturnResult(Object ^pdata) {
 	else
 		tcs->SetException(gcnew SpotifyException(err));
 
+	_ReadWriteBarrier();
 	sp_toplistbrowse_release(data->browse);
 
 	delete data;

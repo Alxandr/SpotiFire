@@ -76,12 +76,14 @@ Playlist ^Link::AsPlaylist() {
 	SPLock lock;
 	sp_playlist *pl = sp_playlist_create(_session->_ptr, _ptr);
 	Playlist ^ret = gcnew Playlist(_session, pl);
+	_ReadWriteBarrier();
 	sp_playlist_release(pl);
 	return ret;
 }
 
 __forceinline Link ^CREATE(Session ^session, sp_link *link) {
 	Link ^ret = gcnew Link(session, link);
+	_ReadWriteBarrier();
 	sp_link_release(link);
 	return ret;
 }

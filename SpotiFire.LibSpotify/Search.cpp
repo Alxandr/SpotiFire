@@ -191,6 +191,7 @@ Search ^Search::Create(SpotiFire::Session ^session,
 		)
 	);
 	*box = ret;
+	_ReadWriteBarrier();
 	sp_search_release(ret->_ptr);
 	return ret;
 }
