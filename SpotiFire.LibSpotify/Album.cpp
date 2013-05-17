@@ -81,3 +81,19 @@ AlbumBrowse ^Album::Browse() {
 	SPLock lock;
 	return AlbumBrowse::Create(_session, this);
 }
+
+int Album::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Album::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool Album::operator== (Album^ left, Album^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool Album::operator!= (Album^ left, Album^ right) {
+	return !(left == right);
+}

@@ -93,6 +93,50 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		static Image ^FromId(SpotiFire::Session ^session, String ^id);
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the hash code for this image. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <returns>	The hash code. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual int GetHashCode() override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if this image is considered to be the same as the given object. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="other">	The object to compare. </param>
+		///
+		/// <returns>	true if the given object is equal to the image, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual bool Equals(Object^ other) override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given images should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The image on the left-hand side of the operator. </param>
+		/// <param name="right">	The image on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given images are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (Image^ left, Image^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given images should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The image on the left-hand side of the operator. </param>
+		/// <param name="right">	The image on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given images are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (Image^ left, Image^ right);
+
 	private:
 		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
 		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;

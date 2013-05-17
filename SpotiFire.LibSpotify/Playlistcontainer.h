@@ -74,6 +74,52 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual property User ^Owner { User ^get() sealed; }
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the hash code for this playlistcontainer. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <returns>	The hash code. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual int GetHashCode() override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if this playlistcontainer is considered to be the same as the given object.
+		///				</summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="other">	The object to compare. </param>
+		///
+		/// <returns>	true if the given object is equal to the playlistcontainer, otherwise false.
+		///				</returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual bool Equals(Object^ other) override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given playlistcontainers should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The playlistcontainer on the left-hand side of the operator. </param>
+		/// <param name="right">	The playlistcontainer on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given playlistcontainers are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (PlaylistContainer^ left, PlaylistContainer^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given playlistcontainers should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The playlistcontainer on the left-hand side of the operator. </param>
+		/// <param name="right">	The playlistcontainer on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given playlistcontainers are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (PlaylistContainer^ left, PlaylistContainer^ right);
+
 	internal:
 		virtual Error AddFolder(int index, String ^name) sealed;
 		virtual PlaylistType GetPlaylistType(int index) sealed;

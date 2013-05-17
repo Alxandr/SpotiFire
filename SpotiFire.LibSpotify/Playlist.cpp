@@ -149,6 +149,22 @@ bool Playlist::IsReady::get() {
 	return true;
 }
 
+int Playlist::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Playlist::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool Playlist::operator== (Playlist^ left, Playlist^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool Playlist::operator!= (Playlist^ left, Playlist^ right) {
+	return !(left == right);
+}
+
 //---------------------------------------------
 // Track meta-properties
 

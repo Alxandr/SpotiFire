@@ -156,3 +156,19 @@ Task<ToplistBrowse ^> ^ToplistBrowse::CreateToplistBrowse(SpotiFire::Session ^se
 	sp_toplistbrowse_create(session->_ptr, ENUM(sp_toplisttype, type), ENUM(sp_toplistregion, region), context.marshal_as<const char *>(username), &callback, data);
 	return tcs->Task;
 }
+
+int ToplistBrowse::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool ToplistBrowse::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool ToplistBrowse::operator== (ToplistBrowse^ left, ToplistBrowse^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool ToplistBrowse::operator!= (ToplistBrowse^ left, ToplistBrowse^ right) {
+	return !(left == right);
+}

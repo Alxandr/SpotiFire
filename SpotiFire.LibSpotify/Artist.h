@@ -65,5 +65,49 @@ namespace SpotiFire {
 		/// <returns>	The newly created albumbrowse. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual ArtistBrowse ^Browse(ArtistBrowseType type) sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the hash code for this artist. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <returns>	The hash code. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual int GetHashCode() override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if this artist is considered to be the same as the given object. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="other">	The object to compare. </param>
+		///
+		/// <returns>	true if the given object is equal to the artist, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual bool Equals(Object^ other) override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given artists should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The artist on the left-hand side of the operator. </param>
+		/// <param name="right">	The artist on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given artists are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (Artist^ left, Artist^ right);
+
+			///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given artists should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The artist on the left-hand side of the operator. </param>
+		/// <param name="right">	The artist on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given artists are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (Artist^ left, Artist^ right);
 	};
 }
