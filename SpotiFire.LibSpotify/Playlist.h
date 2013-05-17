@@ -5,11 +5,22 @@
 
 using namespace System;
 using namespace System::Collections::Generic;
+using namespace SpotiFire::Collections;
 
 namespace SpotiFire {
 
 	ref class User;
 	ref class Track;
+
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Delegate for handling Playlist events. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 17.05.2013. </remarks>
+	///
+	/// <param name="sender">	[in,out] If non-null, the sender. </param>
+	/// <param name="e">	 	[in,out] If non-null, the PlaylistEventArgs to process. </param>
+	///-------------------------------------------------------------------------------------------------
+	public delegate void PlaylistEventHandler(Playlist^ sender, PlaylistEventArgs^ e);
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Playlist. </summary>
@@ -21,11 +32,19 @@ namespace SpotiFire {
 	internal:
 		Session ^_session;
 		sp_playlist *_ptr;
-		IList<Track ^> ^_tracks;
+		ObservableSPList<Track ^> ^_tracks;
+
+		static Logger ^logger = LogManager::GetCurrentClassLogger();
 
 		Playlist(Session ^session, sp_playlist *ptr);
 		!Playlist(); // finalizer
 		~Playlist(); // destructor
+
+		// Playlist events
+		void tracks_added(array<Track ^>^ tracks, int position);
+		void tracks_removed(array<Track ^>^ tracks);
+		void tracks_moved(array<Track ^>^ tracks, int newPosition);
+		void playlist_state_changed();
 
 	public:
 
@@ -62,7 +81,7 @@ namespace SpotiFire {
 		///
 		/// <value>	The tracks. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property IList<Track ^> ^Tracks { IList<Track ^> ^get() sealed; }
+		virtual property IObservableSPList<Track ^> ^Tracks { IObservableSPList<Track ^> ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Sets the name. </summary>
@@ -119,6 +138,19 @@ namespace SpotiFire {
 		/// <value>	true if this object is ready, false if not. </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property bool IsReady { bool get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in StateChanged events. </summary>
+		///
+		/// <remarks>	The StateChanged event provides a way for applications to be notified whenever
+		/// 			the state of the playlist has been updated. There are three states that trigger
+		///				this callback:
+		///				- Collaboration for this playlist has been turned on or off;
+		///				- The playlist started having pending changes, or all pending changes have now
+		///				  been committed;
+		///				- The playlist started loading, or finished loading. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^StateChanged;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this playlist. </summary>

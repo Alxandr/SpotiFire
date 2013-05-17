@@ -2,7 +2,6 @@
 
 #include "Session.h"
 
-
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 #define SP_CALL void _stdcall
 #define SESSION SP_DATA(Session, _config.userdata)

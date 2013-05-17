@@ -1,22 +1,26 @@
 #include "stdafx.h"
 
 #include "Playlistcontainer.h"
-#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
 using namespace System::Runtime::InteropServices;
+using namespace SpotiFire::Collections;
+
+#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
+void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
+void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata);
 void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata);
 
 sp_playlistcontainer_callbacks _callbacks = {
-	NULL, // playlist added
-	NULL, // playlist removed
-	NULL, // playlist moved
+	&playlist_added, // playlist added
+	&playlist_removed, // playlist removed
+	&playlist_moved, // playlist moved
 	&loaded, // loaded
 };
 
-void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata);
 PlaylistContainer::PlaylistContainer(SpotiFire::Session ^session, sp_playlistcontainer *ptr) {
 	SPLock lock;
 	_ptr = ptr;
@@ -49,7 +53,7 @@ User ^PlaylistContainer::Owner::get() {
 	return gcnew User(_session, sp_playlistcontainer_owner(_ptr));
 }
 
-ref class $PlaylistContainer$PlaylistList sealed : SPList<Playlist ^>
+ref class $PlaylistContainer$PlaylistList sealed : ObservableSPList<Playlist ^>
 {
 internal:
 	PlaylistContainer ^_pc;
@@ -83,9 +87,9 @@ public:
 	}
 };
 
-IList<Playlist ^> ^PlaylistContainer::Playlists::get() {
+IObservableSPList<Playlist ^> ^PlaylistContainer::Playlists::get() {
 	if(_playlists == nullptr) {
-		Interlocked::CompareExchange<IList<Playlist ^> ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
+		Interlocked::CompareExchange<ObservableSPList<Playlist ^> ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
 	}
 	return _playlists;
 }
@@ -120,6 +124,21 @@ UInt64 PlaylistContainer::GetFolderId(int index) {
 // Await
 void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata) {
 	TP0(SP_DATA(PlaylistContainer, userdata), PlaylistContainer::complete);
+}
+
+void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
+	PlaylistContainer^ playlistContainer = SP_DATA(PlaylistContainer, userdata);
+	TP2(Playlist^, int, playlistContainer, PlaylistContainer::playlist_added, gcnew SpotiFire::Playlist(playlistContainer->Session, playlist), position);
+}
+
+void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
+	PlaylistContainer^ playlistContainer = SP_DATA(PlaylistContainer, userdata);
+	TP2(Playlist^, int, playlistContainer, PlaylistContainer::playlist_removed, gcnew SpotiFire::Playlist(playlistContainer->Session, playlist), position);
+}
+
+void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata) {
+	PlaylistContainer^ playlistContainer = SP_DATA(PlaylistContainer, userdata);
+	TP3(Playlist^, int, int, playlistContainer, PlaylistContainer::playlist_moved, gcnew SpotiFire::Playlist(playlistContainer->Session, playlist), position, new_position);
 }
 
 void PlaylistContainer::complete() {
@@ -172,4 +191,26 @@ bool PlaylistContainer::operator== (PlaylistContainer^ left, PlaylistContainer^ 
 
 bool PlaylistContainer::operator!= (PlaylistContainer^ left, PlaylistContainer^ right) {
 	return !(left == right);
+}
+
+//------------------ Event Handlers ------------------//
+void PlaylistContainer::playlist_added(Playlist^ playlist, int position) {
+	 if (_playlists != nullptr) {
+		 NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Add, playlist, position);
+		 _playlists->RaiseCollectionChanged(e);
+	 }
+}
+
+void PlaylistContainer::playlist_removed(Playlist^ playlist, int position) {
+	 if (_playlists != nullptr) {
+		 NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Remove, playlist, position);
+		 _playlists->RaiseCollectionChanged(e);
+	 }
+}
+
+void PlaylistContainer::playlist_moved(Playlist^ playlist, int position, int newPosition) {
+	 if (_playlists != nullptr) {
+		 NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Move, playlist, newPosition, position);
+		 _playlists->RaiseCollectionChanged(e);
+	 }
 }

@@ -182,4 +182,21 @@ namespace SpotiFire {
 		property bool Private { bool get(); }
 	};
 	
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Additional information for private session mode events. </summary>
+	///
+	/// <remarks>	Chris Brandhorst, 17.05.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public ref class PlaylistEventArgs : EventArgs
+	{
+	public:
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Default constructor. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 17.05.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		PlaylistEventArgs();
+	};
+	
 }
