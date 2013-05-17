@@ -126,6 +126,30 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual bool Equals(Object^ other) override;
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given albumbrowse objects should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The albumbrowse object on the left-hand side of the operator. </param>
+		/// <param name="right">	The albumbrowse object on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given albumbrowse objects are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (AlbumBrowse^ left, AlbumBrowse^ right);
+
+		///-----------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given albumbrowse objects should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The albumbrowse object on the left-hand side of the operator. </param>
+		/// <param name="right">	The albumbrowse object on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given albumbrowse objects are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (AlbumBrowse^ left, AlbumBrowse^ right);
+
 	private:
 		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
 		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
@@ -136,28 +160,4 @@ namespace SpotiFire {
 		// Events
 		void complete();
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given albumbrowse objects should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The albumbrowse object on the left-hand side of the operator. </param>
-	/// <param name="right">	The albumbrowse object on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given albumbrowse objects are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (AlbumBrowse^ left, AlbumBrowse^ right);
-
-	///-----------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given albumbrowse objects should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The albumbrowse object on the left-hand side of the operator. </param>
-	/// <param name="right">	The albumbrowse object on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given albumbrowse objects are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (AlbumBrowse^ left, AlbumBrowse^ right);
 }

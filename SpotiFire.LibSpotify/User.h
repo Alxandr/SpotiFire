@@ -79,29 +79,29 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the user, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual bool Equals(Object^ other) override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given users should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The user on the left-hand side of the operator. </param>
+		/// <param name="right">	The user on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given users are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (User^ left, User^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given users should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The user on the left-hand side of the operator. </param>
+		/// <param name="right">	The user on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given users are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (User^ left, User^ right);
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given users should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The user on the left-hand side of the operator. </param>
-	/// <param name="right">	The user on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given users are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (User^ left, User^ right);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given users should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The user on the left-hand side of the operator. </param>
-	/// <param name="right">	The user on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given users are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (User^ left, User^ right);
 }

@@ -154,21 +154,17 @@ bool AlbumBrowse::AddContinuation(Action ^continuationAction) {
 }
 
 int AlbumBrowse::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool AlbumBrowse::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (AlbumBrowse^ left, AlbumBrowse^ right) {
-	SPLock lock;
+bool AlbumBrowse::operator== (AlbumBrowse^ left, AlbumBrowse^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (AlbumBrowse^ left, AlbumBrowse^ right) {
-	SPLock lock;
+bool AlbumBrowse::operator!= (AlbumBrowse^ left, AlbumBrowse^ right) {
 	return !(left == right);
 }

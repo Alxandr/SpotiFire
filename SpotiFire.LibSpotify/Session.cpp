@@ -465,22 +465,18 @@ void Session::ConnectionRules::set(SpotiFire::ConnectionRules rules) {
 }
 
 int Session::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool Session::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (Session^ left, Session^ right) {
-	SPLock lock;
+bool Session::operator== (Session^ left, Session^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (Session^ left, Session^ right) {
-	SPLock lock;
+bool Session::operator!= (Session^ left, Session^ right) {
 	return !(left == right);
 }
 

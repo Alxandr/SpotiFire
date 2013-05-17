@@ -96,6 +96,30 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual bool Equals(Object^ other) override;
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given playlistcontainers should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The playlistcontainer on the left-hand side of the operator. </param>
+		/// <param name="right">	The playlistcontainer on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given playlistcontainers are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (PlaylistContainer^ left, PlaylistContainer^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given playlistcontainers should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The playlistcontainer on the left-hand side of the operator. </param>
+		/// <param name="right">	The playlistcontainer on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given playlistcontainers are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (PlaylistContainer^ left, PlaylistContainer^ right);
+
 	internal:
 		virtual Error AddFolder(int index, String ^name) sealed;
 		virtual PlaylistType GetPlaylistType(int index) sealed;
@@ -110,28 +134,4 @@ namespace SpotiFire {
 		// Events
 		void complete();
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given playlistcontainers should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The playlistcontainer on the left-hand side of the operator. </param>
-	/// <param name="right">	The playlistcontainer on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given playlistcontainers are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (PlaylistContainer^ left, PlaylistContainer^ right);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given playlistcontainers should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The playlistcontainer on the left-hand side of the operator. </param>
-	/// <param name="right">	The playlistcontainer on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given playlistcontainers are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (PlaylistContainer^ left, PlaylistContainer^ right);
 }

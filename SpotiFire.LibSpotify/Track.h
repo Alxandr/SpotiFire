@@ -168,29 +168,29 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the track, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual bool Equals(Object^ other) override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given tracks should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The track on the left-hand side of the operator. </param>
+		/// <param name="right">	The track on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given tracks are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (Track^ left, Track^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given tracks should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The track on the left-hand side of the operator. </param>
+		/// <param name="right">	The track on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given tracks are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (Track^ left, Track^ right);
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given tracks should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The track on the left-hand side of the operator. </param>
-	/// <param name="right">	The track on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given tracks are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (Track^ left, Track^ right);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given tracks should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The track on the left-hand side of the operator. </param>
-	/// <param name="right">	The track on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given tracks are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (Track^ left, Track^ right);
 }

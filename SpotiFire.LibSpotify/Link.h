@@ -121,6 +121,30 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual bool Equals(Object^ other) override;
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given links should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The link on the left-hand side of the operator. </param>
+		/// <param name="right">	The link on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given links are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (Link^ left, Link^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given links should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The link on the left-hand side of the operator. </param>
+		/// <param name="right">	The link on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given links are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (Link^ left, Link^ right);
+
 	internal:
 		static Link ^Create(SpotiFire::Session ^session, String ^link);
 		static Link ^Create(Track ^track, TimeSpan offset);
@@ -135,28 +159,4 @@ namespace SpotiFire {
 		static Link ^CreatePortrait(Artist ^artist, ImageSize size);
 		static Link ^CreatePortrait(ArtistBrowse ^artistBrowse, int index);
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given links should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The link on the left-hand side of the operator. </param>
-	/// <param name="right">	The link on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given links are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (Link^ left, Link^ right);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given links should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The link on the left-hand side of the operator. </param>
-	/// <param name="right">	The link on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given links are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (Link^ left, Link^ right);
 }

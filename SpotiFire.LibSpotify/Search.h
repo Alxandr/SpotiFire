@@ -147,6 +147,30 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual bool Equals(Object^ other) override;
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given search objects should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The search object on the left-hand side of the operator. </param>
+		/// <param name="right">	The search object on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given searches are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (Search^ left, Search^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given search objects should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The search object on the left-hand side of the operator. </param>
+		/// <param name="right">	The search object on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given search objects are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (Search^ left, Search^ right);
+
 	private:
 		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
 		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
@@ -157,28 +181,4 @@ namespace SpotiFire {
 		// Spotify events
 		void complete();
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given search objects should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The search object on the left-hand side of the operator. </param>
-	/// <param name="right">	The search object on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given searches are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (Search^ left, Search^ right);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given search objects should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The search object on the left-hand side of the operator. </param>
-	/// <param name="right">	The search object on the right-hand side of the operator. </param>
-	///
-	/// <returns>	true if the given search objects are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (Search^ left, Search^ right);
 }

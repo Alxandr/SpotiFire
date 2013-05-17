@@ -145,21 +145,17 @@ Link ^Link::CreatePortrait(ArtistBrowse ^artistBrowse, int index) {
 }
 
 int Link::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool Link::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (Link^ left, Link^ right) {
-	SPLock lock;
+bool Link::operator== (Link^ left, Link^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (Link^ left, Link^ right) {
-	SPLock lock;
+bool Link::operator!= (Link^ left, Link^ right) {
 	return !(left == right);
 }

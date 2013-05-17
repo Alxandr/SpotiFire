@@ -80,21 +80,17 @@ Task ^Inbox::PostTracks(SpotiFire::Session ^session, String ^user, array<Track ^
 }
 
 int Inbox::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool Inbox::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (Inbox^ left, Inbox^ right) {
-	SPLock lock;
+bool Inbox::operator== (Inbox^ left, Inbox^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (Inbox^ left, Inbox^ right) {
-	SPLock lock;
+bool Inbox::operator!= (Inbox^ left, Inbox^ right) {
 	return !(left == right);
 }

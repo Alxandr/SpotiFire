@@ -140,21 +140,17 @@ bool Image::AddContinuation(Action ^continuationAction) {
 }
 
 int Image::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool Image::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (Image^ left, Image^ right) {
-	SPLock lock;
+bool Image::operator== (Image^ left, Image^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (Image^ left, Image^ right) {
-	SPLock lock;
+bool Image::operator!= (Image^ left, Image^ right) {
 	return !(left == right);
 }

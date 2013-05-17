@@ -110,21 +110,17 @@ bool ArtistBrowse::AddContinuation(Action ^continuationAction) {
 }
 
 int ArtistBrowse::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool ArtistBrowse::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (ArtistBrowse^ left, ArtistBrowse^ right) {
-	SPLock lock;
+bool ArtistBrowse::operator== (ArtistBrowse^ left, ArtistBrowse^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (ArtistBrowse^ left, ArtistBrowse^ right) {
-	SPLock lock;
+bool ArtistBrowse::operator!= (ArtistBrowse^ left, ArtistBrowse^ right) {
 	return !(left == right);
 }

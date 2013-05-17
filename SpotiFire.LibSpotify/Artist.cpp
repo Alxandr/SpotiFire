@@ -45,21 +45,17 @@ ArtistBrowse ^Artist::Browse(ArtistBrowseType type) {
 }
 
 int Artist::GetHashCode() {
-	SPLock lock;
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
 bool Artist::Equals(Object^ other) {
-	SPLock lock;
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool SpotiFire::operator== (Artist^ left, Artist^ right) {
-	SPLock lock;
+bool Artist::operator== (Artist^ left, Artist^ right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool SpotiFire::operator!= (Artist^ left, Artist^ right) {
-	SPLock lock;
+bool Artist::operator!= (Artist^ left, Artist^ right) {
 	return !(left == right);
 }

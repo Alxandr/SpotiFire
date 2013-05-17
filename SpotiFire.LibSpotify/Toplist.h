@@ -98,6 +98,32 @@ namespace SpotiFire {
 		virtual bool Equals(Object^ other) override;
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given toplistbrowse objects should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The toplistbrowse object on the left-hand side of the operator. </param>
+		/// <param name="right">	The toplistbrowse object on the right-hand side of the operator.
+		///				</param>
+		///
+		/// <returns>	true if the given toplistbrowse objects are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (ToplistBrowse^ left, ToplistBrowse^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given toplistbrowse objects should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The toplistbrowse object on the left-hand side of the operator. </param>
+		/// <param name="right">	The toplistbrowse object on the right-hand side of the operator.
+		///				</param>
+		///
+		/// <returns>	true if the given toplistbrowse objects are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (ToplistBrowse^ left, ToplistBrowse^ right);
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Initiate a request for browsing an toplist. </summary>
 		///
 		/// <remarks>	Aleksander, 09.05.2013. </remarks>
@@ -112,30 +138,4 @@ namespace SpotiFire {
 		[System::Runtime::CompilerServices::ExtensionAttribute]
 		static Task<ToplistBrowse ^> ^CreateToplistBrowse(SpotiFire::Session ^session, ToplistType type, ToplistRegion region, String ^username);
 	};
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given toplistbrowse objects should be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The toplistbrowse object on the left-hand side of the operator. </param>
-	/// <param name="right">	The toplistbrowse object on the right-hand side of the operator.
-	///				</param>
-	///
-	/// <returns>	true if the given toplistbrowse objects are equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator== (ToplistBrowse^ left, ToplistBrowse^ right);
-
-	///-------------------------------------------------------------------------------------------------
-	/// <summary>	Checks if the given toplistbrowse objects should not be considered equal. </summary>
-	///
-	/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
-	///
-	/// <param name="left">	The toplistbrowse object on the left-hand side of the operator. </param>
-	/// <param name="right">	The toplistbrowse object on the right-hand side of the operator.
-	///				</param>
-	///
-	/// <returns>	true if the given toplistbrowse objects are not equal, otherwise false. </returns>
-	///-------------------------------------------------------------------------------------------------
-	bool operator!= (ToplistBrowse^ left, ToplistBrowse^ right);
 }
