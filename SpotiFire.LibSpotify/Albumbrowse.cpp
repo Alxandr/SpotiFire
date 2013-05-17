@@ -152,3 +152,19 @@ bool AlbumBrowse::AddContinuation(Action ^continuationAction) {
 	_continuations->Add(continuationAction);
 	return true;
 }
+
+int AlbumBrowse::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool AlbumBrowse::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool AlbumBrowse::operator== (AlbumBrowse^ left, AlbumBrowse^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool AlbumBrowse::operator!= (AlbumBrowse^ left, AlbumBrowse^ right) {
+	return !(left == right);
+}

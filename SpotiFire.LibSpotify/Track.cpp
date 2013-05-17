@@ -121,3 +121,19 @@ String ^Track::Name::get() {
 	SPLock lock;
 	return UTF8(sp_track_name(_ptr));
 }
+
+int Track::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Track::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool Track::operator== (Track^ left, Track^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool Track::operator!= (Track^ left, Track^ right) {
+	return !(left == right);
+}

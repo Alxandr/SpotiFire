@@ -138,3 +138,19 @@ bool Image::AddContinuation(Action ^continuationAction) {
 	_continuations->Add(continuationAction);
 	return true;
 }
+
+int Image::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Image::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool Image::operator== (Image^ left, Image^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool Image::operator!= (Image^ left, Image^ right) {
+	return !(left == right);
+}

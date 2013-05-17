@@ -43,3 +43,19 @@ String ^Artist::Name::get() {
 ArtistBrowse ^Artist::Browse(ArtistBrowseType type) {
 	return ArtistBrowse::Create(_session, this, type);
 }
+
+int Artist::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool Artist::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool Artist::operator== (Artist^ left, Artist^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool Artist::operator!= (Artist^ left, Artist^ right) {
+	return !(left == right);
+}

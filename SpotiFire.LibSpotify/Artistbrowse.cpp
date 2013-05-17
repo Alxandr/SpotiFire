@@ -108,3 +108,19 @@ bool ArtistBrowse::AddContinuation(Action ^continuationAction) {
 	_continuations->Add(continuationAction);
 	return true;
 }
+
+int ArtistBrowse::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool ArtistBrowse::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool ArtistBrowse::operator== (ArtistBrowse^ left, ArtistBrowse^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool ArtistBrowse::operator!= (ArtistBrowse^ left, ArtistBrowse^ right) {
+	return !(left == right);
+}

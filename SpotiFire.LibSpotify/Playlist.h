@@ -120,6 +120,51 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual property bool IsReady { bool get() sealed; }
 
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the hash code for this playlist. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <returns>	The hash code. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual int GetHashCode() override;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if this playlist is considered to be the same as the given object.
+		///				</summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="other">	The object to compare. </param>
+		///
+		/// <returns>	true if the given object is equal to the playlist, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual bool Equals(Object^ other) override;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given playlists should be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The playlist on the left-hand side of the operator. </param>
+		/// <param name="right">	The playlist on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given playlists are equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator== (Playlist^ left, Playlist^ right);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Checks if the given playlists should not be considered equal. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
+		///
+		/// <param name="left">	The playlist on the left-hand side of the operator. </param>
+		/// <param name="right">	The playlist on the right-hand side of the operator. </param>
+		///
+		/// <returns>	true if the given playlists are not equal, otherwise false. </returns>
+		///-------------------------------------------------------------------------------------------------
+		static bool operator!= (Playlist^ left, Playlist^ right);
+
 		// TODO: Add subscribing users
 
 	internal:

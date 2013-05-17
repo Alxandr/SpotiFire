@@ -39,3 +39,19 @@ String ^User::CanonicalName::get() {
 String ^User::DisplayName::get() {
 	return UTF8(sp_user_display_name(_ptr));
 }
+
+int User::GetHashCode() {
+	return (new IntPtr(_ptr))->GetHashCode();
+}
+
+bool User::Equals(Object^ other) {
+	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
+}
+
+bool User::operator== (User^ left, User^ right) {
+	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
+}
+
+bool User::operator!= (User^ left, User^ right) {
+	return !(left == right);
+}
