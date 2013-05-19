@@ -1,11 +1,26 @@
 #include "stdafx.h"
 
 #include "Playlist.h"
-#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
 using namespace System::Runtime::InteropServices;
+using namespace SpotiFire::Collections;
+
+#define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
+
+void SP_CALLCONV tracks_added(sp_playlist *pl, sp_track *const *tracks, int num_tracks, int position, void *userdata);
+void SP_CALLCONV tracks_removed(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata);
+void SP_CALLCONV tracks_moved(sp_playlist *pl, const int *tracks, int num_tracks, int new_position, void *userdata);
+void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata);
+
+sp_playlist_callbacks _callbacks = {
+	&tracks_added,
+	&tracks_removed,
+	&tracks_moved,
+	NULL, //playlist_renamed
+	&playlist_state_changed
+};
 
 static __forceinline DateTime TIMESTAMP(int timestamp) {
 	DateTime dt(1970, 1, 1, 0, 0, 0, 0);
@@ -17,6 +32,7 @@ Playlist::Playlist(SpotiFire::Session ^session, sp_playlist *ptr) {
 	_ptr = ptr;
 	_session = session;
 	sp_playlist_add_ref(_ptr);
+	sp_playlist_add_callbacks(_ptr, &_callbacks, new gcroot<Playlist ^>(this));
 }
 
 Playlist::~Playlist() {
@@ -57,7 +73,7 @@ OfflineStatus Playlist::OfflineStatus::get() {
 	return ENUM(SpotiFire::OfflineStatus, sp_playlist_get_offline_status(_session->_ptr, _ptr));
 }
 
-ref class $Playlist$TracksArray sealed : SPList<Track ^>
+ref class $Playlist$TracksArray sealed : ObservableSPList<Track ^>
 {
 internal:
 	Playlist ^_playlist;
@@ -92,9 +108,9 @@ public:
 	}
 };
 
-IList<Track ^> ^Playlist::Tracks::get() {
+IObservableSPList<Track ^> ^Playlist::Tracks::get() {
 	if(_tracks == nullptr) {
-		Interlocked::CompareExchange<IList<Track ^> ^>(_tracks, gcnew $Playlist$TracksArray(this), nullptr);
+		Interlocked::CompareExchange<ObservableSPList<Track ^> ^>(_tracks, gcnew $Playlist$TracksArray(this), nullptr);
 	}
 	return _tracks;
 }
@@ -149,6 +165,48 @@ bool Playlist::IsReady::get() {
 	return true;
 }
 
+void SP_CALLCONV tracks_added(sp_playlist *pl, sp_track *const *tracks, int num_tracks, int position, void *userdata) {
+	Session^ session = SP_DATA(Session, userdata);
+	array<Track ^>^ trackArray = gcnew array<Track ^>(num_tracks);
+	for (int i = 0; i < num_tracks; i++) {
+		trackArray[i] = gcnew Track(session, tracks[i]); 
+	}
+	TP2(array<Track ^>^, int, SP_DATA(Playlist, userdata), Playlist::tracks_added, trackArray, position);
+}
+
+void SP_CALLCONV tracks_removed(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata) {
+	Session^ session = SP_DATA(Session, userdata);
+	array<Track ^>^ trackArray = gcnew array<Track ^>(num_tracks);
+	for (int i = 0; i < num_tracks; i++) {
+		// TODO: fill with actual track
+		trackArray[i] = nullptr;
+	}
+	TP2(array<Track ^>^, int, SP_DATA(Playlist, userdata), Playlist::tracks_removed, trackArray, tracks[0]);
+}
+
+void SP_CALLCONV tracks_moved(sp_playlist *pl, const int *tracks, int num_tracks, int new_position, void *userdata) {
+	SPLock lock;
+
+	// new_position is position in list before the move on which the tracks are dropped, so can be > length - 1
+	// tracks contains the indices in the list before the move
+	// The following corrects for this, so we get the _actual_ new position in the list
+	if (new_position > tracks[0]) {
+		new_position -= num_tracks;
+	}
+
+	Session^ session = SP_DATA(Session, userdata);
+	array<Track ^>^ trackArray = gcnew array<Track ^>(num_tracks);
+	for (int i = 0; i < num_tracks; i++) {
+		trackArray[i] = gcnew Track(session, sp_playlist_track(pl, new_position + i)); 
+	}
+
+	TP3(array<Track ^>^, int, int, SP_DATA(Playlist, userdata), Playlist::tracks_moved, trackArray, new_position, tracks[0]);
+}
+
+void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata) {
+	TP0(SP_DATA(Playlist, userdata), Playlist::playlist_state_changed);
+}
+
 int Playlist::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }
@@ -186,4 +244,31 @@ Error Playlist::SetTrackSeen(int trackIndex, bool value) {
 
 String ^Playlist::GetTrackMessage(int trackIndex) {
 	return UTF8(sp_playlist_track_message(_ptr, trackIndex));
+}
+
+//------------------ Event Handlers ------------------//
+void Playlist::tracks_added(array<Track ^>^ tracks, int position) {
+	if (_tracks != nullptr) {
+		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Add, tracks, position);
+		_tracks->RaiseCollectionChanged(e);
+	}
+}
+
+void Playlist::tracks_removed(array<Track ^>^ tracks, int position) {
+	if (_tracks != nullptr) {
+		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Remove, tracks, position);
+		_tracks->RaiseCollectionChanged(e);
+	}
+}
+
+void Playlist::tracks_moved(array<Track ^>^ tracks, int position, int oldPosition) {
+	if (_tracks != nullptr) {
+		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Move, tracks, position, oldPosition);
+		_tracks->RaiseCollectionChanged(e);
+	}
+}
+
+void Playlist::playlist_state_changed() {
+	logger->Trace("playlist_state_changed");
+	StateChanged(this, gcnew PlaylistEventArgs());
 }
