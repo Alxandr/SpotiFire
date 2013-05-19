@@ -571,7 +571,11 @@ void Session::credentials_blob_updated(String ^blob) {
 
 void Session::connectionstate_updated() {
 	logger->Trace("connectionstate_updated");
-	ConnectionstateUpdated(this, gcnew SessionEventArgs());
+	SpotiFire::ConnectionState newCs = this->ConnectionState;
+	if (newCs != _cs) {
+		_cs = newCs;
+		ConnectionstateUpdated(this, gcnew SessionEventArgs());
+	}
 }
 
 void Session::scrobble_error(Error error) {
