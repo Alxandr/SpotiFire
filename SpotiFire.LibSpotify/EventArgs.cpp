@@ -79,3 +79,6 @@ PrivateSessionModeEventArgs::PrivateSessionModeEventArgs(bool isPrivate) {
 bool PrivateSessionModeEventArgs::Private::get() {
 	return _private;
 }
+
+PlaylistEventArgs::PlaylistEventArgs() {
+}

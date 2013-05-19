@@ -190,6 +190,30 @@ __forceinline void __TP2(System::Action<T1, T2> ^action, T1 val1, T2 val2) {
 }
 #define TP2(type1, type2, object, func, val1, val2) __TP2<type1, type2>(gcnew System::Action<type1, type2>(object, &func), val1, val2)
 
+generic<typename T1, typename T2, typename T3>
+ref struct $WaitCallback3 {
+	T1 _val1;
+	T2 _val2;
+	T3 _val3;
+	System::Action<T1, T2, T3> ^_cb;
+	$WaitCallback3(Action<T1, T2, T3> ^cb, T1 val1, T2 val2, T3 val3) {
+		_cb = cb;
+		_val1 = val1;
+		_val2 = val2;
+		_val3 = val3;
+	}
+	void Callback(Object ^state) {
+		_cb(_val1, _val2, _val3);
+	}
+};
+generic<typename T1, typename T2, typename T3>
+__forceinline void __TP3(System::Action<T1, T2, T3> ^action, T1 val1, T2 val2, T3 val3) {
+	auto wc = gcnew $WaitCallback3<T1, T2, T3>(action, val1, val2, val3);
+	auto _wc = gcnew WaitCallback(wc, &$WaitCallback3<T1, T2, T3>::Callback);
+	TPQN(_wc);
+}
+#define TP3(type1, type2, type3, object, func, val1, val2, val3) __TP3<type1, type2, type3>(gcnew System::Action<type1, type2, type3>(object, &func), val1, val2, val3)
+
 #define SP_DATA(type, data) (*(gcroot<type ^> *)data)
 #define GC_CAST(type, gcroot) (type ^)gcroot
 

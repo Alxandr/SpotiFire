@@ -5,6 +5,7 @@
 
 using namespace System;
 using namespace System::Collections::Generic;
+using namespace SpotiFire::Collections;
 
 namespace SpotiFire {
 
@@ -31,7 +32,7 @@ namespace SpotiFire {
 	public ref class PlaylistContainer sealed : ISpotifyObject, ISpotifyAwaitable
 	{
 	private:
-		IList<Playlist ^> ^_playlists;
+		ObservableSPList<Playlist ^> ^_playlists;
 
 		List<Action ^> ^_continuations;
 		bool _complete;
@@ -43,6 +44,12 @@ namespace SpotiFire {
 		PlaylistContainer(Session ^session, sp_playlistcontainer *ptr);
 		!PlaylistContainer(); // finalizer
 		~PlaylistContainer(); // destructor
+
+		// Playlistcontainer callbacks
+		void complete();
+		void playlist_added(Playlist^ playlist, int position);
+		void playlist_removed(Playlist^ playlist, int position);
+		void playlist_moved(Playlist^ playlist, int position, int newPosition);
 
 	public:
 
@@ -65,7 +72,7 @@ namespace SpotiFire {
 		///
 		/// <value>	The playlists. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property IList<Playlist ^> ^Playlists { IList<Playlist ^> ^get() sealed; }
+		virtual property IObservableSPList<Playlist ^> ^Playlists { IObservableSPList<Playlist ^> ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the owner. </summary>
@@ -130,8 +137,5 @@ namespace SpotiFire {
 		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
 		virtual bool AddContinuation(Action ^continuation) sealed = ISpotifyAwaitable::AddContinuation;
 
-	internal:
-		// Events
-		void complete();
 	};
 }
