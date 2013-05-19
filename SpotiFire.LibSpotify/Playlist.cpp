@@ -41,6 +41,7 @@ Playlist::~Playlist() {
 
 Playlist::!Playlist() {
 	SPLock lock;
+	sp_playlist_remove_callbacks(_ptr, &_callbacks, NULL);
 	sp_playlist_release(_ptr);
 	_ptr = NULL;
 }
@@ -105,6 +106,10 @@ public:
 		SPLock lock;
 		DoRemove(index);
 		DoInsert(index - 1, item);
+	}
+
+	virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e) override sealed {
+		CollectionChanged(_playlist, e);
 	}
 };
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SpotiFire
 {
@@ -212,5 +213,19 @@ namespace SpotiFire
             return tcs.Task;
         }        
     }
+
+
+
+    public static class PlaylistExtensions
+    {
+
+        public static bool AllTracksLoaded(this Playlist playlist)
+        {
+            return playlist.Tracks.All(t => t.IsLoaded);
+        }
+
+
+    }
+
 
 }

@@ -35,6 +35,7 @@ PlaylistContainer::~PlaylistContainer() {
 
 PlaylistContainer::!PlaylistContainer() {
 	SPLock lock;
+	sp_playlistcontainer_remove_callbacks(_ptr, &_callbacks, NULL);
 	sp_playlistcontainer_release(_ptr);
 	_ptr = NULL;
 }
@@ -127,18 +128,18 @@ void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata) {
 }
 
 void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
-	PlaylistContainer^ playlistContainer = SP_DATA(PlaylistContainer, userdata);
-	TP2(Playlist^, int, playlistContainer, PlaylistContainer::playlist_added, gcnew SpotiFire::Playlist(playlistContainer->Session, playlist), position);
+	PlaylistContainer^ plc = SP_DATA(PlaylistContainer, userdata);
+	TP2(Playlist^, int, plc, PlaylistContainer::playlist_added, plc->Playlists[new_position], position);
 }
 
 void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
-	PlaylistContainer^ playlistContainer = SP_DATA(PlaylistContainer, userdata);
-	TP2(Playlist^, int, playlistContainer, PlaylistContainer::playlist_removed, gcnew SpotiFire::Playlist(playlistContainer->Session, playlist), position);
+	PlaylistContainer^ plc = SP_DATA(PlaylistContainer, userdata);
+	TP2(Playlist^, int, plc, PlaylistContainer::playlist_removed, gcnew SpotiFire::Playlist(plc->Session, playlist), position);
 }
 
 void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata) {
-	PlaylistContainer^ playlistContainer = SP_DATA(PlaylistContainer, userdata);
-	TP3(Playlist^, int, int, playlistContainer, PlaylistContainer::playlist_moved, gcnew SpotiFire::Playlist(playlistContainer->Session, playlist), position, new_position);
+	PlaylistContainer^ plc = SP_DATA(PlaylistContainer, userdata);
+	TP3(Playlist^, int, int, plc, PlaylistContainer::playlist_moved, plc->Playlists[new_position], position, new_position);
 }
 
 void PlaylistContainer::complete() {
