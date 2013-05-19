@@ -42,8 +42,8 @@ namespace SpotiFire {
 
 		// Playlist events
 		void tracks_added(array<Track ^>^ tracks, int position);
-		void tracks_removed(array<Track ^>^ tracks);
-		void tracks_moved(array<Track ^>^ tracks, int newPosition);
+		void tracks_removed(array<Track ^>^ tracks, int position);
+		void tracks_moved(array<Track ^>^ tracks, int position, int oldPosition);
 		void playlist_state_changed();
 
 	public:

@@ -168,25 +168,39 @@ bool Playlist::IsReady::get() {
 void SP_CALLCONV tracks_added(sp_playlist *pl, sp_track *const *tracks, int num_tracks, int position, void *userdata) {
 	Session^ session = SP_DATA(Session, userdata);
 	array<Track ^>^ trackArray = gcnew array<Track ^>(num_tracks);
-	for (int i = 0; i< num_tracks; i++) {
+	for (int i = 0; i < num_tracks; i++) {
 		trackArray[i] = gcnew Track(session, tracks[i]); 
 	}
 	TP2(array<Track ^>^, int, SP_DATA(Playlist, userdata), Playlist::tracks_added, trackArray, position);
 }
 
 void SP_CALLCONV tracks_removed(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata) {
-	SPLock lock;
-	int c = sp_playlist_num_tracks(pl);
 	Session^ session = SP_DATA(Session, userdata);
 	array<Track ^>^ trackArray = gcnew array<Track ^>(num_tracks);
 	for (int i = 0; i < num_tracks; i++) {
-		sp_track *t = sp_playlist_track(pl, tracks[i]);
-		trackArray[i] = gcnew Track(session, t);
+		// TODO: fill with actual track
+		trackArray[i] = nullptr;
 	}
-	TP1(array<Track ^>^, SP_DATA(Playlist, userdata), Playlist::tracks_removed, trackArray);
+	TP2(array<Track ^>^, int, SP_DATA(Playlist, userdata), Playlist::tracks_removed, trackArray, tracks[0]);
 }
 
 void SP_CALLCONV tracks_moved(sp_playlist *pl, const int *tracks, int num_tracks, int new_position, void *userdata) {
+	SPLock lock;
+
+	// new_position is position in list before the move on which the tracks are dropped, so can be > length - 1
+	// tracks contains the indices in the list before the move
+	// The following corrects for this, so we get the _actual_ new position in the list
+	if (new_position > tracks[0]) {
+		new_position -= num_tracks;
+	}
+
+	Session^ session = SP_DATA(Session, userdata);
+	array<Track ^>^ trackArray = gcnew array<Track ^>(num_tracks);
+	for (int i = 0; i < num_tracks; i++) {
+		trackArray[i] = gcnew Track(session, sp_playlist_track(pl, new_position + i)); 
+	}
+
+	TP3(array<Track ^>^, int, int, SP_DATA(Playlist, userdata), Playlist::tracks_moved, trackArray, new_position, tracks[0]);
 }
 
 void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata) {
@@ -240,16 +254,16 @@ void Playlist::tracks_added(array<Track ^>^ tracks, int position) {
 	}
 }
 
-void Playlist::tracks_removed(array<Track ^>^ tracks) {
+void Playlist::tracks_removed(array<Track ^>^ tracks, int position) {
 	if (_tracks != nullptr) {
-		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Remove, tracks);
+		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Remove, tracks, position);
 		_tracks->RaiseCollectionChanged(e);
 	}
 }
 
-void Playlist::tracks_moved(array<Track ^>^ tracks, int newPosition) {
+void Playlist::tracks_moved(array<Track ^>^ tracks, int position, int oldPosition) {
 	if (_tracks != nullptr) {
-		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Move, tracks, newPosition, -1);
+		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Move, tracks, position, oldPosition);
 		_tracks->RaiseCollectionChanged(e);
 	}
 }
