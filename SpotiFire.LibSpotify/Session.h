@@ -70,6 +70,7 @@ namespace SpotiFire {
 		TaskCompletionSource<bool> ^_logout;
 
 		PlaylistContainer ^_pc;
+		ConnectionState _cs;
 
 	internal:
 		static Task<Session^> ^Create(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent);
