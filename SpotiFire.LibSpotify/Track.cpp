@@ -122,6 +122,15 @@ String ^Track::Name::get() {
 	return UTF8(sp_track_name(_ptr));
 }
 
+Link ^Track::GetLink() {
+    TimeSpan ts(0);
+	return this->GetLink(ts);
+}
+
+Link ^Track::GetLink(TimeSpan offset) {
+	return Link::Create(this, offset);
+}
+
 int Track::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }

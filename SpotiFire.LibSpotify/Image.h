@@ -10,6 +10,7 @@ using namespace System::Collections::Generic;
 namespace SpotiFire {
 
 	ref class Image;
+	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Delegate for handling Image events. </summary>
@@ -92,6 +93,16 @@ namespace SpotiFire {
 		/// <returns>	Returns an image from the given Id. </returns>
 		///-------------------------------------------------------------------------------------------------
 		static Image ^FromId(SpotiFire::Session ^session, String ^id);
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the image. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this image. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this image. </summary>

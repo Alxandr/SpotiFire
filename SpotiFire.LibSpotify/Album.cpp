@@ -82,6 +82,10 @@ AlbumBrowse ^Album::Browse() {
 	return AlbumBrowse::Create(_session, this);
 }
 
+Link ^Album::GetLink() {
+	return Link::Create(this);
+}
+
 int Album::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }

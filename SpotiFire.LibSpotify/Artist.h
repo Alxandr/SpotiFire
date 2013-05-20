@@ -9,6 +9,7 @@ using namespace System::Collections::Generic;
 namespace SpotiFire {
 
 	ref class ArtistBrowse;
+	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Artist. </summary>
@@ -65,6 +66,16 @@ namespace SpotiFire {
 		/// <returns>	The newly created albumbrowse. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual ArtistBrowse ^Browse(ArtistBrowseType type) sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the artist. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this artist. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this artist. </summary>

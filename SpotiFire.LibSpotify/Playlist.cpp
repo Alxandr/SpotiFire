@@ -263,7 +263,6 @@ void SP_CALLCONV track_message_changed(sp_playlist *pl, int position, const char
 
 void SP_CALLCONV subscribers_changed(sp_playlist *pl, void *userdata) {
 	TP0(SP_DATA(Playlist, userdata), Playlist::subscribers_changed);
->>>>>>> master
 }
 
 int Playlist::GetHashCode() {
@@ -305,7 +304,7 @@ String ^Playlist::GetTrackMessage(int trackIndex) {
 	return UTF8(sp_playlist_track_message(_ptr, trackIndex));
 }
 
-Link ^Playlist::ToLink() {
+Link ^Playlist::GetLink() {
 	return this->IsLoaded ? Link::Create(this) : nullptr;
 }
 

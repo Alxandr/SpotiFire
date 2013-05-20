@@ -8,6 +8,8 @@ using namespace System::Collections::Generic;
 
 namespace SpotiFire {
 
+	ref class Link;
+
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Track. </summary>
 	///
@@ -149,6 +151,28 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual Track ^GetPlayable() sealed;
 		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the track. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this track. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink();
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the track. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <param name="offset">	Offset in track. </param>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this track. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink(TimeSpan offset);
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this track. </summary>
 		///

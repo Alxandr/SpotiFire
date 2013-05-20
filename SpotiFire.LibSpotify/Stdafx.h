@@ -80,7 +80,6 @@ namespace SpotiFire {
 #include "Interfaces.h"
 #include "Lists.h"
 #include "EventArgs.h"
-#include "Exceptions.h"
 
 #include "Session.h"
 #include "Image.h"

@@ -12,7 +12,6 @@ namespace SpotiFire {
 	ref class User;
 	ref class Track;
 	ref class Link;
-	ref class NotLoadedException;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Delegate for handling Playlist events. </summary>
@@ -153,19 +152,18 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the playlist. </summary>
 		///
-		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> Object when you are done with
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
 		///				it. </remarks>
 		///
 		/// <remarks>	Due to reasons in the playlist backend design and the Spotify URI scheme you need
 		///				to wait for the playlist to be loaded before you can successfully construct a
 		///				link. If the playlist is not loaded when this method is called (
-		///				see <see cref="SpotiFire.Playlist.IsLoaded" />), an exception will be raised.
-		///				</remarks>
+		///				see <see cref="SpotiFire.Playlist.IsLoaded" />), null we be returned. </remarks>
 		///
-		/// <exception cref="SpotiFire::NotLoadedException">	When the playlist is not loaded. See 
-		///				<see cref="SpotiFire.Playlist.IsLoaded" />. </exception>
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this playlist, or null if the
+		///				playlist is not loaded (yet). </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual Link ^ToLink();
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in Renamed events. </summary>

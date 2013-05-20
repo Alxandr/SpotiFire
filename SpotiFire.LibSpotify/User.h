@@ -7,6 +7,8 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
+	
+	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	User. </summary>
@@ -59,6 +61,16 @@ namespace SpotiFire {
 		/// <value>	true if this object is ready, false if not. </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property bool IsReady { bool get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the user. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this user. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this user. </summary>

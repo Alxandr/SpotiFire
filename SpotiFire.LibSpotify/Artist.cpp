@@ -44,6 +44,10 @@ ArtistBrowse ^Artist::Browse(ArtistBrowseType type) {
 	return ArtistBrowse::Create(_session, this, type);
 }
 
+Link ^Artist::GetLink() {
+	return Link::Create(this);
+}
+
 int Artist::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }

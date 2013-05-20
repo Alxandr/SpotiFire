@@ -168,6 +168,10 @@ int Search::TotalArtists::get() {
 	return sp_search_total_artists(_ptr);
 }
 
+Link ^Search::GetLink() {
+	return Link::Create(this);
+}
+
 void SP_CALLCONV search_complete(sp_search *search, void *userdata);
 Search ^Search::Create(SpotiFire::Session ^session,
 					   String ^query,

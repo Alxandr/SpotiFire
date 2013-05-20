@@ -7,6 +7,8 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
+	
+	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Search. </summary>
@@ -124,6 +126,16 @@ namespace SpotiFire {
 		/// <value>	The total number of artists. </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property int TotalArtists { int get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the search. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this search. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this search object. </summary>

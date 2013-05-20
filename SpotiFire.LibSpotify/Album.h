@@ -10,6 +10,7 @@ namespace SpotiFire {
 
 	ref class Artist;
 	ref class AlbumBrowse;
+	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	A spotify album. </summary>
@@ -102,6 +103,16 @@ namespace SpotiFire {
 		/// <returns>	null if it fails, else. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual AlbumBrowse ^Browse() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the album. </summary>
+		///
+		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
+		///				it. </remarks>
+		///
+		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this album. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this album. </summary>

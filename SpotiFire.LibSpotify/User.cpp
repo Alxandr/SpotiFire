@@ -40,6 +40,10 @@ String ^User::DisplayName::get() {
 	return UTF8(sp_user_display_name(_ptr));
 }
 
+Link ^User::GetLink() {
+	return Link::Create(this);
+}
+
 int User::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }

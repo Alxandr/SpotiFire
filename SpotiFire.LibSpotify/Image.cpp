@@ -78,6 +78,10 @@ Image ^Image::FromId(SpotiFire::Session ^session, String ^id) {
 	return Image::Create(session, id);
 }
 
+Link ^Image::GetLink() {
+	return Link::Create(this);
+}
+
 //------------------ Event Handlers ------------------//
 
 ref struct $image$completed {
