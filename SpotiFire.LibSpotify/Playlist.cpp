@@ -12,14 +12,31 @@ using namespace SpotiFire::Collections;
 void SP_CALLCONV tracks_added(sp_playlist *pl, sp_track *const *tracks, int num_tracks, int position, void *userdata);
 void SP_CALLCONV tracks_removed(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata);
 void SP_CALLCONV tracks_moved(sp_playlist *pl, const int *tracks, int num_tracks, int new_position, void *userdata);
+void SP_CALLCONV playlist_renamed(sp_playlist *pl, void *userdata);
 void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata);
+void SP_CALLCONV playlist_update_in_progress(sp_playlist *pl, bool done, void *userdata);
+void SP_CALLCONV playlist_metadata_updated(sp_playlist *pl, void *userdata);
+void SP_CALLCONV track_created_changed(sp_playlist *pl, int position, sp_user *user, int when, void *userdata);
+void SP_CALLCONV track_seen_changed(sp_playlist *pl, int position, bool seen, void *userdata);
+void SP_CALLCONV description_changed(sp_playlist *pl, const char *desc, void *userdata);
+void SP_CALLCONV image_changed(sp_playlist *pl, const byte *image, void *userdata);
+void SP_CALLCONV track_message_changed(sp_playlist *pl, int position, const char *message, void *userdata);
+void SP_CALLCONV subscribers_changed(sp_playlist *pl, void *userdata);
 
 sp_playlist_callbacks _callbacks = {
 	&tracks_added,
 	&tracks_removed,
 	&tracks_moved,
-	NULL, //playlist_renamed
-	&playlist_state_changed
+	&playlist_renamed,
+	&playlist_state_changed,
+	&playlist_update_in_progress,
+	&playlist_metadata_updated,
+	&track_created_changed,
+	&track_seen_changed,
+	&description_changed,
+	&image_changed,
+	&track_message_changed,
+	&subscribers_changed
 };
 
 static __forceinline DateTime TIMESTAMP(int timestamp) {
@@ -208,8 +225,44 @@ void SP_CALLCONV tracks_moved(sp_playlist *pl, const int *tracks, int num_tracks
 	TP3(array<Track ^>^, int, int, SP_DATA(Playlist, userdata), Playlist::tracks_moved, trackArray, new_position, tracks[0]);
 }
 
+void SP_CALLCONV playlist_renamed(sp_playlist *pl, void *userdata) {
+	TP0(SP_DATA(Playlist, userdata), Playlist::playlist_renamed);
+}
+
 void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata) {
 	TP0(SP_DATA(Playlist, userdata), Playlist::playlist_state_changed);
+}
+
+void SP_CALLCONV playlist_update_in_progress(sp_playlist *pl, bool done, void *userdata) {
+	TP1(bool, SP_DATA(Playlist, userdata), Playlist::playlist_update_in_progress, done);
+}
+
+void SP_CALLCONV playlist_metadata_updated(sp_playlist *pl, void *userdata) {
+	TP0(SP_DATA(Playlist, userdata), Playlist::playlist_metadata_updated);
+}
+
+void SP_CALLCONV track_created_changed(sp_playlist *pl, int position, sp_user *user, int when, void *userdata) {
+	TP1(int, SP_DATA(Playlist, userdata), Playlist::track_created_changed, position);
+}
+
+void SP_CALLCONV track_seen_changed(sp_playlist *pl, int position, bool seen, void *userdata) {
+	TP1(int, SP_DATA(Playlist, userdata), Playlist::track_seen_changed, position);
+}
+
+void SP_CALLCONV description_changed(sp_playlist *pl, const char *desc, void *userdata) {
+	TP0(SP_DATA(Playlist, userdata), Playlist::description_changed);
+}
+
+void SP_CALLCONV image_changed(sp_playlist *pl, const byte *image, void *userdata) {
+	TP0(SP_DATA(Playlist, userdata), Playlist::image_changed);
+}
+
+void SP_CALLCONV track_message_changed(sp_playlist *pl, int position, const char *message, void *userdata) {
+	TP1(int, SP_DATA(Playlist, userdata), Playlist::track_message_changed, position);
+}
+
+void SP_CALLCONV subscribers_changed(sp_playlist *pl, void *userdata) {
+	TP0(SP_DATA(Playlist, userdata), Playlist::subscribers_changed);
 }
 
 int Playlist::GetHashCode() {
@@ -231,11 +284,11 @@ bool Playlist::operator!= (Playlist^ left, Playlist^ right) {
 //---------------------------------------------
 // Track meta-properties
 
-DateTime Playlist::GetCreateTime(int trackIndex) {
+DateTime Playlist::GetTrackCreateTime(int trackIndex) {
 	return TIMESTAMP(sp_playlist_track_create_time(_ptr, trackIndex));
 }
 
-User ^Playlist::GetCreator(int trackIndex) {
+User ^Playlist::GetTrackCreator(int trackIndex) {
 	return gcnew User(_session, sp_playlist_track_creator(_ptr, trackIndex));
 }
 
@@ -253,6 +306,7 @@ String ^Playlist::GetTrackMessage(int trackIndex) {
 
 //------------------ Event Handlers ------------------//
 void Playlist::tracks_added(array<Track ^>^ tracks, int position) {
+	logger->Trace("tracks_added");
 	if (_tracks != nullptr) {
 		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Add, tracks, position);
 		_tracks->RaiseCollectionChanged(e);
@@ -260,6 +314,7 @@ void Playlist::tracks_added(array<Track ^>^ tracks, int position) {
 }
 
 void Playlist::tracks_removed(array<Track ^>^ tracks, int position) {
+	logger->Trace("tracks_removed");
 	if (_tracks != nullptr) {
 		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Remove, tracks, position);
 		_tracks->RaiseCollectionChanged(e);
@@ -267,13 +322,59 @@ void Playlist::tracks_removed(array<Track ^>^ tracks, int position) {
 }
 
 void Playlist::tracks_moved(array<Track ^>^ tracks, int position, int oldPosition) {
+	logger->Trace("tracks_moved");
 	if (_tracks != nullptr) {
 		NotifyCollectionChangedEventArgs^ e = gcnew NotifyCollectionChangedEventArgs(System::Collections::Specialized::NotifyCollectionChangedAction::Move, tracks, position, oldPosition);
 		_tracks->RaiseCollectionChanged(e);
 	}
 }
 
+void Playlist::playlist_renamed() {
+	logger->Trace("playlist_renamed");
+	Renamed(this, gcnew PlaylistEventArgs());
+}
+
 void Playlist::playlist_state_changed() {
 	logger->Trace("playlist_state_changed");
 	StateChanged(this, gcnew PlaylistEventArgs());
+}
+
+void Playlist::playlist_update_in_progress(bool done) {
+	logger->Trace("playlist_update_in_progress");
+	UpdateInProgress(this, gcnew PlaylistEventArgs(done));
+}
+
+void Playlist::playlist_metadata_updated() {
+	logger->Trace("playlist_metadata_updated");
+	MetadataUpdated(this, gcnew PlaylistEventArgs());
+}
+
+void Playlist::track_created_changed(int track_position) {
+	logger->Trace("track_created_changed");
+	TrackCreatedChanged(this, gcnew PlaylistEventArgs(track_position));
+}
+
+void Playlist::track_seen_changed(int track_position) {
+	logger->Trace("track_seen_changed");
+	TrackCreatedChanged(this, gcnew PlaylistEventArgs(track_position));
+}
+
+void Playlist::description_changed() {
+	logger->Trace("description_changed");
+	DescriptionChanged(this, gcnew PlaylistEventArgs());
+}
+
+void Playlist::image_changed() {
+	logger->Trace("image_changed");
+	ImageChanged(this, gcnew PlaylistEventArgs());
+}
+
+void Playlist::track_message_changed(int track_position) {
+	logger->Trace("track_message_changed");
+	TrackCreatedChanged(this, gcnew PlaylistEventArgs(track_position));
+}
+
+void Playlist::subscribers_changed() {
+	logger->Trace("subscribers_changed");
+	SubscribersChanged(this, gcnew PlaylistEventArgs());
 }
