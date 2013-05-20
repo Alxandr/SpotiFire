@@ -82,3 +82,19 @@ bool PrivateSessionModeEventArgs::Private::get() {
 
 PlaylistEventArgs::PlaylistEventArgs() {
 }
+
+PlaylistEventArgs::PlaylistEventArgs(int track_position) {
+	_track_position = track_position;
+}
+
+PlaylistEventArgs::PlaylistEventArgs(bool update_done) {
+	_update_done = update_done;
+}
+
+int PlaylistEventArgs::TrackPosition::get() {
+	return _track_position;
+}
+
+bool PlaylistEventArgs::UpdateComplete::get() {
+	return _update_done;
+}
