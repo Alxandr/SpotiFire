@@ -189,6 +189,10 @@ namespace SpotiFire {
 	///-------------------------------------------------------------------------------------------------
 	public ref class PlaylistEventArgs : EventArgs
 	{
+	private:
+		int _track_position;
+		bool _update_done;
+
 	public:
 
 		///-------------------------------------------------------------------------------------------------
@@ -197,6 +201,33 @@ namespace SpotiFire {
 		/// <remarks>	Chris Brandhorst, 17.05.2013. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		PlaylistEventArgs();
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Constructor that takes the position of a track. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 20.05.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		PlaylistEventArgs(int track_position);
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Constructor that takes the update done flag. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 20.05.2013. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		PlaylistEventArgs(bool update_done);
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the track position relevant for this event. </summary>
+		///
+		/// <value>	The track position. </value>
+		///-------------------------------------------------------------------------------------------------
+		property int TrackPosition { int get(); }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets whether this event was caused by the completion of an update. </summary>
+		///
+		/// <value>	Whether an update was completed. </value>
+		///-------------------------------------------------------------------------------------------------
+		property bool UpdateComplete { bool get(); }
 	};
-	
 }
