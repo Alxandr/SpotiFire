@@ -262,6 +262,81 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		event PlaylistEventHandler ^SubscribersChanged;
 
+		/// <summary>	Event queue for all listeners interested in UpdateInProgress events. </summary>
+		///
+		/// <remarks>	The UpdateInProgress event provides a way for applications to be notified whenever
+		/// 			a playlist is updating or is done updating. </remarks>
+		///
+		/// <remarks>	This is called before and after a series of changes are applied to the playlist.
+		///				It allows e.g. the user interface to defer updating until the entire operation is
+		///				complete. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^UpdateInProgress;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in MetadataUpdated events. </summary>
+		///
+		/// <remarks>	The MetadataUpdated event provides a way for applications to be notified whenever
+		/// 			the metadata for one or more tracks in the playlist has been updated. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^MetadataUpdated;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in TrackCreatedChanged events. </summary>
+		///
+		/// <remarks>	The TrackCreatedChanged event provides a way for applications to be notified
+		///				whenever create time and/or creator for the playlist entry changes. Use
+		///				<see cref="SpotiFire.Playlist.GetTrackCreateTime" /> and
+		///				<see cref="SpotiFire.Playlist.GetTrackCreator" /> to retrieve this data.
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^TrackCreatedChanged;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in TrackSeenChanged events. </summary>
+		///
+		/// <remarks>	The TrackSeenChanged event provides a way for applications to be notified
+		///				whenever the seen attribute for a playlist entry changes. Use
+		///				<see cref="SpotiFire.Playlist.GetTrackSeen" /> to retrieve the value. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^TrackSeenChanged;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in DescriptionChanged events. </summary>
+		///
+		/// <remarks>	The MetadataUpdated event provides a way for applications to be notified whenever
+		/// 			the description of the playlist has been changed. Use
+		///				<see cref="SpotiFire.Playlist.Description" /> to retrieve the value. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^DescriptionChanged;
+		
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in ImageChanged events. </summary>
+		///
+		/// <remarks>	The ImageChanged event provides a way for applications to be notified whenever
+		/// 			the image of the playlist has been changed. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^ImageChanged;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in TrackMessageChanged events. </summary>
+		///
+		/// <remarks>	The TrackSeenChanged event provides a way for applications to be notified
+		///				whenever the message attribute for a playlist entry changes. Use
+		///				<see cref="SpotiFire.Playlist.GetTrackMessage" /> to retrieve the value.
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^TrackMessageChanged;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Event queue for all listeners interested in SubscribersChanged events. </summary>
+		///
+		/// <remarks>	The SubscribersChanged event provides a way for applications to be notified
+		///				whenever the when playlist subscribers changes (count or list of names).
+		///				</remarks>
+		///-------------------------------------------------------------------------------------------------
+		event PlaylistEventHandler ^SubscribersChanged;
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this playlist. </summary>
 		///
