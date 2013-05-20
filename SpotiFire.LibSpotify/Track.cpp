@@ -147,6 +147,15 @@ Link ^Track::GetLink(TimeSpan offset) {
     return Link::Create(this, offset);
 }
 
+Link ^Track::GetLink() {
+    TimeSpan ts(0);
+	return this->GetLink(ts);
+}
+
+Link ^Track::GetLink(TimeSpan offset) {
+	return Link::Create(this, offset);
+}
+
 int Track::GetHashCode() {
     return (new IntPtr(_ptr))->GetHashCode();
 }
