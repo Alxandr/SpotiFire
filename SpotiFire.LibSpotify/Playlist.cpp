@@ -212,6 +212,10 @@ void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata) {
 	TP0(SP_DATA(Playlist, userdata), Playlist::playlist_state_changed);
 }
 
+Link ^Playlist::ToLink() {
+	return this->IsLoaded ? Link::Create(this) : nullptr;
+}
+
 int Playlist::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }

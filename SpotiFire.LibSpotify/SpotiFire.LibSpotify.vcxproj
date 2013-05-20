@@ -91,6 +91,7 @@
     <ClInclude Include="Artistbrowse.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="EventArgs.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Inbox.h" />
@@ -115,6 +116,7 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Enums.cpp" />
     <ClCompile Include="EventArgs.cpp" />
+    <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Inbox.cpp" />
     <ClCompile Include="Link.cpp" />
