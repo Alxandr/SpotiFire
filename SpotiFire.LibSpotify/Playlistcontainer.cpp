@@ -129,7 +129,7 @@ void SP_CALLCONV loaded(sp_playlistcontainer *pc, void *userdata) {
 
 void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
 	PlaylistContainer^ plc = SP_DATA(PlaylistContainer, userdata);
-	TP2(Playlist^, int, plc, PlaylistContainer::playlist_added, plc->Playlists[new_position], position);
+	TP2(Playlist^, int, plc, PlaylistContainer::playlist_added, plc->Playlists[position], position);
 }
 
 void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
