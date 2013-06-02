@@ -3,6 +3,8 @@
 #include "Image.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#define IMAGE_LOADED(ptr) if(!sp_image_is_loaded(ptr)) throw gcnew NotLoadedException("Image")
+
 static __forceinline const std::vector<byte> HTB(String ^hex)
 {
 	std::vector<byte> ret;
@@ -46,16 +48,19 @@ bool Image::IsLoaded::get() {
 
 Error Image::Error::get() {
 	SPLock lock;
+	IMAGE_LOADED(_ptr);
 	return ENUM(SpotiFire::Error, sp_image_error(_ptr));
 }
 
 ImageFormat Image::Format::get() {
 	SPLock lock;
+	IMAGE_LOADED(_ptr);
 	return ENUM(ImageFormat, sp_image_format(_ptr));
 }
 
 System::Drawing::Image ^Image::GetImage() {
 	SPLock lock;
+	IMAGE_LOADED(_ptr);
 	size_t size;
 	const void *raw = sp_image_data(_ptr, &size);
 	

@@ -9,6 +9,8 @@ using namespace SpotiFire::Collections;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#define PLAYLIST_LOADED(ptr) if(!sp_playlist_is_loaded(ptr)) throw gcnew NotLoadedException("Playlist")
+
 void SP_CALLCONV tracks_added(sp_playlist *pl, sp_track *const *tracks, int num_tracks, int position, void *userdata);
 void SP_CALLCONV tracks_removed(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata);
 void SP_CALLCONV tracks_moved(sp_playlist *pl, const int *tracks, int num_tracks, int new_position, void *userdata);
@@ -69,11 +71,13 @@ Session ^Playlist::Session::get() {
 
 bool Playlist::InRam::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return sp_playlist_is_in_ram(_session->_ptr, _ptr);
 }
 
 void Playlist::InRam::set(bool value) {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	sp_playlist_set_in_ram(_session->_ptr, _ptr, value);
 }
 
@@ -83,11 +87,13 @@ bool Playlist::Offline::get() {
 
 void Playlist::Offline::set(bool value) {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	sp_playlist_set_offline_mode(_session->_ptr, _ptr, value);
 }
 
 OfflineStatus Playlist::OfflineStatus::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return ENUM(SpotiFire::OfflineStatus, sp_playlist_get_offline_status(_session->_ptr, _ptr));
 }
 
@@ -100,27 +106,32 @@ internal:
 public:
 	virtual int DoCount() override sealed {
 		SPLock lock;
+		PLAYLIST_LOADED(_playlist->_ptr);
 		return sp_playlist_num_tracks(_playlist->_ptr);
 	}
 
 	virtual Track ^DoFetch(int index) override sealed {
 		SPLock lock;
+		PLAYLIST_LOADED(_playlist->_ptr);
 		return gcnew Track(_playlist->_session, sp_playlist_track(_playlist->_ptr, index));
 	}
 
 	virtual void DoInsert(int index, Track ^item) override sealed {
 		SPLock lock;
+		PLAYLIST_LOADED(_playlist->_ptr);
 		sp_track *track = item->_ptr;
 		sp_playlist_add_tracks(_playlist->_ptr, &track, 1, index, _playlist->_session->_ptr);
 	}
 
 	virtual void DoRemove(int index) override sealed {
 		SPLock lock;
+		PLAYLIST_LOADED(_playlist->_ptr);
 		sp_playlist_remove_tracks(_playlist->_ptr, &index, 1);
 	}
 
 	virtual void DoUpdate(int index, Track ^item) override sealed {
 		SPLock lock;
+		PLAYLIST_LOADED(_playlist->_ptr);
 		DoRemove(index);
 		DoInsert(index - 1, item);
 	}
@@ -139,47 +150,56 @@ IObservableSPList<Track ^> ^Playlist::Tracks::get() {
 
 String ^Playlist::Name::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return UTF8(sp_playlist_name(_ptr));
 }
 
 void Playlist::Name::set(String ^value) {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	marshal_context context;
 	sp_playlist_rename(_ptr, context.marshal_as<const char *>(value));
 }
 
 User ^Playlist::Owner::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return gcnew User(_session, sp_playlist_owner(_ptr));
 }
 
 bool Playlist::IsCollaborative::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return sp_playlist_is_collaborative(_ptr);
 }
 
 void Playlist::IsCollaborative::set(bool value) {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	sp_playlist_set_collaborative(_ptr, value);
 }
 
 void Playlist::IsAutolinked::set(bool value) {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	sp_playlist_set_autolink_tracks(_ptr, value);
 }
 
 String ^Playlist::Description::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return UTF8(sp_playlist_get_description(_ptr));
 }
 
 bool Playlist::HasPendingChanges::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return sp_playlist_has_pending_changes(_ptr);
 }
 
 bool Playlist::IsLoaded::get() {
 	SPLock lock;
+	PLAYLIST_LOADED(_ptr);
 	return sp_playlist_is_loaded(_ptr);
 }
 
