@@ -284,6 +284,12 @@ Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocat
 	create->settingsLocation = settingsLocation;
 	create->userAgent = userAgent;
 
+	SynchronizationContext ^context = SynchronizationContext::Current;
+	if(context == nullptr)
+		context = gcnew SynchronizationContext();
+	//_sync.swap(gcroot<SynchronizationContext ^>(context));
+	Sync::Current = gcroot<SynchronizationContext ^>(context);
+
 	return Task::Factory->StartNew(gcnew Func<Session ^>(create, &$session$create::run),
 		CancellationToken::None, System::Threading::Tasks::TaskCreationOptions::None, TaskScheduler::Default);
 }

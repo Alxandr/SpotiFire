@@ -15,7 +15,9 @@ namespace SpotiFire.TestClient
             if (buffer == null)
             {
                 buffer = new NAudio.Wave.BufferedWaveProvider(new NAudio.Wave.WaveFormat(rate, channels));
-                NAudio.Wave.DirectSoundOut dso = new NAudio.Wave.DirectSoundOut(70);
+                //NAudio.Wave.DirectSoundOut dso = new NAudio.Wave.DirectSoundOut(70);
+                //NAudio.Wave.AsioOut dso = new NAudio.Wave.AsioOut();
+                NAudio.Wave.WaveOut dso = new NAudio.Wave.WaveOut();
                 dso.Init(buffer);
                 dso.Play();
             }

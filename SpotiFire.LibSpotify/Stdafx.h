@@ -16,8 +16,6 @@ using namespace System::Collections::Generic;
 
 #define ENUM(name, intval) name(intval)
 #define SPERR(err) gcnew String(sp_error_message(err))
-#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
-#define TPQN(wc) TPQ(wc, nullptr)
 
 static __forceinline String ^UTF8(const char *text)
 {
@@ -144,6 +142,21 @@ __forceinline void __SP_RETURN(sp_error error) {
 }
 #define SP_ERR(sp_ret_error) __SP_RETURN(sp_ret_error);
 
+ref class Sync abstract sealed {
+internal:
+	static SynchronizationContext ^Current;
+};
+//#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
+#define TPQ(wc, state) _sync->Post(wc, state)
+#define TPQN(wc) TPQ(wc, nullptr)
+
+__forceinline void __Post(SendOrPostCallback ^fn, Object ^state) {
+	SynchronizationContext ^sync = Sync::Current;
+	if(sync == nullptr)
+		throw gcnew NullReferenceException("How on earth did sync get null???");
+	sync->Post(fn, state);
+}
+
 ref struct $WaitCallback0 {
 	Action ^_cb;
 	$WaitCallback0(Action ^cb) {
@@ -155,8 +168,8 @@ ref struct $WaitCallback0 {
 };
 __forceinline void __TP0(Action ^action) {
 	auto wc = gcnew $WaitCallback0(action);
-	auto _wc = gcnew WaitCallback(wc, &$WaitCallback0::Callback);
-	TPQN(_wc);
+	auto _wc = gcnew SendOrPostCallback(wc, &$WaitCallback0::Callback);
+	__Post(_wc, nullptr);
 }
 #define TP0(object, func) __TP0(gcnew Action(object, &func))
 
@@ -175,8 +188,8 @@ ref struct $WaitCallback1 {
 generic<typename T1>
 __forceinline void __TP1(Action<T1> ^action, T1 val1) {
 	auto wc = gcnew $WaitCallback1<T1>(action, val1);
-	auto _wc = gcnew WaitCallback(wc, &$WaitCallback1<T1>::Callback);
-	TPQN(_wc);
+	auto _wc = gcnew SendOrPostCallback(wc, &$WaitCallback1<T1>::Callback);
+	__Post(_wc, nullptr);
 }
 #define TP1(type1, object, func, val1) __TP1<type1>(gcnew Action<type1>(object, &func), val1)
 
@@ -197,8 +210,8 @@ ref struct $WaitCallback2 {
 generic<typename T1, typename T2>
 __forceinline void __TP2(System::Action<T1, T2> ^action, T1 val1, T2 val2) {
 	auto wc = gcnew $WaitCallback2<T1, T2>(action, val1, val2);
-	auto _wc = gcnew WaitCallback(wc, &$WaitCallback2<T1, T2>::Callback);
-	TPQN(_wc);
+	auto _wc = gcnew SendOrPostCallback(wc, &$WaitCallback2<T1, T2>::Callback);
+	__Post(_wc, nullptr);
 }
 #define TP2(type1, type2, object, func, val1, val2) __TP2<type1, type2>(gcnew System::Action<type1, type2>(object, &func), val1, val2)
 
