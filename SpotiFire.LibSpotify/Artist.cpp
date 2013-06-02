@@ -3,6 +3,8 @@
 #include "Artist.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#define ARTIST_LOADED(ptr) if(!sp_artist_is_loaded(ptr)) throw gcnew NotLoadedException("Artist")
+
 Artist::Artist(SpotiFire::Session ^session, sp_artist *ptr) {
 	SPLock lock;
 	_ptr = ptr;
@@ -37,6 +39,7 @@ bool Artist::IsLoaded::get() {
 
 String ^Artist::Name::get() {
 	SPLock lock;
+	ARTIST_LOADED(_ptr);
 	return UTF8(sp_artist_name(_ptr));
 }
 

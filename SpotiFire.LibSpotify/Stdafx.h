@@ -75,6 +75,16 @@ namespace SpotiFire {
 		}
 	};
 
+	///-------------------------------------------------------------------------------------------------
+	/// <summary>	Exception for signalling not loaded errors. </summary>
+	///
+	/// <remarks>	Aleksander, 02.06.2013. </remarks>
+	///-------------------------------------------------------------------------------------------------
+	public ref class NotLoadedException : Exception {
+	internal:
+		NotLoadedException(String ^type) : Exception(type + " not loaded.") { }
+	};
+
 }
 
 #include "Interfaces.h"

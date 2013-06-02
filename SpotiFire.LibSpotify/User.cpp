@@ -3,6 +3,8 @@
 #include "User.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
+#define USER_LOADED(ptr) if(!sp_user_is_loaded(ptr)) throw gcnew NotLoadedException("User")
+
 User::User(SpotiFire::Session ^session, sp_user *ptr) {
 	SPLock lock;
 	_ptr = ptr;
@@ -25,18 +27,28 @@ Session ^User::Session::get() {
 }
 
 bool User::IsLoaded::get() {
+	SPLock lock;
 	return sp_user_is_loaded(_ptr);
 }
 
 bool User::IsReady::get() {
-	return IsLoaded && !String::IsNullOrEmpty(CanonicalName);
+	SPLock lock;
+	if(!sp_user_is_loaded(_ptr))
+		return false;
+
+	const char *name = sp_user_canonical_name(_ptr);
+	return name != NULL && strlen(name) > 0;
 }
 
 String ^User::CanonicalName::get() {
+	SPLock lock;
+	USER_LOADED(_ptr);
 	return UTF8(sp_user_canonical_name(_ptr));
 }
 
 String ^User::DisplayName::get() {
+	SPLock lock;
+	USER_LOADED(_ptr);
 	return UTF8(sp_user_display_name(_ptr));
 }
 
