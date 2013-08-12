@@ -142,8 +142,7 @@ __forceinline void __SP_RETURN(sp_error error) {
 }
 #define SP_ERR(sp_ret_error) __SP_RETURN(sp_ret_error);
 
-//#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
-#define TPQ(wc, state) _sync->Post(wc, state)
+#define TPQ(wc, state) ThreadPool::QueueUserWorkItem(wc, state)
 #define TPQN(wc) TPQ(wc, nullptr)
 
 __forceinline void __Post(WaitCallback ^fn, Object ^state) {

@@ -27,3 +27,15 @@ template<class T, class U>
 __forceinline bool isinst(U u) {
    return dynamic_cast<T>(u) != nullptr;
 }
+
+#define RAISE_EVENT(type, evt, sender, args) \
+	if(evt == nullptr) return;\
+	auto list = evt->GetInvocationList(); \
+	for(int i = 0; i < list->Length; i++) {\
+		auto invoker = dynamic_cast<System::ComponentModel::ISynchronizeInvoke ^>(list[i]->Target);\
+		if(invoker != nullptr && invoker->InvokeRequired) {\
+			invoker->Invoke(list[i], gcnew array<Object ^> { sender, args });\
+		} else {\
+			((type ^)list[i])->Invoke(sender, args);\
+		}\
+	}

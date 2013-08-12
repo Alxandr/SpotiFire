@@ -204,19 +204,6 @@ void main_thread(Object ^arg) {
 	Session::logger->Debug("Stopping main thread");
 }
 
-generic<typename TEventArgs> where TEventArgs : EventArgs
-__forceinline void triggerEvent(EventHandler<TEventArgs> ^evt, TEventArgs args, Object ^sender) {
-	auto list = evt->GetInvocationList();
-	for(int i = 0; i < list->Length; i++) {
-		auto invoker = dynamic_cast<System::ComponentModel::ISynchronizeInvoke ^>(list[i]->Target);
-		if(invoker != nullptr && invoker->InvokeRequired) {
-			invoker->Invoke(list[i], gcnew array<Object ^> { sender, args });
-		} else {
-			((EventHandler<TEventArgs> ^)list[i])->Invoke(sender, args);
-		}
-	}
-}
-
 Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent) {
 	logger->Trace("Ctor");
 	SPLock lock;

@@ -135,10 +135,6 @@ public:
 		DoRemove(index);
 		DoInsert(index - 1, item);
 	}
-
-	virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e) override sealed {
-		CollectionChanged(_playlist, e);
-	}
 };
 
 IObservableSPList<Track ^> ^Playlist::Tracks::get() {

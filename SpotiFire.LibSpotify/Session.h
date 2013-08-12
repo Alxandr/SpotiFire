@@ -6,6 +6,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Threading;
+using namespace System::Runtime::CompilerServices;
 using namespace NLog;
 
 
@@ -71,6 +72,25 @@ namespace SpotiFire {
 
 		PlaylistContainer ^_pc;
 		ConnectionState _cs;
+
+		// events
+		SessionEventHandler ^_connectionError;
+		SessionEventHandler ^_connectionstateUpdated;
+		SessionEventHandler ^_credentialsBlobUpdated;
+		SessionEventHandler ^_endOfTrack;
+		SessionEventHandler ^_logMessage;
+		SessionEventHandler ^_messageToUser;
+		SessionEventHandler ^_metadataUpdated;
+		SessionEventHandler ^_offlineError;
+		SessionEventHandler ^_offlineStatusUpdated;
+		SessionEventHandler ^_playTokenLost;
+		PrivateSessionModeEventHandler ^_privateSessionModeChanged;
+		SessionEventHandler ^_scobbleErrors;
+		SessionEventHandler ^_startPlayback;
+		SessionEventHandler ^_stopPlayback;
+		SessionEventHandler ^_streamingError;
+		SessionEventHandler ^_scrobbleError;
+		SessionEventHandler ^_userinfoUpdated;
 
 	internal:
 		static Task<Session^> ^Create(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent);
@@ -373,7 +393,22 @@ namespace SpotiFire {
 		/// 			metadata has been updated. If you have metadata cached outside of libspotify, you
 		///				should purge your caches and fetch new versions. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^MetadataUpdated;
+		event SessionEventHandler ^MetadataUpdated {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_metadataUpdated += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_metadataUpdated -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _metadataUpdated, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in ConnectionError events. </summary>
@@ -384,7 +419,22 @@ namespace SpotiFire {
 		///				for instance notifying the client and automatically trying to login again.
 		///				</remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^ConnectionError;
+		event SessionEventHandler ^ConnectionError {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_connectionError += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_connectionError -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _connectionError, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MessageToUser events. </summary>
@@ -394,7 +444,22 @@ namespace SpotiFire {
 		///				whenever a message should be displayed to the user. Actions that can be taken
 		///				after this are for instance notifying the client of the message. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^MessageToUser;
+		event SessionEventHandler ^MessageToUser {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_messageToUser += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_messageToUser -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _messageToUser, sender, args);
+			}
+		}
 		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MusicDelivered events. </summary>
@@ -416,7 +481,22 @@ namespace SpotiFire {
 		/// 			starts to play music on another machine (or another application on the same
 		///				machine). </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^PlayTokenLost;
+		event SessionEventHandler ^PlayTokenLost {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_playTokenLost += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_playTokenLost -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _playTokenLost, sender, args);
+			}
+		}
 		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in LogMessage events. </summary>
@@ -425,7 +505,22 @@ namespace SpotiFire {
 		/// 			libspotify requests some log data to be logged. The application may log the given
 		///				data. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^LogMessage;
+		event SessionEventHandler ^LogMessage {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_logMessage += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_logMessage -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _logMessage, sender, args);
+			}
+		}
 		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>
@@ -434,7 +529,22 @@ namespace SpotiFire {
 		/// 			a track has finished playing. Actions that can be taken after this are for
 		/// 			instance playing another track, or exiting the application. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^EndOfTrack;
+		event SessionEventHandler ^EndOfTrack {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_endOfTrack += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_endOfTrack -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _endOfTrack, sender, args);
+			}
+		}
 		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StreamingError events. </summary>
@@ -445,7 +555,22 @@ namespace SpotiFire {
 		///				for instance trying to stream again, or notifying the user of the error.
 		///				</remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^StreamingError;
+		event SessionEventHandler ^StreamingError {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_streamingError += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_streamingError -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _streamingError, sender, args);
+			}
+		}
 		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in UserinfoUpdated events. </summary>
@@ -457,7 +582,22 @@ namespace SpotiFire {
 		///				after this are for instance updating the info on the user page of the application.
 		///				</remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^UserinfoUpdated;
+		event SessionEventHandler ^UserinfoUpdated {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_userinfoUpdated += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_userinfoUpdated -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _userinfoUpdated, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StartPlayback events. </summary>
@@ -468,7 +608,22 @@ namespace SpotiFire {
 		///				must also implement GetAudioBufferStats. Event-listeners on this StartPlayback 
 		///				<strong>must not</strong> (ever) block. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^StartPlayback;
+		event SessionEventHandler ^StartPlayback {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_startPlayback += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_startPlayback -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _startPlayback, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StopPlayback events. </summary>
@@ -479,7 +634,22 @@ namespace SpotiFire {
 		///				must also implement GetAudioBufferStats. Event-listeners on this StopPlayback 
 		///				<strong>must not</strong> (ever) block. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^StopPlayback;
+		event SessionEventHandler ^StopPlayback {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_stopPlayback += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_stopPlayback -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _stopPlayback, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in GetAudioBufferStats events. </summary>
@@ -500,7 +670,22 @@ namespace SpotiFire {
 		///				after this are for instance notifying the user of any synchronisation errors.
 		///				</remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^OfflineError;
+		event SessionEventHandler ^OfflineError {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_offlineError += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_offlineError -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _offlineError, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in OfflineStatusUpdated events. </summary>
@@ -511,7 +696,22 @@ namespace SpotiFire {
 		///				taken after this are for instance notifying the user of which tracks are currently
 		///				available offline. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^OfflineStatusUpdated;
+		event SessionEventHandler ^OfflineStatusUpdated {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_offlineStatusUpdated += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_offlineStatusUpdated -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _offlineStatusUpdated, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in CredentialsBlobUpdated events. </summary>
@@ -522,7 +722,22 @@ namespace SpotiFire {
 		///				connection to the AP has been established. Actionstaken after this are for
 		///				instance storing the blob on disk. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^CredentialsBlobUpdated;
+		event SessionEventHandler ^CredentialsBlobUpdated {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_credentialsBlobUpdated += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_credentialsBlobUpdated -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _credentialsBlobUpdated, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in ConnectionstateUpdated events.
@@ -535,7 +750,22 @@ namespace SpotiFire {
 		///				be taken after this are for instance notifying the client and automatically
 		///				trying to login again. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^ConnectionstateUpdated;
+		event SessionEventHandler ^ConnectionstateUpdated {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_connectionstateUpdated += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_connectionstateUpdated -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _connectionstateUpdated, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in ScrobbleError events.
@@ -546,7 +776,22 @@ namespace SpotiFire {
 		///				whenever a scrobble error has occured. Actions that can be taken after this are
 		///				for instance notifying the user about this change. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event SessionEventHandler ^ScrobbleError;
+		event SessionEventHandler ^ScrobbleError {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(SessionEventHandler ^handler) {
+				_scrobbleError += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(SessionEventHandler ^handler) {
+				_scrobbleError -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, SessionEventArgs ^args) {
+				RAISE_EVENT(SessionEventHandler, _scrobbleError, sender, args);
+			}
+		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in PrivateSessionModeChanged events.
@@ -557,6 +802,21 @@ namespace SpotiFire {
 		///				whenever a change in the private session mode has occured. Actions that can be
 		///				taken after this are for instance notifying the user about this change. </remarks>
 		///-------------------------------------------------------------------------------------------------
-		event PrivateSessionModeEventHandler ^PrivateSessionModeChanged;
+		event PrivateSessionModeEventHandler ^PrivateSessionModeChanged {
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void add(PrivateSessionModeEventHandler ^handler) {
+				_privateSessionModeChanged += handler;
+			}
+
+			[MethodImpl(MethodImplOptions::Synchronized)]
+			void remove(PrivateSessionModeEventHandler ^handler) {
+				_privateSessionModeChanged -= handler;
+			}
+
+		private:
+			void raise(Session ^sender, PrivateSessionModeEventArgs ^args) {
+				RAISE_EVENT(PrivateSessionModeEventHandler, _privateSessionModeChanged, sender, args);
+			}
+		}
 	};
 }
