@@ -9,6 +9,7 @@
 #include <msclr\marshal.h>
 
 #include "include\libspotify\api.h"
+#include "Utils.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -90,6 +91,7 @@ namespace SpotiFire {
 #include "Interfaces.h"
 #include "Lists.h"
 #include "EventArgs.h"
+#include "PortraitId.h"
 
 #include "Session.h"
 #include "Image.h"

@@ -64,7 +64,7 @@ namespace SpotiFire {
 		/// 
 		/// <value>	The identifier of the cover. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property String ^CoverId { String ^get() sealed; }
+		virtual property PortraitId CoverId { PortraitId get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets a value indicating whether this album is available for playback. </summary>

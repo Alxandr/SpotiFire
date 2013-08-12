@@ -30,6 +30,9 @@ namespace SpotiFire {
 	private:
 		IList<String ^> ^_copyrights;
 		IList<Track ^> ^_tracks;
+		IList<PortraitId> ^_portraits;
+		IList<Artist ^> ^_similarArtists;
+		IList<Album ^> ^_albums;
 
 		List<Action ^> ^_continuations;
 		bool _complete;
@@ -77,7 +80,7 @@ namespace SpotiFire {
 		///
 		/// <value>	A list of identifiers of the portraits. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property IList<String ^> ^PortraitIds { IList<String ^> ^get() sealed; }
+		virtual property IList<PortraitId> ^PortraitIds { IList<PortraitId> ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the tracks. </summary>
@@ -85,6 +88,13 @@ namespace SpotiFire {
 		/// <value>	The tracks. </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property IList<Track ^> ^Tracks { IList<Track ^> ^get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the albums. </summary>
+		///
+		/// <value>	The albums. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property IList<Album ^> ^Albums { IList<Album ^> ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets a list of similar artists. </summary>

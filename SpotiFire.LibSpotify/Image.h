@@ -41,7 +41,7 @@ namespace SpotiFire {
 		!Image(); // finalizer
 		~Image(); // destructor
 
-		static Image ^Create(Session ^session, String ^id);
+		static Image ^Create(Session ^session, PortraitId id);
 
 	public:
 
@@ -92,7 +92,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	Returns an image from the given Id. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static Image ^FromId(SpotiFire::Session ^session, String ^id);
+		static Image ^FromId(SpotiFire::Session ^session, PortraitId id);
 		
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the image. </summary>

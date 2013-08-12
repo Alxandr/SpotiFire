@@ -71,15 +71,15 @@ System::Drawing::Image ^Image::GetImage() {
 	return System::Drawing::Image::FromStream(gcnew System::IO::MemoryStream(data));
 }
 
-Image ^Image::Create(SpotiFire::Session ^session, String ^id) {
+Image ^Image::Create(SpotiFire::Session ^session, PortraitId id) {
 	SPLock lock;
-	sp_image *ptr = sp_image_create(session->_ptr, HTB(id).data());
+	sp_image *ptr = sp_image_create(session->_ptr, id.data().data());
 	Image ^ret = gcnew Image(session, ptr);
 	sp_image_release(ptr);
 	return ret;
 }
 
-Image ^Image::FromId(SpotiFire::Session ^session, String ^id) {
+Image ^Image::FromId(SpotiFire::Session ^session, PortraitId id) {
 	return Image::Create(session, id);
 }
 

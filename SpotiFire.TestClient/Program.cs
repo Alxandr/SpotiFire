@@ -114,17 +114,17 @@ namespace SpotiFire.TestClient
                 await Task.Delay(TimeSpan.FromSeconds(2));
             }
 
-            var toplist = await session.CreateToplistBrowse(ToplistType.Tracks, ToplistRegion.Everywhere, null);
-            var toptrack = await toplist.Tracks[0];
-            Console.WriteLine("Most popular track on spotify: " + toptrack.Name);
-            await session.Play(toptrack);
+            //var toplist = await session.CreateToplistBrowse(ToplistType.Tracks, ToplistRegion.Everywhere, null);
+            //var toptrack = await toplist.Tracks[0];
+            //Console.WriteLine("Most popular track on spotify: " + toptrack.Name);
+            //await session.Play(toptrack);
 
-            PlayQueue queue = new PlayQueue();
+            //PlayQueue queue = new PlayQueue();
 
             var playlist = await session.PlaylistContainer.Playlists[0];
-            queue.Seed = playlist.Tracks;
-            while (!queue.IsEmpty)
-                await session.Play(queue.Dequeue());
+            //queue.Seed = playlist.Tracks;
+            //while (!queue.IsEmpty)
+            //    await session.Play(queue.Dequeue());
 
 
             Console.WriteLine("Playing random from " + playlist.Name);
