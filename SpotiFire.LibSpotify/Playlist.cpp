@@ -323,10 +323,6 @@ String ^Playlist::GetTrackMessage(int trackIndex) {
 	return UTF8(sp_playlist_track_message(_ptr, trackIndex));
 }
 
-Link ^Playlist::GetLink() {
-	return this->IsLoaded ? Link::Create(this) : nullptr;
-}
-
 //------------------ Event Handlers ------------------//
 void Playlist::tracks_added(array<Track ^>^ tracks, int position) {
 	logger->Trace("tracks_added");
