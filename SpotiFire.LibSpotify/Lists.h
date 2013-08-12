@@ -12,29 +12,26 @@ typedef System::Collections::IEnumerator IBEnumerator;
 namespace SpotiFire {
 	namespace Collections {
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		ref class SPList;
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		interface class IObservableSPList;
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		ref class ObservableSPList;
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		ref class ReadOnlyList;
 
 		void throw_readonly();
-		generic<typename T> where T : ref class
+		generic<typename T>
 		void ensure_not_readonly(SPList<T> ^);
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		bool ensure_equals(T left, T right);
 
-
-
-
-		generic<typename T> where T : ref class
+		generic<typename T>
 		ref class SPList abstract : IList<T>
 		{
 		protected:
@@ -226,7 +223,7 @@ namespace SpotiFire {
 		///				changes to the list. This interface should be used by SpotiFire classes for
 		///				public observable list members. </remarks>	
 		///-------------------------------------------------------------------------------------------------
-		generic<typename T> where T : ref class
+		generic<typename T>
 		public interface class IObservableSPList : IList<T> {
 		public:
 			///-------------------------------------------------------------------------------------------------
@@ -251,7 +248,7 @@ namespace SpotiFire {
 		///				outside this class. This abstract class should be used by SpotiFire classes for
 		///				internal list members. </remarks>	
 		///-------------------------------------------------------------------------------------------------
-		generic<typename T> where T : ref class
+		generic<typename T>
 		ref class ObservableSPList abstract : SPList<T>, IObservableSPList<T>
 		{
 		public:
@@ -262,7 +259,7 @@ namespace SpotiFire {
 		};
 		
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		ref class ReadOnlyList abstract : SPList<T>
 		{
 		public:
@@ -289,21 +286,15 @@ namespace SpotiFire {
 			throw gcnew InvalidOperationException("ReadOnly Collection");
 		}
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		__forceinline void ensure_not_readonly(SPList<T> ^list) {
 			if(list->IsReadOnly) 
 				throw_readonly();
 		}
 
-		generic<typename T> where T : ref class
+		generic<typename T>
 		__forceinline bool ensure_equals(T left, T right) {
-			if(Object::ReferenceEquals(left, right))
-				return true;
-
-			if(left == nullptr)
-				return false;
-
-			return left->Equals(right);
+			return EqualityComparer<T>::Default->Equals(left, right);
 		}
 	}
 }

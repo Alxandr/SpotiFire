@@ -199,7 +199,6 @@ bool Playlist::HasPendingChanges::get() {
 
 bool Playlist::IsLoaded::get() {
 	SPLock lock;
-	PLAYLIST_LOADED(_ptr);
 	return sp_playlist_is_loaded(_ptr);
 }
 

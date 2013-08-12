@@ -99,6 +99,7 @@
     <ClInclude Include="Lists.h" />
     <ClInclude Include="Playlist.h" />
     <ClInclude Include="Playlistcontainer.h" />
+    <ClInclude Include="PortraitId.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Search.h" />
     <ClInclude Include="Session.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="Toplist.h" />
     <ClInclude Include="Track.h" />
     <ClInclude Include="User.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Album.cpp" />

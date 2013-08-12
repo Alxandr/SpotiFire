@@ -62,10 +62,10 @@ Artist ^Album::Artist::get() {
 	return gcnew SpotiFire::Artist(_session, sp_album_artist(_ptr));
 }
 
-String^ Album::CoverId::get() {
+PortraitId Album::CoverId::get() {
 	SPLock lock;
 	ALBUM_LOADED(_ptr);
-	return HEX(sp_album_cover(_ptr, SP_IMAGE_SIZE_NORMAL), 20);
+	return PortraitId(sp_album_cover(_ptr, SP_IMAGE_SIZE_NORMAL));
 }
 
 String^ Album::Name::get() {

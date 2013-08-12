@@ -40,16 +40,104 @@ bool ArtistBrowse::IsLoaded::get() {
 	return sp_artistbrowse_is_loaded(_ptr);
 }
 
-IList<String ^> ^ArtistBrowse::PortraitIds::get() {
-	throw gcnew NotImplementedException("ArtistBrowse::PortraitIds");
+ref class $ArtistBrowse$PortraitIds sealed : ReadOnlyList<PortraitId>
+{
+internal:
+	ArtistBrowse ^_browse;
+	$ArtistBrowse$PortraitIds(ArtistBrowse ^browse) { _browse = browse; }
+
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_artistbrowse_num_portraits(_browse->_ptr);
+	}
+
+	virtual PortraitId DoFetch(int index) override sealed {
+		SPLock lock;
+		return PortraitId(sp_artistbrowse_portrait(_browse->_ptr, index));
+	}
+};
+
+IList<PortraitId> ^ArtistBrowse::PortraitIds::get() {
+	if(_portraits == nullptr) {
+		Interlocked::CompareExchange<IList<PortraitId> ^>(_portraits, gcnew $ArtistBrowse$PortraitIds(this), nullptr);
+	}
+	return _portraits;
 }
+
+ref class $ArtistBrowse$Tracks sealed : ReadOnlyList<Track ^>
+{
+internal:
+	ArtistBrowse ^_browse;
+	$ArtistBrowse$Tracks(ArtistBrowse ^browse) { _browse = browse; }
+
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_artistbrowse_num_tracks(_browse->_ptr);
+	}
+
+	virtual Track ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return gcnew Track(_browse->_session, sp_artistbrowse_track(_browse->_ptr, index));
+	}
+};
 
 IList<Track ^> ^ArtistBrowse::Tracks::get() {
-	throw gcnew NotImplementedException("ArtistBrowse::Tracks");
+	if(_tracks == nullptr) {
+		Interlocked::CompareExchange<IList<Track ^> ^>(_tracks, gcnew $ArtistBrowse$Tracks(this), nullptr);
+	}
+	return _tracks;
 }
 
+ref class $ArtistBrowse$Albums sealed : ReadOnlyList<Album ^>
+{
+internal:
+	ArtistBrowse ^_browse;
+	$ArtistBrowse$Albums(ArtistBrowse ^browse) { _browse = browse; }
+
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_artistbrowse_num_albums(_browse->_ptr);
+	}
+
+	virtual Album ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return gcnew Album(_browse->_session, sp_artistbrowse_album(_browse->_ptr, index));
+	}
+};
+
+IList<Album ^> ^ArtistBrowse::Albums::get() {
+	if(_albums == nullptr) {
+		Interlocked::CompareExchange<IList<Album ^> ^>(_albums, gcnew $ArtistBrowse$Albums(this), nullptr);
+	}
+	return _albums;
+}
+
+ref class $ArtistBrowse$SimilarArtists sealed : ReadOnlyList<Artist ^>
+{
+internal:
+	ArtistBrowse ^_browse;
+	$ArtistBrowse$SimilarArtists(ArtistBrowse ^browse) { _browse = browse; }
+
+public:
+	virtual int DoCount() override sealed {
+		SPLock lock;
+		return sp_artistbrowse_num_similar_artists(_browse->_ptr);
+	}
+
+	virtual Artist ^DoFetch(int index) override sealed {
+		SPLock lock;
+		return gcnew Artist(_browse->_session, sp_artistbrowse_similar_artist(_browse->_ptr, index));
+	}
+};
+
 IList<Artist ^> ^ArtistBrowse::SimilarArtists::get() {
-	throw gcnew NotImplementedException("ArtistBrowse::SimilarArtists");
+	if(_similarArtists == nullptr) {
+		Interlocked::CompareExchange<IList<SpotiFire::Artist ^> ^>(_similarArtists, gcnew $ArtistBrowse$SimilarArtists(this), nullptr);
+	}
+	return _similarArtists;
 }
 
 String ^ArtistBrowse::Biography::get() {
