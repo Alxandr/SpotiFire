@@ -118,39 +118,28 @@ void SP_CALLCONV completed(sp_albumbrowse *albumbrowse, void *userdata) {
 }
 
 void AlbumBrowse::complete() {
-	array<Action ^> ^continuations = nullptr;
+	TaskCompletionSource<AlbumBrowse ^> ^tcs = nullptr;
 	{
 		SPLock lock;
+		tcs = _tcs;
 		_complete = true;
-		if(_continuations != nullptr) {
-			continuations = gcnew array<Action ^>(_continuations->Count);
-			_continuations->CopyTo(continuations, 0);
-			_continuations->Clear();
-			_continuations = nullptr;
+	}
+	if(tcs != nullptr)
+		tcs->SetResult(this);
+}
+
+System::Runtime::CompilerServices::TaskAwaiter<AlbumBrowse ^> AlbumBrowse::GetAwaiter() {
+	TaskCompletionSource<AlbumBrowse ^> ^tcs = nullptr;
+	{
+		SPLock lock;
+		if(_tcs == nullptr) {
+			_tcs = gcnew TaskCompletionSource<AlbumBrowse ^>();
+			if(_complete)
+				_tcs->SetResult(this);
 		}
+		tcs = _tcs;
 	}
-	if(continuations != nullptr) {
-		for(int i = 0; i < continuations->Length; i++)
-			if(continuations[i])
-				continuations[i]();
-	}
-}
-
-bool AlbumBrowse::IsComplete::get() {
-	SPLock lock;
-	return _complete;
-}
-
-bool AlbumBrowse::AddContinuation(Action ^continuationAction) {
-	SPLock lock;
-	if(IsLoaded)
-		return false;
-
-	if(_continuations == nullptr)
-		_continuations = gcnew List<Action ^>;
-
-	_continuations->Add(continuationAction);
-	return true;
+	return tcs->Task->GetAwaiter();
 }
 
 int AlbumBrowse::GetHashCode() {

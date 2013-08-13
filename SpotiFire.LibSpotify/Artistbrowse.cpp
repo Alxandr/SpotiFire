@@ -162,39 +162,28 @@ void SP_CALLCONV completed(sp_artistbrowse *artistbrowse, void *userdata) {
 }
 
 void ArtistBrowse::complete() {
-	array<Action ^> ^continuations = nullptr;
+	TaskCompletionSource<ArtistBrowse ^> ^tcs = nullptr;
 	{
 		SPLock lock;
+		tcs = _tcs;
 		_complete = true;
-		if(_continuations != nullptr) {
-			continuations = gcnew array<Action ^>(_continuations->Count);
-			_continuations->CopyTo(continuations, 0);
-			_continuations->Clear();
-			_continuations = nullptr;
+	}
+	if(tcs != nullptr)
+		tcs->SetResult(this);
+}
+
+System::Runtime::CompilerServices::TaskAwaiter<ArtistBrowse ^> ArtistBrowse::GetAwaiter() {
+	TaskCompletionSource<ArtistBrowse ^> ^tcs = nullptr;
+	{
+		SPLock lock;
+		if(_tcs == nullptr) {
+			_tcs = gcnew TaskCompletionSource<ArtistBrowse ^>();
+			if(_complete)
+				_tcs->SetResult(this);
 		}
+		tcs = _tcs;
 	}
-	if(continuations != nullptr) {
-		for(int i = 0; i < continuations->Length; i++)
-			if(continuations[i])
-				continuations[i]();
-	}
-}
-
-bool ArtistBrowse::IsComplete::get() {
-	SPLock lock;
-	return _complete;
-}
-
-bool ArtistBrowse::AddContinuation(Action ^continuationAction) {
-	SPLock lock;
-	if(IsLoaded)
-		return false;
-
-	if(_continuations == nullptr)
-		_continuations = gcnew List<Action ^>;
-
-	_continuations->Add(continuationAction);
-	return true;
+	return tcs->Task->GetAwaiter();
 }
 
 int ArtistBrowse::GetHashCode() {

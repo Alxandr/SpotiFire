@@ -29,13 +29,13 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class PlaylistContainer sealed : ISpotifyObject, ISpotifyAwaitable
+	public ref class PlaylistContainer sealed : ISpotifyObject, ISpotifyAwaitable<PlaylistContainer ^>
 	{
 	private:
 		ObservableSPList<Playlist ^> ^_playlists;
 
-		List<Action ^> ^_continuations;
-		bool _complete;
+		volatile bool _complete;
+		TaskCompletionSource<PlaylistContainer ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -133,9 +133,8 @@ namespace SpotiFire {
 		virtual String ^GetFolderName(int index) sealed;
 		virtual UInt64 GetFolderId(int index) sealed;
 
-	private:
-		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
-		virtual bool AddContinuation(Action ^continuation) sealed = ISpotifyAwaitable::AddContinuation;
+	public:
+		virtual System::Runtime::CompilerServices::TaskAwaiter<PlaylistContainer ^> GetAwaiter() sealed = ISpotifyAwaitable<PlaylistContainer ^>::GetAwaiter;
 
 	};
 }

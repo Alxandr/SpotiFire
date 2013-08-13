@@ -15,7 +15,7 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class Search sealed : ISpotifyObject, ISpotifyAwaitable
+	public ref class Search sealed : ISpotifyObject, ISpotifyAwaitable<Search ^>
 	{
 	private:
 		IList<Track ^> ^_tracks;
@@ -23,8 +23,8 @@ namespace SpotiFire {
 		IList<Playlist ^> ^_playlists;
 		IList<Artist ^> ^_artists;
 
-		List<Action ^> ^_continuations;
-		bool _complete;
+		volatile bool _complete;
+		TaskCompletionSource<Search ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -183,9 +183,8 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		static bool operator!= (Search^ left, Search^ right);
 
-	private:
-		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
-		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
+	public:
+		virtual System::Runtime::CompilerServices::TaskAwaiter<Search ^> GetAwaiter() sealed = ISpotifyAwaitable<Search ^>::GetAwaiter;
 
 	internal:
 		static Search ^Create(SpotiFire::Session ^session, String ^query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, int playlistOffset, int playlistCount, SearchType type);

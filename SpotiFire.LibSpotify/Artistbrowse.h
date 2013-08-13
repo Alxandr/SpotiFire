@@ -25,7 +25,7 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class ArtistBrowse sealed : ISpotifyObject, ISpotifyAwaitable
+	public ref class ArtistBrowse sealed : ISpotifyObject, ISpotifyAwaitable<ArtistBrowse ^>
 	{
 	private:
 		IList<String ^> ^_copyrights;
@@ -34,8 +34,8 @@ namespace SpotiFire {
 		IList<Artist ^> ^_similarArtists;
 		IList<Album ^> ^_albums;
 
-		List<Action ^> ^_continuations;
-		bool _complete;
+		volatile bool _complete;
+		TaskCompletionSource<ArtistBrowse ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -156,9 +156,8 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		static bool operator!= (ArtistBrowse^ left, ArtistBrowse^ right);
 
-	private:
-		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
-		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
+	public:
+		virtual System::Runtime::CompilerServices::TaskAwaiter<ArtistBrowse ^> GetAwaiter() sealed = ISpotifyAwaitable<ArtistBrowse ^>::GetAwaiter;
 
 	internal:
 		static ArtistBrowse ^Create(SpotiFire::Session ^session, SpotiFire::Artist ^album, ArtistBrowseType type);

@@ -113,39 +113,28 @@ void SP_CALLCONV completed(sp_image *image, void *userdata) {
 //------------------------------------------
 // Await
 void Image::complete() {
-	array<Action ^> ^continuations = nullptr;
+	TaskCompletionSource<Image ^> ^tcs = nullptr;
 	{
 		SPLock lock;
+		tcs = _tcs;
 		_complete = true;
-		if(_continuations != nullptr) {
-			continuations = gcnew array<Action ^>(_continuations->Count);
-			_continuations->CopyTo(continuations, 0);
-			_continuations->Clear();
-			_continuations = nullptr;
+	}
+	if(tcs != nullptr)
+		tcs->SetResult(this);
+}
+
+System::Runtime::CompilerServices::TaskAwaiter<Image ^> Image::GetAwaiter() {
+	TaskCompletionSource<Image ^> ^tcs = nullptr;
+	{
+		SPLock lock;
+		if(_tcs == nullptr) {
+			_tcs = gcnew TaskCompletionSource<Image ^>();
+			if(_complete)
+				_tcs->SetResult(this);
 		}
+		tcs = _tcs;
 	}
-	if(continuations != nullptr) {
-		for(int i = 0; i < continuations->Length; i++)
-			if(continuations[i])
-				continuations[i]();
-	}
-}
-
-bool Image::IsComplete::get() {
-	SPLock lock;
-	return _complete;
-}
-
-bool Image::AddContinuation(Action ^continuationAction) {
-	SPLock lock;
-	if(IsLoaded)
-		return false;
-
-	if(_continuations == nullptr)
-		_continuations = gcnew List<Action ^>;
-
-	_continuations->Add(continuationAction);
-	return true;
+	return tcs->Task->GetAwaiter();
 }
 
 int Image::GetHashCode() {

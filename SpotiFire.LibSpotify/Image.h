@@ -27,11 +27,11 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class Image sealed : ISpotifyObject, ISpotifyAwaitable
+	public ref class Image sealed : ISpotifyObject, ISpotifyAwaitable<Image ^>
 	{
 	private:
-		List<Action ^> ^_continuations;
-		bool _complete;
+		volatile bool _complete;
+		TaskCompletionSource<Image ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -148,9 +148,8 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		static bool operator!= (Image^ left, Image^ right);
 
-	private:
-		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
-		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
+	public:
+		virtual System::Runtime::CompilerServices::TaskAwaiter<Image ^> GetAwaiter() sealed = ISpotifyAwaitable<Image ^>::GetAwaiter;
 
 	internal:
 		// Spotify events
