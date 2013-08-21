@@ -54,7 +54,7 @@ User ^PlaylistContainer::Owner::get() {
 	return gcnew User(_session, sp_playlistcontainer_owner(_ptr));
 }
 
-ref class $PlaylistContainer$PlaylistList sealed : ObservableSPList<Playlist ^>
+ref class $PlaylistContainer$PlaylistList sealed : ObservableSPList<Playlist ^>, IInternalPlaylistList, IPlaylistList
 {
 internal:
 	PlaylistContainer ^_pc;
@@ -86,11 +86,17 @@ public:
 		DoRemove(index);
 		DoInsert(index - 1, item);
 	}
+
+	virtual Playlist ^Create(String ^name) sealed {
+		SPLock lock;
+		marshal_context context;
+		return gcnew Playlist(_pc->Session, sp_playlistcontainer_add_new_playlist(_pc->_ptr, context.marshal_as<const char *>(name)));
+	}
 };
 
-IObservableSPList<Playlist ^> ^PlaylistContainer::Playlists::get() {
+IPlaylistList ^PlaylistContainer::Playlists::get() {
 	if(_playlists == nullptr) {
-		Interlocked::CompareExchange<ObservableSPList<Playlist ^> ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
+		Interlocked::CompareExchange<IInternalPlaylistList ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
 	}
 	return _playlists;
 }

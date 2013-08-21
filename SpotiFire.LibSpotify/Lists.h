@@ -10,6 +10,8 @@ typedef System::Collections::IEnumerator IBEnumerator;
 //#include "Lists.h"
 
 namespace SpotiFire {
+	ref class Playlist;
+
 	namespace Collections {
 
 		generic<typename T>
@@ -280,6 +282,16 @@ namespace SpotiFire {
 			virtual void DoUpdate(int index, T item) override sealed {
 				throw_readonly();
 			}
+		};
+
+		public interface class IPlaylistList : IObservableSPList<Playlist ^> {
+		public:
+			Playlist ^Create(String ^name);
+		};
+
+		interface class IInternalPlaylistList : IPlaylistList {
+		public:
+			virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e);
 		};
 
 		__forceinline void throw_readonly() {
