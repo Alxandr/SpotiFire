@@ -77,7 +77,7 @@ namespace SpotiFire {
 
 			virtual void Add(T item) sealed = IList<T>::Add {
 				ensure_not_readonly(this);
-				this->Insert(Count - 1, item);
+				this->Insert(Math::Max(Count - 1, 0), item);
 			}
 
 			virtual void Clear() sealed = IList<T>::Clear {
@@ -116,7 +116,7 @@ namespace SpotiFire {
 
 			virtual void Insert(int index, T item) sealed/* = IList<T>::Insert*/ {
 				ensure_not_readonly(this);
-				if(index < 0 || index >= DoCount())
+				if(index < 0 || index > DoCount())
 					throw gcnew IndexOutOfRangeException();
 				Interlocked::Increment(_version);
 				DoInsert(index, item);
