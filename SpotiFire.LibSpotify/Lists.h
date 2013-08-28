@@ -77,7 +77,7 @@ namespace SpotiFire {
 
 			virtual void Add(T item) sealed = IList<T>::Add {
 				ensure_not_readonly(this);
-				this->Insert(Math::Max(Count - 1, 0), item);
+				this->Insert(Count, item);
 			}
 
 			virtual void Clear() sealed = IList<T>::Clear {
