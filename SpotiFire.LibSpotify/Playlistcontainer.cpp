@@ -9,6 +9,8 @@ using namespace SpotiFire::Collections;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#define PLAYLIST_CONTAINER_LOADED(ptr) if(!sp_playlistcontainer_is_loaded(ptr)) throw gcnew NotLoadedException("PlaylistContainer")
+
 void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
 void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
 void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata);
@@ -63,26 +65,30 @@ internal:
 public:
 	virtual int DoCount() override sealed {
 		SPLock lock;
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
 		return sp_playlistcontainer_num_playlists(_pc->_ptr);
 	}
 
 	virtual Playlist ^DoFetch(int index) override sealed {
 		SPLock lock;
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
 		return gcnew Playlist(_pc->_session, sp_playlistcontainer_playlist(_pc->_ptr, index));
 	}
 
 	virtual void DoInsert(int index, Playlist ^item) override sealed {
 		SPLock lock;
-		throw gcnew NotImplementedException("PlaylistList::DoInsert");
+		throw gcnew InvalidOperationException("PlaylistList::DoInsert");
 	}
 
 	virtual void DoRemove(int index) override sealed {
 		SPLock lock;
-		throw gcnew NotImplementedException("PlaylistList::DoRemove");
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
+		sp_playlistcontainer_remove_playlist(_pc->_ptr, index);
 	}
 
 	virtual void DoUpdate(int index, Playlist ^item) override sealed {
 		SPLock lock;
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
 		DoRemove(index);
 		DoInsert(index - 1, item);
 	}
