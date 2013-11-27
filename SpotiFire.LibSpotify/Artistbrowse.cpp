@@ -3,7 +3,6 @@
 #include "Artistbrowse.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
-
 ArtistBrowse::ArtistBrowse(SpotiFire::Session ^session, sp_artistbrowse *ptr) {
 	SPLock lock;
 	_session = session;
@@ -59,7 +58,7 @@ public:
 };
 
 IList<PortraitId> ^ArtistBrowse::PortraitIds::get() {
-	if(_portraits == nullptr) {
+	if (_portraits == nullptr) {
 		Interlocked::CompareExchange<IList<PortraitId> ^>(_portraits, gcnew $ArtistBrowse$PortraitIds(this), nullptr);
 	}
 	return _portraits;
@@ -84,7 +83,7 @@ public:
 };
 
 IList<Track ^> ^ArtistBrowse::Tracks::get() {
-	if(_tracks == nullptr) {
+	if (_tracks == nullptr) {
 		Interlocked::CompareExchange<IList<Track ^> ^>(_tracks, gcnew $ArtistBrowse$Tracks(this), nullptr);
 	}
 	return _tracks;
@@ -109,7 +108,7 @@ public:
 };
 
 IList<Album ^> ^ArtistBrowse::Albums::get() {
-	if(_albums == nullptr) {
+	if (_albums == nullptr) {
 		Interlocked::CompareExchange<IList<Album ^> ^>(_albums, gcnew $ArtistBrowse$Albums(this), nullptr);
 	}
 	return _albums;
@@ -134,7 +133,7 @@ public:
 };
 
 IList<Artist ^> ^ArtistBrowse::SimilarArtists::get() {
-	if(_similarArtists == nullptr) {
+	if (_similarArtists == nullptr) {
 		Interlocked::CompareExchange<IList<SpotiFire::Artist ^> ^>(_similarArtists, gcnew $ArtistBrowse$SimilarArtists(this), nullptr);
 	}
 	return _similarArtists;
@@ -144,46 +143,22 @@ String ^ArtistBrowse::Biography::get() {
 	return UTF8(sp_artistbrowse_biography(_ptr));
 }
 
-void SP_CALLCONV completed(sp_artistbrowse *browse, void *userdata);
-ArtistBrowse ^ArtistBrowse::Create(SpotiFire::Session ^session, SpotiFire::Artist ^artist, SpotiFire::ArtistBrowseType type) {
+Task<ArtistBrowse ^> ^ArtistBrowse::Create(SpotiFire::Session ^session, SpotiFire::Artist ^artist, SpotiFire::ArtistBrowseType type) {
+	typedef NativeTuple2<gcroot<TaskCompletionSource<ArtistBrowse ^> ^>, gcroot<SpotiFire::Session ^>> callbackdata;
+
+	auto tcs = gcnew TaskCompletionSource<ArtistBrowse ^>();
+	auto tcs_box = new gcroot<TaskCompletionSource<ArtistBrowse ^> ^>(tcs);
+	auto session_box = new gcroot<SpotiFire::Session ^>(session);
+	auto data = new callbackdata(tcs_box, session_box);
+
 	SPLock lock;
-	gcroot<ArtistBrowse ^> *box = new gcroot<ArtistBrowse ^>();
-	sp_artistbrowse *ptr = sp_artistbrowse_create(session->_ptr, artist->_ptr, (sp_artistbrowse_type)type, &completed, box);
-	ArtistBrowse ^ret = gcnew ArtistBrowse(session, ptr);
-	sp_artistbrowse_release(ptr);
-	*box = ret;
-	return ret;
-}
+	sp_artistbrowse_create(session->_ptr, artist->_ptr, (sp_artistbrowse_type)type, [](sp_artistbrowse *artistbrowse, void *userdata) {
+		auto data = static_cast<callbackdata *>(userdata);
+		(*data->obj1)->SetResult(gcnew ArtistBrowse(*data->obj2, artistbrowse));
+		delete data;
+	}, data);
 
-//------------------------------------------
-// Await
-void SP_CALLCONV completed(sp_artistbrowse *artistbrowse, void *userdata) {
-	TP0(SP_DATA_REM(ArtistBrowse, userdata), ArtistBrowse::complete);
-}
-
-void ArtistBrowse::complete() {
-	TaskCompletionSource<ArtistBrowse ^> ^tcs = nullptr;
-	{
-		SPLock lock;
-		tcs = _tcs;
-		_complete = true;
-	}
-	if(tcs != nullptr)
-		tcs->SetResult(this);
-}
-
-System::Runtime::CompilerServices::TaskAwaiter<ArtistBrowse ^> ArtistBrowse::GetAwaiter() {
-	TaskCompletionSource<ArtistBrowse ^> ^tcs = nullptr;
-	{
-		SPLock lock;
-		if(_tcs == nullptr) {
-			_tcs = gcnew TaskCompletionSource<ArtistBrowse ^>();
-			if(_complete)
-				_tcs->SetResult(this);
-		}
-		tcs = _tcs;
-	}
-	return tcs->Task->GetAwaiter();
+	return tcs->Task;
 }
 
 int ArtistBrowse::GetHashCode() {

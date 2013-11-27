@@ -268,7 +268,7 @@ namespace SpotiFire {
 				}
 
 			private:
-				void raise(Object ^sender, NotifyCollectionChangedEventArgs ^args) {
+				void raise(Object ^sender, NotifyCollectionChangedEventArgs ^args) sealed {
 					RAISE_EVENT(NotifyCollectionChangedEventHandler, _collectionChanged, sender, args);
 				}
 			}

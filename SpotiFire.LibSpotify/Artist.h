@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-
 	ref class ArtistBrowse;
 	ref class Link;
 
@@ -65,7 +64,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	The newly created albumbrowse. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual ArtistBrowse ^Browse(ArtistBrowseType type) sealed;
+		virtual Task<ArtistBrowse ^> ^Browse(ArtistBrowseType type) sealed;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the artist. </summary>
@@ -95,7 +94,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the artist, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given artists should be considered equal. </summary>
@@ -107,9 +106,9 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given artists are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Artist^ left, Artist^ right);
+		static bool operator== (Artist ^left, Artist ^right);
 
-			///-------------------------------------------------------------------------------------------------
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given artists should not be considered equal. </summary>
 		///
 		/// <remarks>	Chris Brandhorst, 16.05.2013. </remarks>
@@ -119,6 +118,6 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given artists are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Artist^ left, Artist^ right);
+		static bool operator!= (Artist ^left, Artist ^right);
 	};
 }

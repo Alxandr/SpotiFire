@@ -9,9 +9,7 @@ using namespace System::Threading;
 using namespace System::Runtime::CompilerServices;
 using namespace NLog;
 
-
 namespace SpotiFire {
-
 	ref class Session;
 	ref class Track;
 	ref class PlaylistContainer;
@@ -60,7 +58,7 @@ namespace SpotiFire {
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	The main Spotify object. Used to communicate with Spotify's server, and playing music, amongst other things. </summary>
-	/// 
+	///
 	/// <remarks>	Aleksander, 30.01.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
 	public ref class Session : ISpotifyObject
@@ -98,7 +96,7 @@ namespace SpotiFire {
 		static Logger ^logger = LogManager::GetCurrentClassLogger();
 		static AutoResetEvent ^notifier;
 		sp_session *_ptr;
-		
+
 		Session(array<byte> ^applicationKey, String ^cacheLocation, String ^settingsLocation, String ^userAgent);
 		!Session(); // finalizer
 		~Session(); // destructor
@@ -163,7 +161,7 @@ namespace SpotiFire {
 		/// <param name="username">	The username to log in. </param>
 		/// <param name="password">	The password for the specified username. </param>
 		/// <param name="remember">	If true, the username / password will be remembered. </param>
-		/// 
+		///
 		/// <seealso cref="Relogin" />
 		/// <seealso cref="Logout" />
 		///
@@ -175,7 +173,7 @@ namespace SpotiFire {
 		/// <summary>	Logs the user back in. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
+		///
 		/// <seealso cref="Login" />
 		/// <seealso cref="Logout" />
 		/// 										///
@@ -188,7 +186,7 @@ namespace SpotiFire {
 		/// 			otherwise, settings and cache may be lost. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
+		///
 		/// <seealso cref="Login" />
 		/// <seealso cref="Relogin" />
 		///
@@ -214,7 +212,7 @@ namespace SpotiFire {
 		/// <summary>	Loads the specified track. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
+		///
 		/// <exception cref="SpotifyException">Thrown on error.</exception>
 		///
 		/// <param name="track">	The track to be loaded. </param>
@@ -223,7 +221,7 @@ namespace SpotiFire {
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Pauses the currently playing track. </summary>
-		/// 
+		///
 		/// <exception cref="SpotifyException">Thrown on error.</exception>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
@@ -234,7 +232,7 @@ namespace SpotiFire {
 		/// <summary>	Starts playback of the currently loaded track. </summary>
 		///
 		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		/// 
+		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		virtual void PlayerPlay() sealed;
@@ -243,7 +241,7 @@ namespace SpotiFire {
 		/// <summary>	Seeks to a given position in the loaded track. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
+		///
 		/// <exception cref="SpotifyException">Thrown on error.</exception>
 		///
 		/// <param name="offset">	The offset (in milliseconds) from the start of the track. </param>
@@ -254,7 +252,7 @@ namespace SpotiFire {
 		/// <summary>	Seeks to a given position in the loaded track. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
-		/// 
+		///
 		/// <exception cref="SpotifyException">Thrown on error.</exception>
 		///
 		/// <param name="offset">	The offset from the start of the track. </param>
@@ -265,7 +263,7 @@ namespace SpotiFire {
 		/// <summary>	Unload the currently loaded track. </summary>
 		///
 		/// <exception cref="SpotifyException">Thrown on error.</exception>
-		/// 
+		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		virtual void PlayerUnload() sealed;
@@ -360,7 +358,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the session, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given sessions should be considered equal. </summary>
@@ -372,7 +370,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given sessions are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Session^ left, Session^ right);
+		static bool operator== (Session ^left, Session ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given sessions should not be considered equal. </summary>
@@ -384,7 +382,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given sessions are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Session^ left, Session^ right);
+		static bool operator!= (Session ^left, Session ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MetadataUpdated events. </summary>
@@ -404,16 +402,16 @@ namespace SpotiFire {
 				_metadataUpdated -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _metadataUpdated, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _metadataUpdated, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in ConnectionError events. </summary>
 		///
-		/// <remarks>	Called when a connection error has occured. </remarks>	
+		/// <remarks>	Called when a connection error has occured. </remarks>
 		/// <remarks>	The ConnectionError event provides a way for applications to be notified
 		///				whenever a connection error has occured. Actions that can be taken after this are
 		///				for instance notifying the client and automatically trying to login again.
@@ -430,16 +428,16 @@ namespace SpotiFire {
 				_connectionError -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _connectionError, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _connectionError, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MessageToUser events. </summary>
 		///
-		/// <remarks>	Called when the access point wants to display a message to the user. </remarks>	
+		/// <remarks>	Called when the access point wants to display a message to the user. </remarks>
 		/// <remarks>	The MessageToUser event provides a way for applications to be notified
 		///				whenever a message should be displayed to the user. Actions that can be taken
 		///				after this are for instance notifying the client of the message. </remarks>
@@ -455,12 +453,12 @@ namespace SpotiFire {
 				_messageToUser -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _messageToUser, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _messageToUser, sender, args);
 		}
-		
+		}
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in MusicDelivered events. </summary>
 		///
@@ -470,7 +468,7 @@ namespace SpotiFire {
 		/// 			will stop working if any listeners on the MusicDelivered event blocks. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		event MusicDeliveryEventHandler ^MusicDelivered;
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in PlayTokenLost events. </summary>
 		///
@@ -492,12 +490,12 @@ namespace SpotiFire {
 				_playTokenLost -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _playTokenLost, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _playTokenLost, sender, args);
 		}
-		
+		}
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in LogMessage events. </summary>
 		///
@@ -516,12 +514,12 @@ namespace SpotiFire {
 				_logMessage -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _logMessage, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _logMessage, sender, args);
 		}
-		
+		}
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in EndOfTrack events. </summary>
 		///
@@ -540,16 +538,16 @@ namespace SpotiFire {
 				_endOfTrack -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _endOfTrack, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _endOfTrack, sender, args);
 		}
-		
+		}
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StreamingError events. </summary>
 		///
-		/// <remarks>	Called when streaming cannot start or continue. </remarks>	
+		/// <remarks>	Called when streaming cannot start or continue. </remarks>
 		/// <remarks>	The StreamingError event provides a way for applications to be notified
 		///				whenever a streaming error has occured. Actions that can be taken after this are
 		///				for instance trying to stream again, or notifying the user of the error.
@@ -566,17 +564,17 @@ namespace SpotiFire {
 				_streamingError -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _streamingError, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _streamingError, sender, args);
 		}
-		
+		}
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in UserinfoUpdated events. </summary>
 		///
 		/// <remarks>	Called after user info (anything related to sp_user objects) have been updated.
-		///				</remarks>	
+		///				</remarks>
 		/// <remarks>	The UserinfoUpdated event provides a way for applications to be notified
 		///				whenever a modification of the user object has occured. Actions that can be taken
 		///				after this are for instance updating the info on the user page of the application.
@@ -593,19 +591,19 @@ namespace SpotiFire {
 				_userinfoUpdated -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _userinfoUpdated, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _userinfoUpdated, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StartPlayback events. </summary>
 		///
-		/// <remarks>	Called when audio playback should start. </remarks>	
+		/// <remarks>	Called when audio playback should start. </remarks>
 		/// <remarks>	The StartPlayback event provides a way for applications to be notified
 		///				whenever audio playback should start. For this to work correctly the application
-		///				must also implement GetAudioBufferStats. Event-listeners on this StartPlayback 
+		///				must also implement GetAudioBufferStats. Event-listeners on this StartPlayback
 		///				<strong>must not</strong> (ever) block. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		event SessionEventHandler ^StartPlayback {
@@ -619,19 +617,19 @@ namespace SpotiFire {
 				_startPlayback -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _startPlayback, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _startPlayback, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in StopPlayback events. </summary>
 		///
-		/// <remarks>	Called when audio playback should stop. </remarks>	
+		/// <remarks>	Called when audio playback should stop. </remarks>
 		/// <remarks>	The StartPlayback event provides a way for applications to be notified
 		///				whenever audio playback should stop. For this to work correctly the application
-		///				must also implement GetAudioBufferStats. Event-listeners on this StopPlayback 
+		///				must also implement GetAudioBufferStats. Event-listeners on this StopPlayback
 		///				<strong>must not</strong> (ever) block. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		event SessionEventHandler ^StopPlayback {
@@ -645,16 +643,16 @@ namespace SpotiFire {
 				_stopPlayback -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _stopPlayback, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _stopPlayback, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in GetAudioBufferStats events. </summary>
 		///
-		/// <remarks>	Called to query application about its audio buffer. </remarks>	
+		/// <remarks>	Called to query application about its audio buffer. </remarks>
 		/// <remarks>	The GetAudioBufferStats event provides a way for applications to inform libspotify
 		///				about the audio buffer of the application. Event-listeners on this
 		///				GetAudioBufferStats <strong>must not</strong> (ever) block. </remarks>
@@ -664,7 +662,7 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in OfflineError events. </summary>
 		///
-		/// <remarks>	Called when an offline synchronization error has occured. </remarks>	
+		/// <remarks>	Called when an offline synchronization error has occured. </remarks>
 		/// <remarks>	The OfflineError event provides a way for applications to be notified
 		///				whenever an offline synchronisation error has occured. Actions that can be taken
 		///				after this are for instance notifying the user of any synchronisation errors.
@@ -681,16 +679,16 @@ namespace SpotiFire {
 				_offlineError -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _offlineError, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _offlineError, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in OfflineStatusUpdated events. </summary>
 		///
-		/// <remarks>	Called when offline synchronization status is updated. </remarks>	
+		/// <remarks>	Called when offline synchronization status is updated. </remarks>
 		/// <remarks>	The OfflineStatusUpdated event provides a way for applications to be notified
 		///				whenever the offline synchronisation error status is updated. Actions that can be
 		///				taken after this are for instance notifying the user of which tracks are currently
@@ -707,16 +705,16 @@ namespace SpotiFire {
 				_offlineStatusUpdated -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _offlineStatusUpdated, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _offlineStatusUpdated, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in CredentialsBlobUpdated events. </summary>
 		///
-		/// <remarks>	Called when storable credentials have been updated. </remarks>	
+		/// <remarks>	Called when storable credentials have been updated. </remarks>
 		/// <remarks>	The CredentialsBlobUpdated event provides a way for applications to be notified
 		///				whenever the storable credentials have been updated, which usually happens when a
 		///				connection to the AP has been established. Actionstaken after this are for
@@ -733,10 +731,10 @@ namespace SpotiFire {
 				_credentialsBlobUpdated -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _credentialsBlobUpdated, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _credentialsBlobUpdated, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
@@ -744,7 +742,7 @@ namespace SpotiFire {
 		///				</summary>
 		///
 		/// <remarks>	Called when the connection state has updated - such as when logging in, going
-		///				offline, etc. </remarks>	
+		///				offline, etc. </remarks>
 		/// <remarks>	The ConnectionstateUpdated event provides a way for applications to be notified
 		///				whenever the connection status of the Session has been updated. Actions that can
 		///				be taken after this are for instance notifying the client and automatically
@@ -761,17 +759,17 @@ namespace SpotiFire {
 				_connectionstateUpdated -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _connectionstateUpdated, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _connectionstateUpdated, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in ScrobbleError events.
 		///				</summary>
 		///
-		/// <remarks>	Called when there is a scrobble error event. </remarks>	
+		/// <remarks>	Called when there is a scrobble error event. </remarks>
 		/// <remarks>	The ScrobbleError event provides a way for applications to be notified
 		///				whenever a scrobble error has occured. Actions that can be taken after this are
 		///				for instance notifying the user about this change. </remarks>
@@ -787,17 +785,17 @@ namespace SpotiFire {
 				_scrobbleError -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, SessionEventArgs ^args) {
-				RAISE_EVENT(SessionEventHandler, _scrobbleError, sender, args);
-			}
+	private:
+		void raise(Session ^sender, SessionEventArgs ^args) {
+			RAISE_EVENT(SessionEventHandler, _scrobbleError, sender, args);
+		}
 		}
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in PrivateSessionModeChanged events.
 		///				</summary>
 		///
-		/// <remarks>	Called when there is a change in the private session mode. </remarks>	
+		/// <remarks>	Called when there is a change in the private session mode. </remarks>
 		/// <remarks>	The PrivateSessionModeChanged event provides a way for applications to be notified
 		///				whenever a change in the private session mode has occured. Actions that can be
 		///				taken after this are for instance notifying the user about this change. </remarks>
@@ -813,10 +811,10 @@ namespace SpotiFire {
 				_privateSessionModeChanged -= handler;
 			}
 
-		private:
-			void raise(Session ^sender, PrivateSessionModeEventArgs ^args) {
-				RAISE_EVENT(PrivateSessionModeEventHandler, _privateSessionModeChanged, sender, args);
-			}
+	private:
+		void raise(Session ^sender, PrivateSessionModeEventArgs ^args) {
+			RAISE_EVENT(PrivateSessionModeEventHandler, _privateSessionModeChanged, sender, args);
+		}
 		}
 	};
 }

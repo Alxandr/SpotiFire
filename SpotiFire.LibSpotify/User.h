@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-	
 	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
@@ -90,7 +89,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the user, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given users should be considered equal. </summary>
@@ -102,7 +101,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given users are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (User^ left, User^ right);
+		static bool operator== (User ^left, User ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given users should not be considered equal. </summary>
@@ -114,6 +113,6 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given users are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (User^ left, User^ right);
+		static bool operator!= (User ^left, User ^right);
 	};
 }

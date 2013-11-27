@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-	
 	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
@@ -157,7 +156,7 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the search object, otherwise false.
 		///				</returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given search objects should be considered equal. </summary>
@@ -169,7 +168,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given searches are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Search^ left, Search^ right);
+		static bool operator== (Search ^left, Search ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given search objects should not be considered equal. </summary>
@@ -181,7 +180,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given search objects are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Search^ left, Search^ right);
+		static bool operator!= (Search ^left, Search ^right);
 
 	public:
 		virtual System::Runtime::CompilerServices::TaskAwaiter<Search ^> GetAwaiter() sealed = ISpotifyAwaitable<Search ^>::GetAwaiter;

@@ -8,7 +8,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-
 	ref class Image;
 	ref class Link;
 
@@ -93,7 +92,7 @@ namespace SpotiFire {
 		/// <returns>	Returns an image from the given Id. </returns>
 		///-------------------------------------------------------------------------------------------------
 		static Image ^FromId(SpotiFire::Session ^session, PortraitId id);
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the image. </summary>
 		///
@@ -122,7 +121,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the image, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given images should be considered equal. </summary>
@@ -134,7 +133,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given images are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Image^ left, Image^ right);
+		static bool operator== (Image ^left, Image ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given images should not be considered equal. </summary>
@@ -146,7 +145,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given images are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Image^ left, Image^ right);
+		static bool operator!= (Image ^left, Image ^right);
 
 	public:
 		virtual System::Runtime::CompilerServices::TaskAwaiter<Image ^> GetAwaiter() sealed = ISpotifyAwaitable<Image ^>::GetAwaiter;
