@@ -307,6 +307,15 @@ Task<Error> ^Session::Login(String ^username, String ^password, bool remember) {
 	return _login->Task;
 }
 
+Task<Error> ^Session::Login(String ^username, String ^credentials) {
+	logger->Trace("Login");
+	SPLock lock;
+	marshal_context context;
+	_login = gcnew TaskCompletionSource<Error>();	
+	sp_session_login(_ptr, context.marshal_as<const char *>(username), NULL, true, context.marshal_as<const char *>(credentials));
+	return _login->Task;
+}
+
 Task<Error> ^Session::Relogin() {
 	logger->Trace("Relogin");
 	SPLock lock;

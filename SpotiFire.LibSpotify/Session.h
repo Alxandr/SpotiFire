@@ -170,6 +170,24 @@ namespace SpotiFire {
 		virtual Task<Error> ^Login(String ^username, String ^password, bool remember) sealed;
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Logs in the specified username/credentials blob combo. This initiates the login in the
+		/// 			background. An application MUST NEVER store the user's password in clear text. If automatic
+		/// 			relogin is required, use <see cref="Relogin" />. When logging in using the credentials blob,
+		/// 			the credentials are always remembered. </summary>
+		///
+		/// <remarks>	Chris Brandhorst, 16.11.2013. </remarks>
+		///
+		/// <param name="username">	The username to log in. </param>
+		/// <param name="password">	The credentials blob for the specified username. </param>
+		/// 
+		/// <seealso cref="Relogin" />
+		/// <seealso cref="Logout" />
+		///
+		/// <returns>	The pending login-task. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual Task<Error> ^Login(String ^username, String ^blob) sealed;
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Logs the user back in. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
