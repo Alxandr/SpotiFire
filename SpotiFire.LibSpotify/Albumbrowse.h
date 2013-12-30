@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-	
 	ref class AlbumBrowse;
 	ref class Album;
 	ref class Artist;
@@ -27,14 +26,11 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 30.01.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class AlbumBrowse sealed : ISpotifyObject, ISpotifyAwaitable<AlbumBrowse ^>
+	public ref class AlbumBrowse sealed : ISpotifyObject
 	{
 	private:
 		IList<String ^> ^_copyrights;
 		IList<Track ^> ^_tracks;
-
-		volatile bool _complete;
-		TaskCompletionSource<AlbumBrowse ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -43,8 +39,6 @@ namespace SpotiFire {
 		AlbumBrowse(Session ^session, sp_albumbrowse *ptr);
 		!AlbumBrowse(); // finalizer
 		~AlbumBrowse(); // destructor
-
-		
 
 	public:
 
@@ -103,7 +97,7 @@ namespace SpotiFire {
 		/// <value>	The review. </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property String ^Review { String ^get() sealed; }
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the hash code for this albumbrowse object. </summary>
 		///
@@ -124,7 +118,7 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the albumbrowse object, otherwise
 		///				false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given albumbrowse objects should be considered equal. </summary>
@@ -136,7 +130,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given albumbrowse objects are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (AlbumBrowse^ left, AlbumBrowse^ right);
+		static bool operator== (AlbumBrowse ^left, AlbumBrowse ^right);
 
 		///-----------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given albumbrowse objects should not be considered equal. </summary>
@@ -148,15 +142,9 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given albumbrowse objects are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (AlbumBrowse^ left, AlbumBrowse^ right);
-
-	public:
-		virtual System::Runtime::CompilerServices::TaskAwaiter<AlbumBrowse ^> GetAwaiter() sealed = ISpotifyAwaitable<AlbumBrowse ^>::GetAwaiter;
+		static bool operator!= (AlbumBrowse ^left, AlbumBrowse ^right);
 
 	internal:
-		static AlbumBrowse ^Create(SpotiFire::Session ^session, SpotiFire::Album ^album);
-
-		// Events
-		void complete();
+		static Task<AlbumBrowse ^> ^Create(SpotiFire::Session ^session, SpotiFire::Album ^album);
 	};
 }

@@ -18,6 +18,8 @@
 			</references>
 			<sources basedir="${project::get-base-directory()}">
 				<include name="**.cs" />
+				<include name="../SpotiFire.TestClient/IPlayer.cs" />
+				<include name="../SpotiFire.TestClient/NAudioPlayer.cs" />
 			</sources>
 		</csc>
 	</target>

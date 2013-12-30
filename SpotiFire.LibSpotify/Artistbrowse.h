@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-	
 	ref class ArtistBrowse;
 
 	///-------------------------------------------------------------------------------------------------
@@ -25,7 +24,7 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class ArtistBrowse sealed : ISpotifyObject, ISpotifyAwaitable<ArtistBrowse ^>
+	public ref class ArtistBrowse sealed : ISpotifyObject
 	{
 	private:
 		IList<String ^> ^_copyrights;
@@ -33,9 +32,6 @@ namespace SpotiFire {
 		IList<PortraitId> ^_portraits;
 		IList<Artist ^> ^_similarArtists;
 		IList<Album ^> ^_albums;
-
-		volatile bool _complete;
-		TaskCompletionSource<ArtistBrowse ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -130,7 +126,7 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the artistbrowse object, otherwise
 		///				false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given artistbrowse objects should be considered equal. </summary>
@@ -142,7 +138,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given artistbrowse objects are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (ArtistBrowse^ left, ArtistBrowse^ right);
+		static bool operator== (ArtistBrowse ^left, ArtistBrowse ^right);
 
 		///-----------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given artistbrowse objects should not be considered equal. </summary>
@@ -154,15 +150,9 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given artistbrowse objects are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (ArtistBrowse^ left, ArtistBrowse^ right);
-
-	public:
-		virtual System::Runtime::CompilerServices::TaskAwaiter<ArtistBrowse ^> GetAwaiter() sealed = ISpotifyAwaitable<ArtistBrowse ^>::GetAwaiter;
+		static bool operator!= (ArtistBrowse ^left, ArtistBrowse ^right);
 
 	internal:
-		static ArtistBrowse ^Create(SpotiFire::Session ^session, SpotiFire::Artist ^album, ArtistBrowseType type);
-
-		// Events
-		void complete();
+		static Task<ArtistBrowse ^> ^Create(SpotiFire::Session ^session, SpotiFire::Artist ^album, ArtistBrowseType type);
 	};
 }

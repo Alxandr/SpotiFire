@@ -5,11 +5,11 @@
 @if defined FOUND (
     @REM do nothing
 ) else (
-    @if exist "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat" (
-        call "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat"
+    @if exist "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
+        call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
     ) else (
-        @if exist "C:\Program Files\Microsoft Visual Studio 11.0\VC\vcvarsall.bat" (
-            call "C:\Program Files\Microsoft Visual Studio 11.0\VC\vcvarsall.bat"
+        @if exist "C:\Program Files\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
+            call "C:\Program Files\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
         ) else (
             @echo "vcvarsall.bat not found in any known places"
             @exit /D 1

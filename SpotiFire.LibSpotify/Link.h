@@ -4,7 +4,6 @@
 using namespace System;
 
 namespace SpotiFire {
-
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Link. </summary>
 	///
@@ -119,7 +118,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the link, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given links should be considered equal. </summary>
@@ -131,7 +130,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given links are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Link^ left, Link^ right);
+		static bool operator== (Link ^left, Link ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given links should not be considered equal. </summary>
@@ -143,7 +142,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given links are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Link^ left, Link^ right);
+		static bool operator!= (Link ^left, Link ^right);
 
 	internal:
 		static Link ^Create(SpotiFire::Session ^session, String ^link);

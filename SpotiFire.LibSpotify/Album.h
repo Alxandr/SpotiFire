@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-
 	ref class Artist;
 	ref class AlbumBrowse;
 	ref class Link;
@@ -61,7 +60,7 @@ namespace SpotiFire {
 		/// <summary>	Gets the identifier of the cover. </summary>
 		///
 		/// <seealso cref="Image::FromId" />
-		/// 
+		///
 		/// <value>	The identifier of the cover. </value>
 		///-------------------------------------------------------------------------------------------------
 		virtual property PortraitId CoverId { PortraitId get() sealed; }
@@ -102,7 +101,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	null if it fails, else. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual AlbumBrowse ^Browse() sealed;
+		virtual Task<AlbumBrowse ^> ^Browse() sealed;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the album. </summary>
@@ -132,7 +131,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the album, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given albums should be considered equal. </summary>
@@ -144,7 +143,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given albums are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Album^ left, Album^ right);
+		static bool operator== (Album ^left, Album ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given albums should not be considered equal. </summary>
@@ -156,6 +155,6 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given albums are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Album^ left, Album^ right);
+		static bool operator!= (Album ^left, Album ^right);
 	};
 }

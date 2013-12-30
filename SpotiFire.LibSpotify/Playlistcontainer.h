@@ -8,7 +8,6 @@ using namespace System::Collections::Generic;
 using namespace SpotiFire::Collections;
 
 namespace SpotiFire {
-
 	ref class User;
 	ref class PlaylistContainer;
 
@@ -22,7 +21,7 @@ namespace SpotiFire {
 	/// <param name="args">  	The EventArgs to process. </param>
 	///-------------------------------------------------------------------------------------------------
 	generic<typename TEventArgs> where TEventArgs : EventArgs
-	public delegate void PlaylistContainerHandler(PlaylistContainer ^sender, TEventArgs args);
+		public delegate void PlaylistContainerHandler(PlaylistContainer ^sender, TEventArgs args);
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Playlist container. </summary>
@@ -40,7 +39,7 @@ namespace SpotiFire {
 	internal:
 		Session ^_session;
 		sp_playlistcontainer *_ptr;
-		
+
 		PlaylistContainer(Session ^session, sp_playlistcontainer *ptr);
 		!PlaylistContainer(); // finalizer
 		~PlaylistContainer(); // destructor
@@ -101,7 +100,7 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the playlistcontainer, otherwise false.
 		///				</returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given playlistcontainers should be considered equal. </summary>
@@ -113,7 +112,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given playlistcontainers are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (PlaylistContainer^ left, PlaylistContainer^ right);
+		static bool operator== (PlaylistContainer ^left, PlaylistContainer ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given playlistcontainers should not be considered equal. </summary>
@@ -125,7 +124,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given playlistcontainers are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (PlaylistContainer^ left, PlaylistContainer^ right);
+		static bool operator!= (PlaylistContainer ^left, PlaylistContainer ^right);
 
 	internal:
 		virtual Error AddFolder(int index, String ^name) sealed;
@@ -135,6 +134,5 @@ namespace SpotiFire {
 
 	public:
 		virtual System::Runtime::CompilerServices::TaskAwaiter<PlaylistContainer ^> GetAwaiter() sealed = ISpotifyAwaitable<PlaylistContainer ^>::GetAwaiter;
-
 	};
 }

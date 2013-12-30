@@ -3,7 +3,6 @@
 #include "Albumbrowse.h"
 #define SP_TYPE(type_name, ptrPtr) (type_name *)(void *)ptrPtr
 
-
 AlbumBrowse::AlbumBrowse(SpotiFire::Session ^session, sp_albumbrowse *ptr) {
 	SPLock lock;
 	_session = session;
@@ -64,7 +63,7 @@ public:
 };
 
 IList<String ^> ^AlbumBrowse::Copyrights::get() {
-	if(_copyrights == nullptr) {
+	if (_copyrights == nullptr) {
 		Interlocked::CompareExchange<IList<String ^> ^>(_copyrights, gcnew $AlbumBrowse$CopyrightsArray(this), nullptr);
 	}
 	return _copyrights;
@@ -94,66 +93,44 @@ public:
 };
 
 IList<Track ^> ^AlbumBrowse::Tracks::get() {
-	if(_tracks == nullptr) {
+	if (_tracks == nullptr) {
 		Interlocked::CompareExchange<IList<Track ^> ^>(_tracks, gcnew $AlbumBrowse$TracksArray(this), nullptr);
 	}
 	return _tracks;
 }
 
-void SP_CALLCONV completed(sp_albumbrowse *browse, void *userdata);
-AlbumBrowse ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^album) {
+Task<AlbumBrowse ^> ^AlbumBrowse::Create(SpotiFire::Session ^session, SpotiFire::Album ^album) {
+	typedef NativeTuple2<gcroot<TaskCompletionSource<AlbumBrowse ^> ^>, gcroot<SpotiFire::Session ^>> callbackdata;
+
+	auto tcs = gcnew TaskCompletionSource<AlbumBrowse ^>();
+	auto tcs_box = new gcroot<TaskCompletionSource<AlbumBrowse ^> ^>(tcs);
+	auto session_box = new gcroot<SpotiFire::Session ^>(session);
+	auto data = new callbackdata(tcs_box, session_box);
+
 	SPLock lock;
-	gcroot<AlbumBrowse ^> *box = new gcroot<AlbumBrowse ^>();
-	sp_albumbrowse *ptr = sp_albumbrowse_create(session->_ptr, album->_ptr, &completed, box);
-	AlbumBrowse ^ret = gcnew AlbumBrowse(session, ptr);
-	sp_albumbrowse_release(ptr);
-	*box = ret;
-	return ret;
-}
+	sp_albumbrowse_create(session->_ptr, album->_ptr, [](sp_albumbrowse *albumbrowse, void *userdata) {
+		auto data = static_cast<callbackdata *>(userdata);
+		TaskCompletionSource<AlbumBrowse ^> ^tcs = *data->obj1;
+		SpotiFire::Session ^session = *data->obj2;
+		tcs->SetResult(gcnew AlbumBrowse(session, albumbrowse));
+		delete data;
+	}, data);
 
-//------------------------------------------
-// Await
-void SP_CALLCONV completed(sp_albumbrowse *albumbrowse, void *userdata) {
-	TP0(SP_DATA_REM(AlbumBrowse, userdata), AlbumBrowse::complete);
-}
-
-void AlbumBrowse::complete() {
-	TaskCompletionSource<AlbumBrowse ^> ^tcs = nullptr;
-	{
-		SPLock lock;
-		tcs = _tcs;
-		_complete = true;
-	}
-	if(tcs != nullptr)
-		tcs->SetResult(this);
-}
-
-System::Runtime::CompilerServices::TaskAwaiter<AlbumBrowse ^> AlbumBrowse::GetAwaiter() {
-	TaskCompletionSource<AlbumBrowse ^> ^tcs = nullptr;
-	{
-		SPLock lock;
-		if(_tcs == nullptr) {
-			_tcs = gcnew TaskCompletionSource<AlbumBrowse ^>();
-			if(_complete)
-				_tcs->SetResult(this);
-		}
-		tcs = _tcs;
-	}
-	return tcs->Task->GetAwaiter();
+	return tcs->Task;
 }
 
 int AlbumBrowse::GetHashCode() {
 	return (new IntPtr(_ptr))->GetHashCode();
 }
 
-bool AlbumBrowse::Equals(Object^ other) {
+bool AlbumBrowse::Equals(Object ^other) {
 	return other != nullptr && GetType() == other->GetType() && GetHashCode() == other->GetHashCode();
 }
 
-bool AlbumBrowse::operator== (AlbumBrowse^ left, AlbumBrowse^ right) {
+bool AlbumBrowse::operator== (AlbumBrowse ^left, AlbumBrowse ^right) {
 	return Object::ReferenceEquals(left, right) || (!Object::ReferenceEquals(left, nullptr) && left->Equals(right));
 }
 
-bool AlbumBrowse::operator!= (AlbumBrowse^ left, AlbumBrowse^ right) {
+bool AlbumBrowse::operator!= (AlbumBrowse ^left, AlbumBrowse ^right) {
 	return !(left == right);
 }

@@ -43,7 +43,7 @@ String ^Artist::Name::get() {
 	return UTF8(sp_artist_name(_ptr));
 }
 
-ArtistBrowse ^Artist::Browse(ArtistBrowseType type) {
+Task<ArtistBrowse ^> ^Artist::Browse(ArtistBrowseType type) {
 	return ArtistBrowse::Create(_session, this, type);
 }
 

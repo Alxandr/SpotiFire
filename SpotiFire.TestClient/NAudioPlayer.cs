@@ -9,6 +9,8 @@ namespace SpotiFire.TestClient
     class NAudioPlayer : IPlayer
     {
         NAudio.Wave.BufferedWaveProvider buffer;
+        NAudio.Wave.IWavePlayer player;
+        int times = 0;
 
         public int EnqueueSamples(int channels, int rate, byte[] samples, int frames)
         {
@@ -20,11 +22,16 @@ namespace SpotiFire.TestClient
                 NAudio.Wave.WaveOut dso = new NAudio.Wave.WaveOut();
                 dso.Init(buffer);
                 dso.Play();
+
+                player = dso;
             }
             int space = buffer.BufferLength - buffer.BufferedBytes;
             if (space > samples.Length)
             {
-                buffer.AddSamples(samples, 0, samples.Length);
+                if (times == 0)
+                    Console.WriteLine("Enqueue");
+
+                times = (times + 1) % 100;
                 return frames;
             }
             return 0;
