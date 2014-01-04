@@ -150,7 +150,7 @@ void PlaylistContainer::complete() {
 		_complete = true;
 	}
 	if(tcs != nullptr)
-		tcs->SetResult(this);
+		tcs->TrySetResult(this);
 }
 
 System::Runtime::CompilerServices::TaskAwaiter<PlaylistContainer ^> PlaylistContainer::GetAwaiter() {
