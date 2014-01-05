@@ -210,6 +210,8 @@ Session::Session(array<byte> ^applicationKey, String ^cacheLocation, String ^set
 	marshal_context context;
 	sp_error err;
 
+	_lifeTimeManager = gcnew LifeTimeManager();
+
 	_config.cache_location = context.marshal_as<const char *>(cacheLocation);
 	_config.settings_location = context.marshal_as<const char *>(settingsLocation);
 	_config.user_agent = context.marshal_as<const char *>(userAgent);
@@ -259,7 +261,9 @@ Session::~Session() {
 Session::!Session() {
 	SPLock lock;
 	marshal_context context;
+	_lifeTimeManager->End(LifeTime::LifeTime);
 	sp_session_logout(_ptr);
+	delete _lifeTimeManager;
 	_shutdown = true;
 	notifier->Set();
 	sp_session_release(_ptr);
@@ -328,6 +332,7 @@ Task ^Session::Logout() {
 	logger->Trace("Logout");
 	SPLock lock;
 	_logout = gcnew TaskCompletionSource<bool>();
+	_lifeTimeManager->End(LifeTime::Session);
 	sp_session_logout(_ptr);
 	return _logout->Task;
 }

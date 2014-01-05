@@ -10,6 +10,7 @@
 
 #include "include\libspotify\api.h"
 #include "Utils.h"
+#include "LifeTimeManager.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -131,7 +132,18 @@ namespace SpotiFire {
 		~SPLock() { System::Threading::Monitor::Exit(libspotify::Mutex); }
 	private:
 		SPLock(const SPLock^ nocopy) {};
-		SPLock^ operator=(const SPLock^ nocopy) {return nullptr;};
+		SPLock^ operator=(const SPLock^ nocopy) { return nullptr; };
+	};
+
+	ref class ObjLock sealed {
+	private:
+		initonly Object ^_obj;
+	internal:
+		ObjLock(Object ^obj) { System::Threading::Monitor::Enter(_obj = obj); }
+		~ObjLock() { System::Threading::Monitor::Exit(_obj); }
+	private:
+		ObjLock(const ObjLock ^nocopy) {};
+		ObjLock ^operator=(const ObjLock ^nocopy) { return nullptr; };
 	};
 }
 

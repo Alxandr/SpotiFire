@@ -97,6 +97,7 @@
     <ClInclude Include="Image.h" />
     <ClInclude Include="Inbox.h" />
     <ClInclude Include="include\libspotify\api.h" />
+    <ClInclude Include="LifeTimeManager.h" />
     <ClInclude Include="Link.h" />
     <ClInclude Include="Lists.h" />
     <ClInclude Include="Playlist.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="EventArgs.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Inbox.cpp" />
+    <ClCompile Include="LifeTimeManager.cpp" />
     <ClCompile Include="Link.cpp" />
     <ClCompile Include="Playlist.cpp" />
     <ClCompile Include="Playlistcontainer.cpp" />

@@ -70,6 +70,7 @@ namespace SpotiFire {
 
 		PlaylistContainer ^_pc;
 		ConnectionState _cs;
+		LifeTimeManager ^_lifeTimeManager;
 
 		// events
 		SessionEventHandler ^_connectionError;
