@@ -275,7 +275,6 @@ namespace SpotiFire {
 				}
 			}
 
-		internal:
 			virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e) {
 				CollectionChanged(this, e);
 			}
