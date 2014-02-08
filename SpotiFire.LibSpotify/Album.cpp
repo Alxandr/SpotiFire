@@ -10,7 +10,7 @@ static __forceinline String^ HEX(const byte *bytes, int count)
 	char result[41];
 	result[40] = '\0';
 	char *current = result;
-	for(int i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		sprintf(current, "%02X", bytes[i]);
 		current += 2;
 	}
@@ -86,8 +86,7 @@ int Album::Year::get() {
 	return sp_album_year(_ptr);
 }
 
-AlbumBrowse ^Album::Browse() {
-	SPLock lock; // don't think we need ALBUM_LOADED here. Should be tested.
+Task<AlbumBrowse ^> ^Album::Browse() {
 	return AlbumBrowse::Create(_session, this);
 }
 

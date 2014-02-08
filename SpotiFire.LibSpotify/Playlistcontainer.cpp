@@ -155,39 +155,28 @@ void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist,
 }
 
 void PlaylistContainer::complete() {
-	array<Action ^> ^continuations = nullptr;
+	TaskCompletionSource<PlaylistContainer ^> ^tcs = nullptr;
 	{
 		SPLock lock;
+		tcs = _tcs;
 		_complete = true;
-		if(_continuations != nullptr) {
-			continuations = gcnew array<Action ^>(_continuations->Count);
-			_continuations->CopyTo(continuations, 0);
-			_continuations->Clear();
-			_continuations = nullptr;
+	}
+	if(tcs != nullptr)
+		tcs->TrySetResult(this);
+}
+
+System::Runtime::CompilerServices::TaskAwaiter<PlaylistContainer ^> PlaylistContainer::GetAwaiter() {
+	TaskCompletionSource<PlaylistContainer ^> ^tcs = nullptr;
+	{
+		SPLock lock;
+		if(_tcs == nullptr) {
+			_tcs = gcnew TaskCompletionSource<PlaylistContainer ^>();
+			if(_complete)
+				_tcs->SetResult(this);
 		}
+		tcs = _tcs;
 	}
-	if(continuations != nullptr) {
-		for(int i = 0; i < continuations->Length; i++)
-			if(continuations[i])
-				continuations[i]();
-	}
-}
-
-bool PlaylistContainer::IsComplete::get() {
-	SPLock lock;
-	return _complete;
-}
-
-bool PlaylistContainer::AddContinuation(Action ^continuationAction) {
-	SPLock lock;
-	if(IsLoaded)
-		return false;
-
-	if(_continuations == nullptr)
-		_continuations = gcnew List<Action ^>;
-
-	_continuations->Add(continuationAction);
-	return true;
+	return tcs->Task->GetAwaiter();
 }
 
 int PlaylistContainer::GetHashCode() {

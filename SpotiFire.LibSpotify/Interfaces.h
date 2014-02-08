@@ -57,25 +57,10 @@ namespace SpotiFire {
     ///
     /// <remarks>	Aleksander, 03.02.2013. </remarks>
     ///-------------------------------------------------------------------------------------------------
-    public interface class ISpotifyAwaitable {
+    generic<typename TType>
+    interface class ISpotifyAwaitable {
     public:
 
-        ///-------------------------------------------------------------------------------------------------
-        /// <summary>	Gets a value indicating whether this object is complete. </summary>
-        ///
-        /// <value>	true if this object is complete, false if not. </value>
-        ///-------------------------------------------------------------------------------------------------
-        property bool IsComplete { bool get(); }
-
-        ///-------------------------------------------------------------------------------------------------
-        /// <summary>	Adds a continuation. </summary>
-        ///
-        /// <remarks>	Aleksander, 03.02.2013. </remarks>
-        ///
-        /// <param name="continuationAction">	[in,out] If non-null, the continuation action. </param>
-        ///
-        /// <returns>	true if it succeeds, false if it fails. </returns>
-        ///-------------------------------------------------------------------------------------------------
-        bool AddContinuation(Action ^continuationAction);
+        System::Runtime::CompilerServices::TaskAwaiter<TType> GetAwaiter();
     };
 }

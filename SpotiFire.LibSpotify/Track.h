@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-
 	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
@@ -150,7 +149,7 @@ namespace SpotiFire {
 		/// <returns>	null if it fails, else the actual track. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual Track ^GetPlayable() sealed;
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the track. </summary>
 		///
@@ -160,7 +159,7 @@ namespace SpotiFire {
 		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this track. </returns>
 		///-------------------------------------------------------------------------------------------------
 		virtual Link ^GetLink();
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the track. </summary>
 		///
@@ -191,7 +190,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the track, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given tracks should be considered equal. </summary>
@@ -203,7 +202,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given tracks are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Track^ left, Track^ right);
+		static bool operator== (Track ^left, Track ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given tracks should not be considered equal. </summary>
@@ -215,6 +214,6 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given tracks are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Track^ left, Track^ right);
+		static bool operator!= (Track ^left, Track ^right);
 	};
 }

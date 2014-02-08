@@ -16,11 +16,6 @@ namespace SpotiFire
             image.GetImage().Save(location);
         }
 
-        public static AwaitHelper.AwaitableAwaiter<Search> GetAwaiter(this Search search)
-        {
-            return AwaitHelper.GetAwaiter<Search>(search);
-        }
-
         public static Search Search(this Session session,
             string query,
             int trackOffset, int trackCount,
@@ -47,30 +42,6 @@ namespace SpotiFire
         public static Search SearchPlaylist(this Session session, string query, int playlistOffset, int playlistCount)
         {
             return Search(session, query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, SearchType.Standard);
-        }
-
-        // ArtistBrowse methods made Synchronously
-        public static AwaitHelper.AwaitableAwaiter<ArtistBrowse> GetAwaiter(this ArtistBrowse artistBrowse)
-        {
-            return AwaitHelper.GetAwaiter<ArtistBrowse>(artistBrowse);
-        }
-
-        // AlbumBrowse methods made Synchronously
-        public static AwaitHelper.AwaitableAwaiter<AlbumBrowse> GetAwaiter(this AlbumBrowse albumBrowse)
-        {
-            return AwaitHelper.GetAwaiter<AlbumBrowse>(albumBrowse);
-        }
-
-        // PlaylistContainer
-        public static AwaitHelper.AwaitableAwaiter<PlaylistContainer> GetAwaiter(this PlaylistContainer pc)
-        {
-            return AwaitHelper.GetAwaiter<PlaylistContainer>(pc);
-        }
-
-        // Image
-        public static AwaitHelper.AwaitableAwaiter<Image> GetAwaiter(this Image image)
-        {
-            return AwaitHelper.GetAwaiter<Image>(image);
         }
 
         private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> _waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();

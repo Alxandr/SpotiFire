@@ -1483,6 +1483,11 @@
             Gets the collection of logging rules.
             </summary>
         </member>
+        <member name="P:NLog.Config.LoggingConfiguration.DefaultCultureInfo">
+            <summary>
+            Gets or sets the default culture info use.
+            </summary>
+        </member>
         <member name="P:NLog.Config.LoggingConfiguration.AllTargets">
             <summary>
             Gets all targets.
@@ -1799,6 +1804,21 @@
             above and including the specified level are output.
             </summary>
             <param name="target">The target to log all messages to.</param>
+            <param name="minLevel">The minimal logging level.</param>
+        </member>
+        <member name="M:NLog.Config.SimpleConfigurator.ConfigureForFileLogging(System.String)">
+            <summary>
+            Configures NLog for file logging so that all messages above and including
+            the <see cref="F:NLog.LogLevel.Info"/> level are written to the specified file.
+            </summary>
+            <param name="fileName">Log file name.</param>
+        </member>
+        <member name="M:NLog.Config.SimpleConfigurator.ConfigureForFileLogging(System.String,NLog.LogLevel)">
+            <summary>
+            Configures NLog for file logging so that all messages above and including
+            the specified level are written to the specified file.
+            </summary>
+            <param name="fileName">Log file name.</param>
             <param name="minLevel">The minimal logging level.</param>
         </member>
         <member name="T:NLog.Config.StackTraceUsage">
@@ -2475,6 +2495,27 @@
             Object construction helper.
             </summary>
         </member>
+        <member name="T:NLog.Internal.Fakeables.AppDomainWrapper">
+            <summary>
+            Adapter for <see cref="T:System.AppDomain"/> to <see cref="T:NLog.Internal.Fakeables.IAppDomain"/>
+            </summary>
+        </member>
+        <member name="T:NLog.Internal.Fakeables.IAppDomain">
+            <summary>
+            Interface for fakeable the current <see cref="T:System.AppDomain"/>. Not fully implemented, please methods/properties as necessary.
+            </summary>
+        </member>
+        <member name="M:NLog.Internal.Fakeables.AppDomainWrapper.#ctor(System.AppDomain)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.Internal.Fakeables.AppDomainWrapper"/> class.
+            </summary>
+            <param name="appDomain">The <see cref="T:System.AppDomain"/> to wrap.</param>
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppDomainWrapper.CurrentDomain">
+            <summary>
+            Gets a the current <see cref="T:System.AppDomain"/> wrappered in a <see cref="T:NLog.Internal.Fakeables.AppDomainWrapper"/>.
+            </summary>
+        </member>
         <member name="T:NLog.Internal.FileAppenders.BaseFileAppender">
             <summary>
             Base class for optimized file appenders.
@@ -2973,12 +3014,15 @@
             Creates instances of <see cref="T:NLog.Internal.NetworkSenders.NetworkSender"/> objects for given URLs.
             </summary>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.INetworkSenderFactory.Create(System.String)">
+        <member name="M:NLog.Internal.NetworkSenders.INetworkSenderFactory.Create(System.String,System.Int32)">
             <summary>
             Creates a new instance of the network sender based on a network URL.
             </summary>
             <param name="url">
             URL that determines the network sender to be created.
+            </param>
+            <param name="maxQueueSize">
+            The maximum queue size.
             </param>
             <returns>
             A newly created network sender.
@@ -2994,14 +3038,17 @@
             Default implementation of <see cref="T:NLog.Internal.NetworkSenders.INetworkSenderFactory"/>.
             </summary>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.NetworkSenderFactory.Create(System.String)">
+        <member name="M:NLog.Internal.NetworkSenders.NetworkSenderFactory.Create(System.String,System.Int32)">
             <summary>
             Creates a new instance of the network sender based on a network URL:.
             </summary>
             <param name="url">
             URL that determines the network sender to be created.
             </param>
-            <returns>
+            <param name="maxQueueSize">
+            The maximum queue size.
+            </param>
+            /// <returns>
             A newly created network sender.
             </returns>
         </member>
@@ -3383,9 +3430,9 @@
             </summary>
             <param name="name">Ambient property name.</param>
         </member>
-        <member name="T:NLog.LayoutRenderers.CallSiteLayoutRenderer">
+        <member name="T:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer">
             <summary>
-            The call site (class name, method name and source information).
+            Assembly version.
             </summary>
         </member>
         <member name="T:NLog.LayoutRenderers.LayoutRenderer">
@@ -3463,6 +3510,18 @@
             Gets the logging configuration this target is part of.
             </summary>
         </member>
+        <member name="M:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <summary>
+            Renders assembly version and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
+            <param name="logEvent">Logging event.</param>
+        </member>
+        <member name="T:NLog.LayoutRenderers.CallSiteLayoutRenderer">
+            <summary>
+            The call site (class name, method name and source information).
+            </summary>
+        </member>
         <member name="M:NLog.LayoutRenderers.CallSiteLayoutRenderer.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.CallSiteLayoutRenderer"/> class.
@@ -3486,6 +3545,17 @@
             Gets or sets a value indicating whether to render the method name.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.CleanNamesOfAnonymousDelegates">
+            <summary>
+            Gets or sets a value indicating whether the method name will be cleaned up if it is detected as an anonymous delegate.
+            </summary>
+            <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.SkipFrames">
+            <summary>
+            Gets or sets the number of frames to skip.
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
@@ -3587,6 +3657,24 @@
             <param name="logEvent">Logging event.</param>
         </member>
         <member name="P:NLog.LayoutRenderers.EventContextLayoutRenderer.Item">
+            <summary>
+            Gets or sets the name of the item.
+            </summary>
+            <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="T:NLog.LayoutRenderers.EventPropertiesLayoutRenderer">
+            <summary>
+            Log event context data.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.EventPropertiesLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <summary>
+            Renders the specified log event context item and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
+            <param name="logEvent">Logging event.</param>
+        </member>
+        <member name="P:NLog.LayoutRenderers.EventPropertiesLayoutRenderer.Item">
             <summary>
             Gets or sets the name of the item.
             </summary>
@@ -3859,6 +3947,11 @@
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer"/> class.
             </summary>
         </member>
+        <member name="M:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppDomain)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer"/> class.
+            </summary>
+        </member>
         <member name="M:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
             <summary>
             Renders the XML logging event and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
@@ -4120,6 +4213,11 @@
         <member name="F:NLog.LayoutRenderers.SilverlightApplicationInfoOption.InstallState">
             <summary>
             Installed state of an application.
+            </summary>
+        </member>
+        <member name="F:NLog.LayoutRenderers.SilverlightApplicationInfoOption.HasElevatedPermissions">
+            <summary>
+            Whether application is running with elevated permissions.
             </summary>
         </member>
         <member name="T:NLog.LayoutRenderers.SpecialFolderLayoutRenderer">
@@ -5501,6 +5599,11 @@
             Occurs when logging <see cref="P:NLog.LogFactory.Configuration"/> changes.
             </summary>
         </member>
+        <member name="P:NLog.LogFactory.CurrentAppDomain">
+            <summary>
+            Gets the current <see cref="T:NLog.Internal.Fakeables.IAppDomain"/>.
+            </summary>
+        </member>
         <member name="P:NLog.LogFactory.ThrowExceptions">
             <summary>
             Gets or sets a value indicating whether exceptions should be thrown.
@@ -6594,7 +6697,7 @@
             Gets the <see cref="T:NLog.LogLevel"/> that corresponds to the specified ordinal.
             </summary>
             <param name="ordinal">The ordinal.</param>
-            <returns>The <see cref="T:NLog.LogLevel"/> instance. For 0 it returns <see cref="F:NLog.LogLevel.Debug"/>, 1 gives <see cref="F:NLog.LogLevel.Info"/> and so on.</returns>
+            <returns>The <see cref="T:NLog.LogLevel"/> instance. For 0 it returns <see cref="F:NLog.LogLevel.Trace"/>, 1 gives <see cref="F:NLog.LogLevel.Debug"/> and so on.</returns>
         </member>
         <member name="M:NLog.LogLevel.FromString(System.String)">
             <summary>
@@ -6750,6 +6853,11 @@
             <remarks>Logging is enabled if the number of <see cref="M:NLog.LogManager.EnableLogging"/> calls is greater 
             than or equal to <see cref="M:NLog.LogManager.DisableLogging"/> calls.</remarks>
         </member>
+        <member name="M:NLog.LogManager.Shutdown">
+            <summary>
+            Dispose all targets, and shutdown logging.
+            </summary>
+        </member>
         <member name="E:NLog.LogManager.ConfigurationChanged">
             <summary>
             Occurs when logging <see cref="P:NLog.LogManager.Configuration"/> changes.
@@ -6770,6 +6878,17 @@
             <summary>
             Gets or sets the global log threshold. Log events below this threshold are not logged.
             </summary>
+        </member>
+        <member name="P:NLog.LogManager.DefaultCultureInfo">
+            <summary>
+            Gets or sets the default culture to use.
+            </summary>
+        </member>
+        <member name="T:NLog.LogManager.GetCultureInfo">
+            <summary>
+            Delegate used to the the culture to use.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:NLog.LogMessageGenerator">
             <summary>
@@ -6799,45 +6918,6 @@
             Ends asynchronous processing of log messages.
             </summary>
             <param name="result">The result.</param>
-        </member>
-        <member name="T:NLog.LogReceiverService.ILogReceiverServer">
-            <summary>
-            Service contract for Log Receiver server.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.ILogReceiverServer.ProcessLogMessages(NLog.LogReceiverService.NLogEvents)">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="events">The events.</param>
-        </member>
-        <member name="T:NLog.LogReceiverService.LogReceiverForwardingService">
-            <summary>
-            Implementation of <see cref="T:NLog.LogReceiverService.ILogReceiverServer"/> which forwards received logs through <see cref="T:NLog.LogManager"/> or a given <see cref="T:NLog.LogFactory"/>.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LogReceiverService.LogReceiverForwardingService"/> class.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.#ctor(NLog.LogFactory)">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LogReceiverService.LogReceiverForwardingService"/> class.
-            </summary>
-            <param name="logFactory">The log factory.</param>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.ProcessLogMessages(NLog.LogReceiverService.NLogEvents)">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="events">The events to process.</param>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.ProcessLogMessages(NLog.LogEventInfo[])">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="logEvents">The log events.</param>
         </member>
         <member name="T:NLog.LogReceiverService.LogReceiverServiceConfig">
             <summary>
@@ -7290,6 +7370,21 @@
             <param name="message">The message.</param>
             <param name="innerException">The inner exception.</param>
         </member>
+        <member name="T:NLog.Targets.ArchiveNumberingMode">
+            <summary>
+            Specifies the way archive numbering is performed.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.ArchiveNumberingMode.Sequence">
+            <summary>
+            Sequence style numbering. The most recent archive has the highest number.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.ArchiveNumberingMode.Rolling">
+            <summary>
+            Rolling style numbering (the most recent is always #0 then #1, ..., #N.
+            </summary>
+        </member>
         <member name="T:NLog.Targets.ChainsawTarget">
             <summary>
             Sends log messages to the remote instance of Chainsaw application from log4j. 
@@ -7614,6 +7709,11 @@
             </summary>
             <docgen category="Connection Options" order="10"/>
         </member>
+        <member name="P:NLog.Targets.NetworkTarget.MaxQueueSize">
+            <summary>
+            Gets or sets the maximum queue size.
+            </summary>
+        </member>
         <member name="P:NLog.Targets.NetworkTarget.OnOverflow">
             <summary>
             Gets or sets the action that should be taken if the message is larger than
@@ -7861,6 +7961,372 @@
             </summary>
             <docgen category='Debugging Options' order='10' />
         </member>
+        <member name="T:NLog.Targets.FileArchivePeriod">
+            <summary>
+            Modes of archiving files based on time.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.FileArchivePeriod.None">
+            <summary>
+            Don't archive based on time.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.FileArchivePeriod.Year">
+            <summary>
+            Archive every year.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.FileArchivePeriod.Month">
+            <summary>
+            Archive every month.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.FileArchivePeriod.Day">
+            <summary>
+            Archive daily.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.FileArchivePeriod.Hour">
+            <summary>
+            Archive every hour.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.FileArchivePeriod.Minute">
+            <summary>
+            Archive every minute.
+            </summary>
+        </member>
+        <member name="T:NLog.Targets.FileTarget">
+            <summary>
+            Writes log messages to one or more files.
+            </summary>
+            <seealso href="http://nlog-project.org/wiki/File_target">Documentation on NLog Wiki</seealso>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.Targets.FileTarget"/> class.
+            </summary>
+            <remarks>
+            The default value of the layout is: <code>${longdate}|${level:uppercase=true}|${logger}|${message}</code>
+            </remarks>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.CleanupInitializedFiles">
+            <summary>
+            Removes records of initialized files that have not been 
+            accessed in the last two days.
+            </summary>
+            <remarks>
+            Files are marked 'initialized' for the purpose of writing footers when the logging finishes.
+            </remarks>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.CleanupInitializedFiles(System.DateTime)">
+            <summary>
+            Removes records of initialized files that have not been
+            accessed after the specified date.
+            </summary>
+            <param name="cleanupThreshold">The cleanup threshold.</param>
+            <remarks>
+            Files are marked 'initialized' for the purpose of writing footers when the logging finishes.
+            </remarks>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.FlushAsync(NLog.Common.AsyncContinuation)">
+            <summary>
+            Flushes all pending file operations.
+            </summary>
+            <param name="asyncContinuation">The asynchronous continuation.</param>
+            <remarks>
+            The timeout parameter is ignored, because file APIs don't provide
+            the needed functionality.
+            </remarks>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.InitializeTarget">
+            <summary>
+            Initializes file logging by creating data structures that
+            enable efficient multi-file logging.
+            </summary>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.CloseTarget">
+            <summary>
+            Closes the file(s) opened for writing.
+            </summary>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.Write(NLog.LogEventInfo)">
+            <summary>
+            Writes the specified logging event to a file specified in the FileName 
+            parameter.
+            </summary>
+            <param name="logEvent">The logging event.</param>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.Write(NLog.Common.AsyncLogEventInfo[])">
+            <summary>
+            Writes the specified array of logging events to a file specified in the FileName
+            parameter.
+            </summary>
+            <param name="logEvents">An array of <see cref="T:NLog.LogEventInfo"/> objects.</param>
+            <remarks>
+            This function makes use of the fact that the events are batched by sorting
+            the requests by filename. This optimizes the number of open/close calls
+            and can help improve performance.
+            </remarks>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.GetFormattedMessage(NLog.LogEventInfo)">
+            <summary>
+            Formats the log event for write.
+            </summary>
+            <param name="logEvent">The log event to be formatted.</param>
+            <returns>A string representation of the log event.</returns>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.GetBytesToWrite(NLog.LogEventInfo)">
+            <summary>
+            Gets the bytes to be written to the file.
+            </summary>
+            <param name="logEvent">Log event.</param>
+            <returns>Array of bytes that are ready to be written.</returns>
+        </member>
+        <member name="M:NLog.Targets.FileTarget.TransformBytes(System.Byte[])">
+            <summary>
+            Modifies the specified byte array before it gets sent to a file.
+            </summary>
+            <param name="value">The byte array.</param>
+            <returns>The modified byte array. The function can do the modification in-place.</returns>
+        </member>
+        <member name="P:NLog.Targets.FileTarget.FileName">
+            <summary>
+            Gets or sets the name of the file to write to.
+            </summary>
+            <remarks>
+            This FileName string is a layout which may include instances of layout renderers.
+            This lets you use a single target to write to multiple files.
+            </remarks>
+            <example>
+            The following value makes NLog write logging events to files based on the log level in the directory where
+            the application runs.
+            <code>${basedir}/${level}.log</code>
+            All <c>Debug</c> messages will go to <c>Debug.log</c>, all <c>Info</c> messages will go to <c>Info.log</c> and so on.
+            You can combine as many of the layout renderers as you want to produce an arbitrary log file name.
+            </example>
+            <docgen category='Output Options' order='1' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.CreateDirs">
+            <summary>
+            Gets or sets a value indicating whether to create directories if they don't exist.
+            </summary>
+            <remarks>
+            Setting this to false may improve performance a bit, but you'll receive an error
+            when attempting to write to a directory that's not present.
+            </remarks>
+            <docgen category='Output Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.DeleteOldFileOnStartup">
+            <summary>
+            Gets or sets a value indicating whether to delete old log file on startup.
+            </summary>
+            <remarks>
+            This option works only when the "FileName" parameter denotes a single file.
+            </remarks>
+            <docgen category='Output Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ReplaceFileContentsOnEachWrite">
+            <summary>
+            Gets or sets a value indicating whether to replace file contents on each write instead of appending log message at the end.
+            </summary>
+            <docgen category='Output Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.KeepFileOpen">
+            <summary>
+            Gets or sets a value indicating whether to keep log file open instead of opening and closing it on each logging event.
+            </summary>
+            <remarks>
+            Setting this property to <c>True</c> helps improve performance.
+            </remarks>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.EnableFileDelete">
+            <summary>
+            Gets or sets a value indicating whether to enable log file(s) to be deleted.
+            </summary>
+            <docgen category='Output Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.LineEnding">
+            <summary>
+            Gets or sets the line ending mode.
+            </summary>
+            <docgen category='Layout Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.AutoFlush">
+            <summary>
+            Gets or sets a value indicating whether to automatically flush the file buffers after each log message.
+            </summary>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.OpenFileCacheSize">
+            <summary>
+            Gets or sets the number of files to be kept open. Setting this to a higher value may improve performance
+            in a situation where a single File target is writing to many files
+            (such as splitting by level or by logger).
+            </summary>
+            <remarks>
+            The files are managed on a LRU (least recently used) basis, which flushes
+            the files that have not been used for the longest period of time should the
+            cache become full. As a rule of thumb, you shouldn't set this parameter to 
+            a very high value. A number like 10-15 shouldn't be exceeded, because you'd
+            be keeping a large number of files open which consumes system resources.
+            </remarks>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.OpenFileCacheTimeout">
+            <summary>
+            Gets or sets the maximum number of seconds that files are kept open. If this number is negative the files are 
+            not automatically closed after a period of inactivity.
+            </summary>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.BufferSize">
+            <summary>
+            Gets or sets the log file buffer size in bytes.
+            </summary>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.Encoding">
+            <summary>
+            Gets or sets the file encoding.
+            </summary>
+            <docgen category='Layout Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ConcurrentWrites">
+            <summary>
+            Gets or sets a value indicating whether concurrent writes to the log file by multiple processes on the same host.
+            </summary>
+            <remarks>
+            This makes multi-process logging possible. NLog uses a special technique
+            that lets it keep the files open for writing.
+            </remarks>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.NetworkWrites">
+            <summary>
+            Gets or sets a value indicating whether concurrent writes to the log file by multiple processes on different network hosts.
+            </summary>
+            <remarks>
+            This effectively prevents files from being kept open.
+            </remarks>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ConcurrentWriteAttempts">
+            <summary>
+            Gets or sets the number of times the write is appended on the file before NLog
+            discards the log message.
+            </summary>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ConcurrentWriteAttemptDelay">
+            <summary>
+            Gets or sets the delay in milliseconds to wait before attempting to write to the file again.
+            </summary>
+            <remarks>
+            The actual delay is a random value between 0 and the value specified
+            in this parameter. On each failed attempt the delay base is doubled
+            up to <see cref="P:NLog.Targets.FileTarget.ConcurrentWriteAttempts"/> times.
+            </remarks>
+            <example>
+            Assuming that ConcurrentWriteAttemptDelay is 10 the time to wait will be:<p/>
+            a random value between 0 and 10 milliseconds - 1st attempt<br/>
+            a random value between 0 and 20 milliseconds - 2nd attempt<br/>
+            a random value between 0 and 40 milliseconds - 3rd attempt<br/>
+            a random value between 0 and 80 milliseconds - 4th attempt<br/>
+            ...<p/>
+            and so on.
+            </example>
+            <docgen category="Performance Tuning Options" order="10"/>
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ArchiveAboveSize">
+            <summary>
+            Gets or sets the size in bytes above which log files will be automatically archived.
+            </summary>
+            <remarks>
+            Caution: Enabling this option can considerably slow down your file 
+            logging in multi-process scenarios. If only one process is going to
+            be writing to the file, consider setting <c>ConcurrentWrites</c>
+            to <c>false</c> for maximum performance.
+            </remarks>
+            <docgen category='Archival Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ArchiveEvery">
+            <summary>
+            Gets or sets a value indicating whether to automatically archive log files every time the specified time passes.
+            </summary>
+            <remarks>
+            Files are moved to the archive as part of the write operation if the current period of time changes. For example
+            if the current <c>hour</c> changes from 10 to 11, the first write that will occur
+            on or after 11:00 will trigger the archiving.
+            <p>
+            Caution: Enabling this option can considerably slow down your file 
+            logging in multi-process scenarios. If only one process is going to
+            be writing to the file, consider setting <c>ConcurrentWrites</c>
+            to <c>false</c> for maximum performance.
+            </p>
+            </remarks>
+            <docgen category='Archival Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ArchiveFileName">
+            <summary>
+            Gets or sets the name of the file to be used for an archive.
+            </summary>
+            <remarks>
+            It may contain a special placeholder {#####}
+            that will be replaced with a sequence of numbers depending on 
+            the archiving strategy. The number of hash characters used determines
+            the number of numerical digits to be used for numbering files.
+            </remarks>
+            <docgen category='Archival Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.MaxArchiveFiles">
+            <summary>
+            Gets or sets the maximum number of archive files that should be kept.
+            </summary>
+            <docgen category='Archival Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.ArchiveNumbering">
+            <summary>
+            Gets or sets the way file archives are numbered. 
+            </summary>
+            <docgen category='Archival Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.NewLineChars">
+            <summary>
+            Gets the characters that are appended after each line.
+            </summary>
+        </member>
+        <member name="T:NLog.Targets.LineEndingMode">
+            <summary>
+            Line ending mode.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.LineEndingMode.Default">
+            <summary>
+            Insert platform-dependent end-of-line sequence after each line.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.LineEndingMode.CRLF">
+            <summary>
+            Insert CR LF sequence (ASCII 13, ASCII 10) after each line.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.LineEndingMode.CR">
+            <summary>
+            Insert CR character (ASCII 13) after each line.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.LineEndingMode.LF">
+            <summary>
+            Insert LF character (ASCII 10) after each line.
+            </summary>
+        </member>
+        <member name="F:NLog.Targets.LineEndingMode.None">
+            <summary>
+            Don't insert any line ending.
+            </summary>
+        </member>
         <member name="T:NLog.Targets.LogReceiverWebServiceTarget">
             <summary>
             Sends log messages to a NLog Receiver Service (using WCF or Web Services).
@@ -7894,6 +8360,15 @@
             optimize batch writes.
             </summary>
             <param name="logEvents">Logging events to be written out.</param>
+        </member>
+        <member name="M:NLog.Targets.LogReceiverWebServiceTarget.CreateWcfLogReceiverClient">
+            <summary>
+            Creating a new instance of WcfLogReceiverClient
+            
+            Inheritors can override this method and provide their own 
+            service configuration - binding and endpoint address
+            </summary>
+            <returns></returns>
         </member>
         <member name="P:NLog.Targets.LogReceiverWebServiceTarget.EndpointAddress">
             <summary>

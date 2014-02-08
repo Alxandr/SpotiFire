@@ -1483,6 +1483,11 @@
             Gets the collection of logging rules.
             </summary>
         </member>
+        <member name="P:NLog.Config.LoggingConfiguration.DefaultCultureInfo">
+            <summary>
+            Gets or sets the default culture info use.
+            </summary>
+        </member>
         <member name="P:NLog.Config.LoggingConfiguration.AllTargets">
             <summary>
             Gets all targets.
@@ -2490,6 +2495,27 @@
             Object construction helper.
             </summary>
         </member>
+        <member name="T:NLog.Internal.Fakeables.AppDomainWrapper">
+            <summary>
+            Adapter for <see cref="T:System.AppDomain"/> to <see cref="T:NLog.Internal.Fakeables.IAppDomain"/>
+            </summary>
+        </member>
+        <member name="T:NLog.Internal.Fakeables.IAppDomain">
+            <summary>
+            Interface for fakeable the current <see cref="T:System.AppDomain"/>. Not fully implemented, please methods/properties as necessary.
+            </summary>
+        </member>
+        <member name="M:NLog.Internal.Fakeables.AppDomainWrapper.#ctor(System.AppDomain)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.Internal.Fakeables.AppDomainWrapper"/> class.
+            </summary>
+            <param name="appDomain">The <see cref="T:System.AppDomain"/> to wrap.</param>
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppDomainWrapper.CurrentDomain">
+            <summary>
+            Gets a the current <see cref="T:System.AppDomain"/> wrappered in a <see cref="T:NLog.Internal.Fakeables.AppDomainWrapper"/>.
+            </summary>
+        </member>
         <member name="T:NLog.Internal.FileAppenders.BaseFileAppender">
             <summary>
             Base class for optimized file appenders.
@@ -2988,12 +3014,15 @@
             Creates instances of <see cref="T:NLog.Internal.NetworkSenders.NetworkSender"/> objects for given URLs.
             </summary>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.INetworkSenderFactory.Create(System.String)">
+        <member name="M:NLog.Internal.NetworkSenders.INetworkSenderFactory.Create(System.String,System.Int32)">
             <summary>
             Creates a new instance of the network sender based on a network URL.
             </summary>
             <param name="url">
             URL that determines the network sender to be created.
+            </param>
+            <param name="maxQueueSize">
+            The maximum queue size.
             </param>
             <returns>
             A newly created network sender.
@@ -3009,14 +3038,17 @@
             Default implementation of <see cref="T:NLog.Internal.NetworkSenders.INetworkSenderFactory"/>.
             </summary>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.NetworkSenderFactory.Create(System.String)">
+        <member name="M:NLog.Internal.NetworkSenders.NetworkSenderFactory.Create(System.String,System.Int32)">
             <summary>
             Creates a new instance of the network sender based on a network URL:.
             </summary>
             <param name="url">
             URL that determines the network sender to be created.
             </param>
-            <returns>
+            <param name="maxQueueSize">
+            The maximum queue size.
+            </param>
+            /// <returns>
             A newly created network sender.
             </returns>
         </member>
@@ -3398,9 +3430,9 @@
             </summary>
             <param name="name">Ambient property name.</param>
         </member>
-        <member name="T:NLog.LayoutRenderers.CallSiteLayoutRenderer">
+        <member name="T:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer">
             <summary>
-            The call site (class name, method name and source information).
+            Assembly version.
             </summary>
         </member>
         <member name="T:NLog.LayoutRenderers.LayoutRenderer">
@@ -3478,6 +3510,18 @@
             Gets the logging configuration this target is part of.
             </summary>
         </member>
+        <member name="M:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <summary>
+            Renders assembly version and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
+            <param name="logEvent">Logging event.</param>
+        </member>
+        <member name="T:NLog.LayoutRenderers.CallSiteLayoutRenderer">
+            <summary>
+            The call site (class name, method name and source information).
+            </summary>
+        </member>
         <member name="M:NLog.LayoutRenderers.CallSiteLayoutRenderer.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.CallSiteLayoutRenderer"/> class.
@@ -3501,6 +3545,17 @@
             Gets or sets a value indicating whether to render the method name.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.CleanNamesOfAnonymousDelegates">
+            <summary>
+            Gets or sets a value indicating whether the method name will be cleaned up if it is detected as an anonymous delegate.
+            </summary>
+            <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.SkipFrames">
+            <summary>
+            Gets or sets the number of frames to skip.
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
@@ -3602,6 +3657,24 @@
             <param name="logEvent">Logging event.</param>
         </member>
         <member name="P:NLog.LayoutRenderers.EventContextLayoutRenderer.Item">
+            <summary>
+            Gets or sets the name of the item.
+            </summary>
+            <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="T:NLog.LayoutRenderers.EventPropertiesLayoutRenderer">
+            <summary>
+            Log event context data.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.EventPropertiesLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <summary>
+            Renders the specified log event context item and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
+            <param name="logEvent">Logging event.</param>
+        </member>
+        <member name="P:NLog.LayoutRenderers.EventPropertiesLayoutRenderer.Item">
             <summary>
             Gets or sets the name of the item.
             </summary>
@@ -3870,6 +3943,11 @@
             </summary>
         </member>
         <member name="M:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer"/> class.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppDomain)">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer"/> class.
             </summary>
@@ -5521,6 +5599,11 @@
             Occurs when logging <see cref="P:NLog.LogFactory.Configuration"/> changes.
             </summary>
         </member>
+        <member name="P:NLog.LogFactory.CurrentAppDomain">
+            <summary>
+            Gets the current <see cref="T:NLog.Internal.Fakeables.IAppDomain"/>.
+            </summary>
+        </member>
         <member name="P:NLog.LogFactory.ThrowExceptions">
             <summary>
             Gets or sets a value indicating whether exceptions should be thrown.
@@ -6614,7 +6697,7 @@
             Gets the <see cref="T:NLog.LogLevel"/> that corresponds to the specified ordinal.
             </summary>
             <param name="ordinal">The ordinal.</param>
-            <returns>The <see cref="T:NLog.LogLevel"/> instance. For 0 it returns <see cref="F:NLog.LogLevel.Debug"/>, 1 gives <see cref="F:NLog.LogLevel.Info"/> and so on.</returns>
+            <returns>The <see cref="T:NLog.LogLevel"/> instance. For 0 it returns <see cref="F:NLog.LogLevel.Trace"/>, 1 gives <see cref="F:NLog.LogLevel.Debug"/> and so on.</returns>
         </member>
         <member name="M:NLog.LogLevel.FromString(System.String)">
             <summary>
@@ -6770,6 +6853,11 @@
             <remarks>Logging is enabled if the number of <see cref="M:NLog.LogManager.EnableLogging"/> calls is greater 
             than or equal to <see cref="M:NLog.LogManager.DisableLogging"/> calls.</remarks>
         </member>
+        <member name="M:NLog.LogManager.Shutdown">
+            <summary>
+            Dispose all targets, and shutdown logging.
+            </summary>
+        </member>
         <member name="E:NLog.LogManager.ConfigurationChanged">
             <summary>
             Occurs when logging <see cref="P:NLog.LogManager.Configuration"/> changes.
@@ -6790,6 +6878,17 @@
             <summary>
             Gets or sets the global log threshold. Log events below this threshold are not logged.
             </summary>
+        </member>
+        <member name="P:NLog.LogManager.DefaultCultureInfo">
+            <summary>
+            Gets or sets the default culture to use.
+            </summary>
+        </member>
+        <member name="T:NLog.LogManager.GetCultureInfo">
+            <summary>
+            Delegate used to the the culture to use.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:NLog.LogMessageGenerator">
             <summary>
@@ -6819,45 +6918,6 @@
             Ends asynchronous processing of log messages.
             </summary>
             <param name="result">The result.</param>
-        </member>
-        <member name="T:NLog.LogReceiverService.ILogReceiverServer">
-            <summary>
-            Service contract for Log Receiver server.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.ILogReceiverServer.ProcessLogMessages(NLog.LogReceiverService.NLogEvents)">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="events">The events.</param>
-        </member>
-        <member name="T:NLog.LogReceiverService.LogReceiverForwardingService">
-            <summary>
-            Implementation of <see cref="T:NLog.LogReceiverService.ILogReceiverServer"/> which forwards received logs through <see cref="T:NLog.LogManager"/> or a given <see cref="T:NLog.LogFactory"/>.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LogReceiverService.LogReceiverForwardingService"/> class.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.#ctor(NLog.LogFactory)">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LogReceiverService.LogReceiverForwardingService"/> class.
-            </summary>
-            <param name="logFactory">The log factory.</param>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.ProcessLogMessages(NLog.LogReceiverService.NLogEvents)">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="events">The events to process.</param>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.ProcessLogMessages(NLog.LogEventInfo[])">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="logEvents">The log events.</param>
         </member>
         <member name="T:NLog.LogReceiverService.LogReceiverServiceConfig">
             <summary>
@@ -7649,6 +7709,11 @@
             </summary>
             <docgen category="Connection Options" order="10"/>
         </member>
+        <member name="P:NLog.Targets.NetworkTarget.MaxQueueSize">
+            <summary>
+            Gets or sets the maximum queue size.
+            </summary>
+        </member>
         <member name="P:NLog.Targets.NetworkTarget.OnOverflow">
             <summary>
             Gets or sets the action that should be taken if the message is larger than
@@ -8295,6 +8360,15 @@
             optimize batch writes.
             </summary>
             <param name="logEvents">Logging events to be written out.</param>
+        </member>
+        <member name="M:NLog.Targets.LogReceiverWebServiceTarget.CreateWcfLogReceiverClient">
+            <summary>
+            Creating a new instance of WcfLogReceiverClient
+            
+            Inheritors can override this method and provide their own 
+            service configuration - binding and endpoint address
+            </summary>
+            <returns></returns>
         </member>
         <member name="P:NLog.Targets.LogReceiverWebServiceTarget.EndpointAddress">
             <summary>

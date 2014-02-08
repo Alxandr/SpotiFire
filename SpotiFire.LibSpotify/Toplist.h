@@ -95,7 +95,7 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the toplistbrowse object, otherwise false.
 		///				</returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given toplistbrowse objects should be considered equal. </summary>
@@ -108,7 +108,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given toplistbrowse objects are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (ToplistBrowse^ left, ToplistBrowse^ right);
+		static bool operator== (ToplistBrowse ^left, ToplistBrowse ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given toplistbrowse objects should not be considered equal. </summary>
@@ -121,7 +121,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given toplistbrowse objects are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (ToplistBrowse^ left, ToplistBrowse^ right);
+		static bool operator!= (ToplistBrowse ^left, ToplistBrowse ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Initiate a request for browsing an toplist. </summary>

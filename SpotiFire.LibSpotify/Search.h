@@ -7,7 +7,6 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-	
 	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
@@ -15,7 +14,7 @@ namespace SpotiFire {
 	///
 	/// <remarks>	Aleksander, 03.02.2013. </remarks>
 	///-------------------------------------------------------------------------------------------------
-	public ref class Search sealed : ISpotifyObject, ISpotifyAwaitable
+	public ref class Search sealed : ISpotifyObject, ISpotifyAwaitable<Search ^>
 	{
 	private:
 		IList<Track ^> ^_tracks;
@@ -23,8 +22,8 @@ namespace SpotiFire {
 		IList<Playlist ^> ^_playlists;
 		IList<Artist ^> ^_artists;
 
-		List<Action ^> ^_continuations;
-		bool _complete;
+		volatile bool _complete;
+		TaskCompletionSource<Search ^> ^_tcs;
 
 	internal:
 		Session ^_session;
@@ -157,7 +156,7 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the search object, otherwise false.
 		///				</returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
+		virtual bool Equals(Object ^other) override;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given search objects should be considered equal. </summary>
@@ -169,7 +168,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given searches are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Search^ left, Search^ right);
+		static bool operator== (Search ^left, Search ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given search objects should not be considered equal. </summary>
@@ -181,11 +180,10 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given search objects are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Search^ left, Search^ right);
+		static bool operator!= (Search ^left, Search ^right);
 
-	private:
-		virtual property bool IsComplete { bool get() sealed = ISpotifyAwaitable::IsComplete::get; }
-		virtual bool AddContinuation(Action ^continuationAction) sealed = ISpotifyAwaitable::AddContinuation;
+	public:
+		virtual System::Runtime::CompilerServices::TaskAwaiter<Search ^> GetAwaiter() sealed = ISpotifyAwaitable<Search ^>::GetAwaiter;
 
 	internal:
 		static Search ^Create(SpotiFire::Session ^session, String ^query, int trackOffset, int trackCount, int albumOffset, int albumCount, int artistOffset, int artistCount, int playlistOffset, int playlistCount, SearchType type);

@@ -8,7 +8,6 @@ using namespace System::Collections::Generic;
 using namespace SpotiFire::Collections;
 
 namespace SpotiFire {
-
 	ref class User;
 	ref class Track;
 	ref class Link;
@@ -163,13 +162,13 @@ namespace SpotiFire {
 		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this playlist, or null if the
 		///				playlist is not loaded (yet). </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual Link ^GetLink();
+		virtual Link ^ToLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in Renamed events. </summary>
 		///
 		/// <remarks>	The Renamed event provides a way for applications to be notified whenever
-		/// 			the name of the playlist has been updated. Use 
+		/// 			the name of the playlist has been updated. Use
 		///				<see cref="SpotiFire.Playlist.Name" /> to retrieve the new name. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		event PlaylistEventHandler ^Renamed;
@@ -216,7 +215,7 @@ namespace SpotiFire {
 		///				</remarks>
 		///-------------------------------------------------------------------------------------------------
 		event PlaylistEventHandler ^TrackCreatedChanged;
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in TrackSeenChanged events. </summary>
 		///
@@ -234,7 +233,7 @@ namespace SpotiFire {
 		///				<see cref="SpotiFire.Playlist.Description" /> to retrieve the value. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		event PlaylistEventHandler ^DescriptionChanged;
-		
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in ImageChanged events. </summary>
 		///
@@ -281,8 +280,8 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given object is equal to the playlist, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override;
-		
+		virtual bool Equals(Object ^other) override;
+
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given playlists should be considered equal. </summary>
 		///
@@ -293,7 +292,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given playlists are equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator== (Playlist^ left, Playlist^ right);
+		static bool operator== (Playlist ^left, Playlist ^right);
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Checks if the given playlists should not be considered equal. </summary>
@@ -305,7 +304,7 @@ namespace SpotiFire {
 		///
 		/// <returns>	true if the given playlists are not equal, otherwise false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		static bool operator!= (Playlist^ left, Playlist^ right);
+		static bool operator!= (Playlist ^left, Playlist ^right);
 
 		// TODO: Add subscribing users
 

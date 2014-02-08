@@ -1483,6 +1483,11 @@
             Gets the collection of logging rules.
             </summary>
         </member>
+        <member name="P:NLog.Config.LoggingConfiguration.DefaultCultureInfo">
+            <summary>
+            Gets or sets the default culture info use.
+            </summary>
+        </member>
         <member name="P:NLog.Config.LoggingConfiguration.AllTargets">
             <summary>
             Gets all targets.
@@ -2475,6 +2480,27 @@
             Object construction helper.
             </summary>
         </member>
+        <member name="T:NLog.Internal.Fakeables.AppDomainWrapper">
+            <summary>
+            Adapter for <see cref="T:System.AppDomain"/> to <see cref="T:NLog.Internal.Fakeables.IAppDomain"/>
+            </summary>
+        </member>
+        <member name="T:NLog.Internal.Fakeables.IAppDomain">
+            <summary>
+            Interface for fakeable the current <see cref="T:System.AppDomain"/>. Not fully implemented, please methods/properties as necessary.
+            </summary>
+        </member>
+        <member name="M:NLog.Internal.Fakeables.AppDomainWrapper.#ctor(System.AppDomain)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.Internal.Fakeables.AppDomainWrapper"/> class.
+            </summary>
+            <param name="appDomain">The <see cref="T:System.AppDomain"/> to wrap.</param>
+        </member>
+        <member name="P:NLog.Internal.Fakeables.AppDomainWrapper.CurrentDomain">
+            <summary>
+            Gets a the current <see cref="T:System.AppDomain"/> wrappered in a <see cref="T:NLog.Internal.Fakeables.AppDomainWrapper"/>.
+            </summary>
+        </member>
         <member name="T:NLog.Internal.FileAppenders.BaseFileAppender">
             <summary>
             Base class for optimized file appenders.
@@ -2934,14 +2960,6 @@
             <param name="asyncContinuation">The async continuation to be invoked after the buffer has been sent.</param>
             <remarks>To be overridden in inheriting classes.</remarks>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.NetworkSender.ParseEndpointAddress(System.Uri,System.Net.Sockets.AddressFamily)">
-            <summary>
-            Parses the URI into an endpoint address.
-            </summary>
-            <param name="uri">The URI to parse.</param>
-            <param name="addressFamily">The address family.</param>
-            <returns>Parsed endpoint.</returns>
-        </member>
         <member name="P:NLog.Internal.NetworkSenders.NetworkSender.Address">
             <summary>
             Gets the address of the network endpoint.
@@ -2973,132 +2991,38 @@
             Creates instances of <see cref="T:NLog.Internal.NetworkSenders.NetworkSender"/> objects for given URLs.
             </summary>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.INetworkSenderFactory.Create(System.String)">
+        <member name="M:NLog.Internal.NetworkSenders.INetworkSenderFactory.Create(System.String,System.Int32)">
             <summary>
             Creates a new instance of the network sender based on a network URL.
             </summary>
             <param name="url">
             URL that determines the network sender to be created.
             </param>
+            <param name="maxQueueSize">
+            The maximum queue size.
+            </param>
             <returns>
             A newly created network sender.
             </returns>
-        </member>
-        <member name="T:NLog.Internal.NetworkSenders.ISocket">
-            <summary>
-            Interface for mocking socket calls.
-            </summary>
         </member>
         <member name="T:NLog.Internal.NetworkSenders.NetworkSenderFactory">
             <summary>
             Default implementation of <see cref="T:NLog.Internal.NetworkSenders.INetworkSenderFactory"/>.
             </summary>
         </member>
-        <member name="M:NLog.Internal.NetworkSenders.NetworkSenderFactory.Create(System.String)">
+        <member name="M:NLog.Internal.NetworkSenders.NetworkSenderFactory.Create(System.String,System.Int32)">
             <summary>
             Creates a new instance of the network sender based on a network URL:.
             </summary>
             <param name="url">
             URL that determines the network sender to be created.
             </param>
-            <returns>
+            <param name="maxQueueSize">
+            The maximum queue size.
+            </param>
+            /// <returns>
             A newly created network sender.
             </returns>
-        </member>
-        <member name="T:NLog.Internal.NetworkSenders.SocketProxy">
-            <summary>
-            Socket proxy for mocking Socket code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.SocketProxy.#ctor(System.Net.Sockets.AddressFamily,System.Net.Sockets.SocketType,System.Net.Sockets.ProtocolType)">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.Internal.NetworkSenders.SocketProxy"/> class.
-            </summary>
-            <param name="addressFamily">The address family.</param>
-            <param name="socketType">Type of the socket.</param>
-            <param name="protocolType">Type of the protocol.</param>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.SocketProxy.Close">
-            <summary>
-            Closes the wrapped socket.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.SocketProxy.ConnectAsync(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            Invokes ConnectAsync method on the wrapped socket.
-            </summary>
-            <param name="args">The <see cref="T:System.Net.Sockets.SocketAsyncEventArgs"/> instance containing the event data.</param>
-            <returns>Result of original method.</returns>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.SocketProxy.SendAsync(System.Net.Sockets.SocketAsyncEventArgs)">
-            <summary>
-            Invokes SendAsync method on the wrapped socket.
-            </summary>
-            <param name="args">The <see cref="T:System.Net.Sockets.SocketAsyncEventArgs"/> instance containing the event data.</param>
-            <returns>Result of original method.</returns>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.SocketProxy.Dispose">
-            <summary>
-            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-            </summary>
-        </member>
-        <member name="T:NLog.Internal.NetworkSenders.TcpNetworkSender">
-            <summary>
-            Sends messages over a TCP network connection.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.#ctor(System.String,System.Net.Sockets.AddressFamily)">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.Internal.NetworkSenders.TcpNetworkSender"/> class.
-            </summary>
-            <param name="url">URL. Must start with tcp://.</param>
-            <param name="addressFamily">The address family.</param>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.CreateSocket(System.Net.Sockets.AddressFamily,System.Net.Sockets.SocketType,System.Net.Sockets.ProtocolType)">
-            <summary>
-            Creates the socket with given parameters. 
-            </summary>
-            <param name="addressFamily">The address family.</param>
-            <param name="socketType">Type of the socket.</param>
-            <param name="protocolType">Type of the protocol.</param>
-            <returns>Instance of <see cref="T:NLog.Internal.NetworkSenders.ISocket"/> which represents the socket.</returns>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.DoInitialize">
-            <summary>
-            Performs sender-specific initialization.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.DoClose(NLog.Common.AsyncContinuation)">
-            <summary>
-            Closes the socket.
-            </summary>
-            <param name="continuation">The continuation.</param>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.DoFlush(NLog.Common.AsyncContinuation)">
-            <summary>
-            Performs sender-specific flush.
-            </summary>
-            <param name="continuation">The continuation.</param>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.DoSend(System.Byte[],System.Int32,System.Int32,NLog.Common.AsyncContinuation)">
-            <summary>
-            Sends the specified text over the connected socket.
-            </summary>
-            <param name="bytes">The bytes to be sent.</param>
-            <param name="offset">Offset in buffer.</param>
-            <param name="length">Number of bytes to send.</param>
-            <param name="asyncContinuation">The async continuation to be invoked after the buffer has been sent.</param>
-            <remarks>To be overridden in inheriting classes.</remarks>
-        </member>
-        <member name="T:NLog.Internal.NetworkSenders.TcpNetworkSender.MySocketAsyncEventArgs">
-            <summary>
-            Facilitates mocking of <see cref="T:System.Net.Sockets.SocketAsyncEventArgs"/> class.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.NetworkSenders.TcpNetworkSender.MySocketAsyncEventArgs.RaiseCompleted">
-            <summary>
-            Raises the Completed event.
-            </summary>
         </member>
         <member name="T:NLog.Internal.ObjectGraphScanner">
             <summary>
@@ -3383,9 +3307,9 @@
             </summary>
             <param name="name">Ambient property name.</param>
         </member>
-        <member name="T:NLog.LayoutRenderers.CallSiteLayoutRenderer">
+        <member name="T:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer">
             <summary>
-            The call site (class name, method name and source information).
+            Assembly version.
             </summary>
         </member>
         <member name="T:NLog.LayoutRenderers.LayoutRenderer">
@@ -3463,6 +3387,18 @@
             Gets the logging configuration this target is part of.
             </summary>
         </member>
+        <member name="M:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <summary>
+            Renders assembly version and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
+            <param name="logEvent">Logging event.</param>
+        </member>
+        <member name="T:NLog.LayoutRenderers.CallSiteLayoutRenderer">
+            <summary>
+            The call site (class name, method name and source information).
+            </summary>
+        </member>
         <member name="M:NLog.LayoutRenderers.CallSiteLayoutRenderer.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.CallSiteLayoutRenderer"/> class.
@@ -3486,6 +3422,17 @@
             Gets or sets a value indicating whether to render the method name.
             </summary>
             <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.CleanNamesOfAnonymousDelegates">
+            <summary>
+            Gets or sets a value indicating whether the method name will be cleaned up if it is detected as an anonymous delegate.
+            </summary>
+            <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.SkipFrames">
+            <summary>
+            Gets or sets the number of frames to skip.
+            </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.CallSiteLayoutRenderer.NLog#Internal#IUsesStackTrace#StackTraceUsage">
             <summary>
@@ -3562,18 +3509,6 @@
             </summary>
             <docgen category='Rendering Options' order='10' />
         </member>
-        <member name="T:NLog.LayoutRenderers.DocumentUriLayoutRenderer">
-            <summary>
-            URI of the HTML page which hosts the current Silverlight application.
-            </summary>
-        </member>
-        <member name="M:NLog.LayoutRenderers.DocumentUriLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
-            <summary>
-            Renders the specified environmental information and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
-            </summary>
-            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
-            <param name="logEvent">Logging event.</param>
-        </member>
         <member name="T:NLog.LayoutRenderers.EventContextLayoutRenderer">
             <summary>
             Log event context data.
@@ -3587,6 +3522,24 @@
             <param name="logEvent">Logging event.</param>
         </member>
         <member name="P:NLog.LayoutRenderers.EventContextLayoutRenderer.Item">
+            <summary>
+            Gets or sets the name of the item.
+            </summary>
+            <docgen category='Rendering Options' order='10' />
+        </member>
+        <member name="T:NLog.LayoutRenderers.EventPropertiesLayoutRenderer">
+            <summary>
+            Log event context data.
+            </summary>
+        </member>
+        <member name="M:NLog.LayoutRenderers.EventPropertiesLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
+            <summary>
+            Renders the specified log event context item and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
+            </summary>
+            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
+            <param name="logEvent">Logging event.</param>
+        </member>
+        <member name="P:NLog.LayoutRenderers.EventPropertiesLayoutRenderer.Item">
             <summary>
             Gets or sets the name of the item.
             </summary>
@@ -3859,6 +3812,11 @@
             Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer"/> class.
             </summary>
         </member>
+        <member name="M:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer.#ctor(NLog.Internal.Fakeables.IAppDomain)">
+            <summary>
+            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer"/> class.
+            </summary>
+        </member>
         <member name="M:NLog.LayoutRenderers.Log4JXmlEventLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
             <summary>
             Renders the XML logging event and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
@@ -4078,39 +4036,6 @@
             Gets or sets a value indicating whether to output UTC time instead of local time.
             </summary>
             <docgen category='Rendering Options' order='10' />
-        </member>
-        <member name="T:NLog.LayoutRenderers.SilverlightApplicationInfoLayoutRenderer">
-            <summary>
-            Information about Silverlight application.
-            </summary>
-        </member>
-        <member name="M:NLog.LayoutRenderers.SilverlightApplicationInfoLayoutRenderer.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LayoutRenderers.SilverlightApplicationInfoLayoutRenderer"/> class.
-            </summary>
-        </member>
-        <member name="M:NLog.LayoutRenderers.SilverlightApplicationInfoLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
-            <summary>
-            Renders the specified environmental information and appends it to the specified <see cref="T:System.Text.StringBuilder"/>.
-            </summary>
-            <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
-            <param name="logEvent">Logging event.</param>
-        </member>
-        <member name="P:NLog.LayoutRenderers.SilverlightApplicationInfoLayoutRenderer.Option">
-            <summary>
-            Gets or sets specific information to display.
-            </summary>
-            <docgen category='Rendering Options' order='10' />
-        </member>
-        <member name="T:NLog.LayoutRenderers.SilverlightApplicationInfoOption">
-            <summary>
-            Specifies application information to display in ${sl-appinfo} renderer.
-            </summary>
-        </member>
-        <member name="F:NLog.LayoutRenderers.SilverlightApplicationInfoOption.XapUri">
-            <summary>
-            URI of the current application XAP file.
-            </summary>
         </member>
         <member name="T:NLog.LayoutRenderers.SpecialFolderLayoutRenderer">
             <summary>
@@ -5491,6 +5416,11 @@
             Occurs when logging <see cref="P:NLog.LogFactory.Configuration"/> changes.
             </summary>
         </member>
+        <member name="P:NLog.LogFactory.CurrentAppDomain">
+            <summary>
+            Gets the current <see cref="T:NLog.Internal.Fakeables.IAppDomain"/>.
+            </summary>
+        </member>
         <member name="P:NLog.LogFactory.ThrowExceptions">
             <summary>
             Gets or sets a value indicating whether exceptions should be thrown.
@@ -6584,7 +6514,7 @@
             Gets the <see cref="T:NLog.LogLevel"/> that corresponds to the specified ordinal.
             </summary>
             <param name="ordinal">The ordinal.</param>
-            <returns>The <see cref="T:NLog.LogLevel"/> instance. For 0 it returns <see cref="F:NLog.LogLevel.Debug"/>, 1 gives <see cref="F:NLog.LogLevel.Info"/> and so on.</returns>
+            <returns>The <see cref="T:NLog.LogLevel"/> instance. For 0 it returns <see cref="F:NLog.LogLevel.Trace"/>, 1 gives <see cref="F:NLog.LogLevel.Debug"/> and so on.</returns>
         </member>
         <member name="M:NLog.LogLevel.FromString(System.String)">
             <summary>
@@ -6740,6 +6670,11 @@
             <remarks>Logging is enabled if the number of <see cref="M:NLog.LogManager.EnableLogging"/> calls is greater 
             than or equal to <see cref="M:NLog.LogManager.DisableLogging"/> calls.</remarks>
         </member>
+        <member name="M:NLog.LogManager.Shutdown">
+            <summary>
+            Dispose all targets, and shutdown logging.
+            </summary>
+        </member>
         <member name="E:NLog.LogManager.ConfigurationChanged">
             <summary>
             Occurs when logging <see cref="P:NLog.LogManager.Configuration"/> changes.
@@ -6760,6 +6695,17 @@
             <summary>
             Gets or sets the global log threshold. Log events below this threshold are not logged.
             </summary>
+        </member>
+        <member name="P:NLog.LogManager.DefaultCultureInfo">
+            <summary>
+            Gets or sets the default culture to use.
+            </summary>
+        </member>
+        <member name="T:NLog.LogManager.GetCultureInfo">
+            <summary>
+            Delegate used to the the culture to use.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:NLog.LogMessageGenerator">
             <summary>
@@ -6789,45 +6735,6 @@
             Ends asynchronous processing of log messages.
             </summary>
             <param name="result">The result.</param>
-        </member>
-        <member name="T:NLog.LogReceiverService.ILogReceiverServer">
-            <summary>
-            Service contract for Log Receiver server.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.ILogReceiverServer.ProcessLogMessages(NLog.LogReceiverService.NLogEvents)">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="events">The events.</param>
-        </member>
-        <member name="T:NLog.LogReceiverService.LogReceiverForwardingService">
-            <summary>
-            Implementation of <see cref="T:NLog.LogReceiverService.ILogReceiverServer"/> which forwards received logs through <see cref="T:NLog.LogManager"/> or a given <see cref="T:NLog.LogFactory"/>.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LogReceiverService.LogReceiverForwardingService"/> class.
-            </summary>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.#ctor(NLog.LogFactory)">
-            <summary>
-            Initializes a new instance of the <see cref="T:NLog.LogReceiverService.LogReceiverForwardingService"/> class.
-            </summary>
-            <param name="logFactory">The log factory.</param>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.ProcessLogMessages(NLog.LogReceiverService.NLogEvents)">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="events">The events to process.</param>
-        </member>
-        <member name="M:NLog.LogReceiverService.LogReceiverForwardingService.ProcessLogMessages(NLog.LogEventInfo[])">
-            <summary>
-            Processes the log messages.
-            </summary>
-            <param name="logEvents">The log events.</param>
         </member>
         <member name="T:NLog.LogReceiverService.LogReceiverServiceConfig">
             <summary>
@@ -7062,6 +6969,12 @@
             <summary>
             Occurs when Close operation has completed.
             </summary>
+        </member>
+        <member name="P:NLog.LogReceiverService.WcfLogReceiverClient.CookieContainer">
+            <summary>
+            Gets or sets the cookie container.
+            </summary>
+            <value>The cookie container.</value>
         </member>
         <member name="T:NLog.MappedDiagnosticsContext">
             <summary>
@@ -7598,6 +7511,11 @@
             </summary>
             <docgen category="Connection Options" order="10"/>
         </member>
+        <member name="P:NLog.Targets.NetworkTarget.MaxQueueSize">
+            <summary>
+            Gets or sets the maximum queue size.
+            </summary>
+        </member>
         <member name="P:NLog.Targets.NetworkTarget.OnOverflow">
             <summary>
             Gets or sets the action that should be taken if the message is larger than
@@ -7879,6 +7797,15 @@
             </summary>
             <param name="logEvents">Logging events to be written out.</param>
         </member>
+        <member name="M:NLog.Targets.LogReceiverWebServiceTarget.CreateWcfLogReceiverClient">
+            <summary>
+            Creating a new instance of WcfLogReceiverClient
+            
+            Inheritors can override this method and provide their own 
+            service configuration - binding and endpoint address
+            </summary>
+            <returns></returns>
+        </member>
         <member name="P:NLog.Targets.LogReceiverWebServiceTarget.EndpointAddress">
             <summary>
             Gets or sets the endpoint address.
@@ -7892,6 +7819,12 @@
             </summary>
             <value>The name of the endpoint configuration.</value>
             <docgen category='Connection Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.LogReceiverWebServiceTarget.UseBinaryEncoding">
+            <summary>
+            Gets or sets a value indicating whether to use binary message encoding.
+            </summary>
+            <docgen category='Payload Options' order='10' />
         </member>
         <member name="P:NLog.Targets.LogReceiverWebServiceTarget.ClientId">
             <summary>

@@ -7,22 +7,21 @@ using namespace System;
 using namespace System::Collections::Generic;
 
 namespace SpotiFire {
-
-	public value class PortraitId sealed : IEquatable<PortraitId> {
+	public value class PortraitId sealed : IEquatable<PortraitId>{
 	private:
 		initonly array<byte> ^_data;
 
 	internal:
 		PortraitId(const byte *data) {
 			_data = gcnew array<Byte>(20);
-			for(int i = 0; i < 20; i++) {
+			for (int i = 0; i < 20; i++) {
 				_data[i] = data[i];
 			}
 		}
 
 		const std::vector<byte> data() {
 			std::vector<byte> ret(20);
-			for(int i = 0; i < 20; i++) {
+			for (int i = 0; i < 20; i++) {
 				ret[i] = _data[i];
 			}
 			return ret;
@@ -36,7 +35,7 @@ namespace SpotiFire {
 		///-------------------------------------------------------------------------------------------------
 		virtual int GetHashCode() override {
 			int hashCode = 0;
-			for(int i = 0; i < 20; i++) {
+			for (int i = 0; i < 20; i++) {
 				hashCode += _data[i];
 			}
 			return hashCode;
@@ -51,11 +50,11 @@ namespace SpotiFire {
 		/// <returns>	true if the given object is equal to the artistbrowse object, otherwise
 		///				false. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual bool Equals(Object^ other) override {
-			if(Object::ReferenceEquals(other, nullptr))
+		virtual bool Equals(Object ^other) override {
+			if (Object::ReferenceEquals(other, nullptr))
 				return false;
 
-			if(other->GetType() == PortraitId::typeid)
+			if (other->GetType() == PortraitId::typeid)
 				return Equals((PortraitId)other);
 
 			return false;

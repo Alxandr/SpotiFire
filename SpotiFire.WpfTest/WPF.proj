@@ -47,8 +47,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IPlayer.cs" />
-    <Compile Include="NAudioPlayer.cs" />
+    <Compile Include="..\SpotiFire.TestClient\IPlayer.cs" />
+    <Compile Include="..\SpotiFire.TestClient\NAudioPlayer.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
