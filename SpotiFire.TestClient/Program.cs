@@ -132,8 +132,8 @@ namespace SpotiFire.TestClient
             Console.WriteLine("Found track " + track.Name);
             await track.Album;
 
-            await track.Album.Browse(); // test
-            await track.Artists[0].Browse(ArtistBrowseType.NoAlbums); // test
+            var albumBrowse = await track.Album.Browse(); // test
+            var artistBrowse = await track.Artists[0].Browse(ArtistBrowseType.NoAlbums); // test
 
             var nPlaylist = await session.PlaylistContainer.Playlists.Create(Guid.NewGuid().ToString());
             nPlaylist.Tracks.Add(track);

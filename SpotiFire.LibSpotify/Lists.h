@@ -4,6 +4,7 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Collections::Specialized;
 using namespace System::Threading;
+using namespace System::Runtime::CompilerServices;
 
 typedef System::Collections::IEnumerator IBEnumerator;
 
@@ -253,8 +254,28 @@ namespace SpotiFire {
 		generic<typename T>
 		ref class ObservableSPList abstract : SPList<T>, IObservableSPList<T>
 		{
+		private:
+			NotifyCollectionChangedEventHandler ^_collectionChanged;
+
 		public:
-			virtual event NotifyCollectionChangedEventHandler ^CollectionChanged;
+			virtual event NotifyCollectionChangedEventHandler ^CollectionChanged {
+				[MethodImpl(MethodImplOptions::Synchronized)]
+				void add(NotifyCollectionChangedEventHandler ^handler) {
+					_collectionChanged += handler;
+				}
+
+				[MethodImpl(MethodImplOptions::Synchronized)]
+				void remove(NotifyCollectionChangedEventHandler ^handler) {
+					_collectionChanged -= handler;
+				}
+
+			private:
+				void raise(Object ^sender, NotifyCollectionChangedEventArgs ^args) sealed {
+					RAISE_EVENT(NotifyCollectionChangedEventHandler, _collectionChanged, sender, args);
+				}
+			}
+
+		internal:
 			virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e) {
 				CollectionChanged(this, e);
 			}
