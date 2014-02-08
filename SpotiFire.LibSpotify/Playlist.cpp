@@ -46,13 +46,16 @@ static __forceinline DateTime TIMESTAMP(int timestamp) {
 	return dt.AddSeconds(timestamp).ToLocalTime();
 }
 
-Playlist::Playlist(SpotiFire::Session ^session, sp_playlist *ptr) {
+Playlist::Playlist(SpotiFire::Session ^session, sp_playlist *ptr, SpotiFire::PlaylistType type) {
 	SPLock lock;
 	_ptr = ptr;
 	_session = session;
+	_type = type;
 	sp_playlist_add_ref(_ptr);
 	sp_playlist_add_callbacks(_ptr, &_callbacks, new gcroot<Playlist ^>(this));
 }
+
+Playlist::Playlist(SpotiFire::Session ^session, sp_playlist *ptr) : Playlist::Playlist(session, ptr, SpotiFire::PlaylistType::Playlist) {}
 
 Playlist::~Playlist() {
 	this->!Playlist();
@@ -63,6 +66,10 @@ Playlist::!Playlist() {
 	sp_playlist_remove_callbacks(_ptr, &_callbacks, NULL);
 	sp_playlist_release(_ptr);
 	_ptr = NULL;
+}
+
+PlaylistType Playlist::Type::get() {
+	return _type;
 }
 
 Session ^Playlist::Session::get() {

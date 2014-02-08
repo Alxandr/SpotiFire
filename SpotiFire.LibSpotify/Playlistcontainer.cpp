@@ -68,7 +68,7 @@ public:
 
 	virtual Playlist ^DoFetch(int index) override sealed {
 		SPLock lock;
-		return gcnew Playlist(_pc->_session, sp_playlistcontainer_playlist(_pc->_ptr, index));
+		return gcnew Playlist(_pc->_session, sp_playlistcontainer_playlist(_pc->_ptr, index), _pc->GetPlaylistType(index));
 	}
 
 	virtual void DoInsert(int index, Playlist ^item) override sealed {
@@ -134,7 +134,7 @@ void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist,
 
 void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata) {
 	PlaylistContainer^ plc = SP_DATA(PlaylistContainer, userdata);
-	TP2(Playlist^, int, plc, PlaylistContainer::playlist_removed, gcnew SpotiFire::Playlist(plc->Session, playlist), position);
+	TP2(Playlist^, int, plc, PlaylistContainer::playlist_removed, gcnew SpotiFire::Playlist(plc->Session, playlist, SpotiFire::PlaylistType::Placeholder), position);
 }
 
 void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata) {

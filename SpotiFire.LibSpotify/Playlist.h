@@ -32,11 +32,13 @@ namespace SpotiFire {
 	internal:
 		Session ^_session;
 		sp_playlist *_ptr;
+		PlaylistType _type;
 		ObservableSPList<Track ^> ^_tracks;
 
 		static Logger ^logger = LogManager::GetCurrentClassLogger();
 
 		Playlist(Session ^session, sp_playlist *ptr);
+		Playlist(Session ^session, sp_playlist *ptr, PlaylistType type);
 		!Playlist(); // finalizer
 		~Playlist(); // destructor
 
@@ -56,6 +58,13 @@ namespace SpotiFire {
 		void subscribers_changed();
 
 	public:
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the type of the playlist. </summary>
+		///
+		/// <value>	The connection type. <see cref="SpotiFire::PlaylistType" /> for possible values. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property PlaylistType Type { SpotiFire::PlaylistType get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the session. </summary>
