@@ -135,6 +135,9 @@ namespace SpotiFire.TestClient
             var albumBrowse = await track.Album.Browse(); // test
             var artistBrowse = await track.Artists[0].Browse(ArtistBrowseType.NoAlbums); // test
 
+            var nPlaylist = await session.PlaylistContainer.Playlists.Create(Guid.NewGuid().ToString());
+            nPlaylist.Tracks.Add(track);
+
             var coverId = track.Album.CoverId;
             var image = await Image.FromId(session, coverId);
             var imageData = image.GetImage();

@@ -9,6 +9,8 @@ using namespace SpotiFire::Collections;
 #define SP_STRING(str) (char *)(void *)Marshal::StringToHGlobalAnsi(str)
 #define SP_FREE(str) Marshal::FreeHGlobal((IntPtr)(void *)str)
 
+#define PLAYLIST_CONTAINER_LOADED(ptr) if(!sp_playlistcontainer_is_loaded(ptr)) throw gcnew NotLoadedException("PlaylistContainer")
+
 void SP_CALLCONV playlist_added(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
 void SP_CALLCONV playlist_removed(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
 void SP_CALLCONV playlist_moved(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata);
@@ -54,7 +56,7 @@ User ^PlaylistContainer::Owner::get() {
 	return gcnew User(_session, sp_playlistcontainer_owner(_ptr));
 }
 
-ref class $PlaylistContainer$PlaylistList sealed : ObservableSPList<Playlist ^>
+ref class $PlaylistContainer$PlaylistList sealed : ObservableSPList<Playlist ^>, IInternalPlaylistList, IPlaylistList
 {
 internal:
 	PlaylistContainer ^_pc;
@@ -63,34 +65,44 @@ internal:
 public:
 	virtual int DoCount() override sealed {
 		SPLock lock;
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
 		return sp_playlistcontainer_num_playlists(_pc->_ptr);
 	}
 
 	virtual Playlist ^DoFetch(int index) override sealed {
 		SPLock lock;
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
 		return gcnew Playlist(_pc->_session, sp_playlistcontainer_playlist(_pc->_ptr, index), _pc->GetPlaylistType(index));
 	}
 
 	virtual void DoInsert(int index, Playlist ^item) override sealed {
 		SPLock lock;
-		throw gcnew NotImplementedException("PlaylistList::DoInsert");
+		throw gcnew InvalidOperationException("PlaylistList::DoInsert");
 	}
 
 	virtual void DoRemove(int index) override sealed {
 		SPLock lock;
-		throw gcnew NotImplementedException("PlaylistList::DoRemove");
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
+		sp_playlistcontainer_remove_playlist(_pc->_ptr, index);
 	}
 
 	virtual void DoUpdate(int index, Playlist ^item) override sealed {
 		SPLock lock;
+		PLAYLIST_CONTAINER_LOADED(_pc->_ptr);
 		DoRemove(index);
 		DoInsert(index - 1, item);
 	}
+
+	virtual Playlist ^Create(String ^name) sealed {
+		SPLock lock;
+		marshal_context context;
+		return gcnew Playlist(_pc->Session, sp_playlistcontainer_add_new_playlist(_pc->_ptr, context.marshal_as<const char *>(name)));
+	}
 };
 
-IObservableSPList<Playlist ^> ^PlaylistContainer::Playlists::get() {
+IPlaylistList ^PlaylistContainer::Playlists::get() {
 	if(_playlists == nullptr) {
-		Interlocked::CompareExchange<ObservableSPList<Playlist ^> ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
+		Interlocked::CompareExchange<IInternalPlaylistList ^>(_playlists, gcnew $PlaylistContainer$PlaylistList(this), nullptr);
 	}
 	return _playlists;
 }

@@ -11,6 +11,8 @@ typedef System::Collections::IEnumerator IBEnumerator;
 //#include "Lists.h"
 
 namespace SpotiFire {
+	ref class Playlist;
+
 	namespace Collections {
 
 		generic<typename T>
@@ -76,7 +78,7 @@ namespace SpotiFire {
 
 			virtual void Add(T item) sealed = IList<T>::Add {
 				ensure_not_readonly(this);
-				this->Insert(Count - 1, item);
+				this->Insert(Count, item);
 			}
 
 			virtual void Clear() sealed = IList<T>::Clear {
@@ -115,7 +117,7 @@ namespace SpotiFire {
 
 			virtual void Insert(int index, T item) sealed/* = IList<T>::Insert*/ {
 				ensure_not_readonly(this);
-				if(index < 0 || index >= DoCount())
+				if(index < 0 || index > DoCount())
 					throw gcnew IndexOutOfRangeException();
 				Interlocked::Increment(_version);
 				DoInsert(index, item);
@@ -273,7 +275,6 @@ namespace SpotiFire {
 				}
 			}
 
-		internal:
 			virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e) {
 				CollectionChanged(this, e);
 			}
@@ -301,6 +302,16 @@ namespace SpotiFire {
 			virtual void DoUpdate(int index, T item) override sealed {
 				throw_readonly();
 			}
+		};
+
+		public interface class IPlaylistList : IObservableSPList<Playlist ^> {
+		public:
+			Playlist ^Create(String ^name);
+		};
+
+		interface class IInternalPlaylistList : IPlaylistList {
+		public:
+			virtual void RaiseCollectionChanged(NotifyCollectionChangedEventArgs^ e);
 		};
 
 		__forceinline void throw_readonly() {

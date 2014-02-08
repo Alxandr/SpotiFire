@@ -31,7 +31,7 @@ namespace SpotiFire {
 	public ref class PlaylistContainer sealed : ISpotifyObject, ISpotifyAwaitable<PlaylistContainer ^>
 	{
 	private:
-		ObservableSPList<Playlist ^> ^_playlists;
+		IInternalPlaylistList ^_playlists;
 
 		volatile bool _complete;
 		TaskCompletionSource<PlaylistContainer ^> ^_tcs;
@@ -71,7 +71,7 @@ namespace SpotiFire {
 		///
 		/// <value>	The playlists. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property IObservableSPList<Playlist ^> ^Playlists { IObservableSPList<Playlist ^> ^get() sealed; }
+		virtual property IPlaylistList ^Playlists { IPlaylistList ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Gets the owner. </summary>
