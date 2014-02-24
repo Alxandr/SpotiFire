@@ -104,7 +104,7 @@ OfflineStatus Playlist::OfflineStatus::get() {
 	return ENUM(SpotiFire::OfflineStatus, sp_playlist_get_offline_status(_session->_ptr, _ptr));
 }
 
-ref class $Playlist$TracksArray sealed : ObservableSPList<Track ^>
+ref class $Playlist$TracksArray sealed : ITrackCollection, ObservableSPList<Track ^>
 {
 internal:
 	Playlist ^_playlist;
@@ -142,13 +142,20 @@ public:
 		DoRemove(index);
 		DoInsert(index - 1, item);
 	}
+
+	virtual property Playlist^ Playlist {
+		SpotiFire::Playlist^ get() sealed {
+			return _playlist;
+		};
+	}
+
 };
 
-IObservableSPList<Track ^> ^Playlist::Tracks::get() {
+ITrackCollection ^Playlist::Tracks::get() {
 	if(_tracks == nullptr) {
 		Interlocked::CompareExchange<ObservableSPList<Track ^> ^>(_tracks, gcnew $Playlist$TracksArray(this), nullptr);
 	}
-	return _tracks;
+	return dynamic_cast<ITrackCollection ^>(_tracks);
 }
 
 String ^Playlist::Name::get() {
