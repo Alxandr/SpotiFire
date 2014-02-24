@@ -255,8 +255,9 @@ void SP_CALLCONV playlist_state_changed(sp_playlist *pl, void *userdata) {
 	TP0(SP_DATA(Playlist, userdata), Playlist::playlist_state_changed);
 }
 
-Link ^Playlist::ToLink() {
-	return this->IsLoaded ? Link::Create(this) : nullptr;
+Link ^Playlist::GetLink() {
+	PLAYLIST_LOADED(_ptr);
+	return Link::Create(this);
 }
 
 void SP_CALLCONV playlist_update_in_progress(sp_playlist *pl, bool done, void *userdata) {

@@ -171,7 +171,7 @@ namespace SpotiFire {
 		/// <returns>	A <see cref="SpotiFire.Link"/> object representing this playlist, or null if the
 		///				playlist is not loaded (yet). </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual Link ^ToLink();
+		virtual Link ^GetLink();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Event queue for all listeners interested in Renamed events. </summary>
