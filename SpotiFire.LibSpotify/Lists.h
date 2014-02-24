@@ -12,6 +12,7 @@ typedef System::Collections::IEnumerator IBEnumerator;
 
 namespace SpotiFire {
 	ref class Playlist;
+	ref class Track;
 
 	namespace Collections {
 
@@ -35,7 +36,7 @@ namespace SpotiFire {
 		bool ensure_equals(T left, T right);
 
 		generic<typename T>
-		ref class SPList abstract : IList<T>
+		public ref class SPList abstract : IList<T>
 		{
 		protected:
 			SPList() {
@@ -252,7 +253,7 @@ namespace SpotiFire {
 		///				internal list members. </remarks>	
 		///-------------------------------------------------------------------------------------------------
 		generic<typename T>
-		ref class ObservableSPList abstract : SPList<T>, IObservableSPList<T>
+		public ref class ObservableSPList abstract : SPList<T>, IObservableSPList<T>
 		{
 		private:
 			NotifyCollectionChangedEventHandler ^_collectionChanged;
@@ -307,6 +308,11 @@ namespace SpotiFire {
 		public interface class IPlaylistList : IObservableSPList<Playlist ^> {
 		public:
 			Playlist ^Create(String ^name);
+		};
+
+		public interface class ITrackCollection : IObservableSPList<Track ^> {
+		public:
+			property Playlist ^Playlist { SpotiFire::Playlist ^get(); }
 		};
 
 		interface class IInternalPlaylistList : IPlaylistList {

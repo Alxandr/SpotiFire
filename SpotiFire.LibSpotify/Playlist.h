@@ -99,7 +99,7 @@ namespace SpotiFire {
 		///
 		/// <value>	The tracks. </value>
 		///-------------------------------------------------------------------------------------------------
-		virtual property IObservableSPList<Track ^> ^Tracks { IObservableSPList<Track ^> ^get() sealed; }
+		virtual property ITrackCollection ^Tracks { ITrackCollection ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Sets the name. </summary>
