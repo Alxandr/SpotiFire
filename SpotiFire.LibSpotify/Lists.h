@@ -36,7 +36,7 @@ namespace SpotiFire {
 		bool ensure_equals(T left, T right);
 
 		generic<typename T>
-		public ref class SPList abstract : IList<T>
+		ref class SPList abstract : IList<T>
 		{
 		protected:
 			SPList() {
@@ -253,7 +253,7 @@ namespace SpotiFire {
 		///				internal list members. </remarks>	
 		///-------------------------------------------------------------------------------------------------
 		generic<typename T>
-		public ref class ObservableSPList abstract : SPList<T>, IObservableSPList<T>
+		ref class ObservableSPList abstract : SPList<T>, IObservableSPList<T>
 		{
 		private:
 			NotifyCollectionChangedEventHandler ^_collectionChanged;
