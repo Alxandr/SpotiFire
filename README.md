@@ -1,5 +1,6 @@
 SpotiFire
 =========
+[![Gitter chat](https://badges.gitter.im/Alxandr/SpotiFire.png)](https://gitter.im/Alxandr/SpotiFire)
 
 A project to make a SpotifyClient in C#
 
