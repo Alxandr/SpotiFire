@@ -63,9 +63,7 @@ Artist ^Album::Artist::get() {
 }
 
 PortraitId Album::CoverId::get() {
-	SPLock lock;
-	ALBUM_LOADED(_ptr);
-	return PortraitId(sp_album_cover(_ptr, SP_IMAGE_SIZE_NORMAL));
+	return GetCover(ImageSize::Normal);
 }
 
 String^ Album::Name::get() {
@@ -88,6 +86,12 @@ int Album::Year::get() {
 
 Task<AlbumBrowse ^> ^Album::Browse() {
 	return AlbumBrowse::Create(_session, this);
+}
+
+PortraitId Album::GetCover(ImageSize size) {
+	SPLock lock;
+	ALBUM_LOADED(_ptr);
+	return PortraitId(sp_album_cover(_ptr, (sp_image_size)size));
 }
 
 Link ^Album::GetLink() {

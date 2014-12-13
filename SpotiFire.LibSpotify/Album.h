@@ -104,6 +104,15 @@ namespace SpotiFire {
 		virtual Task<AlbumBrowse ^> ^Browse() sealed;
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the identifier of the cover with the specified size. </summary>
+		///
+		/// <seealso cref="Image::FromId" />
+		///
+		/// <returns>	The identifier of the cover. </returns>
+		///-------------------------------------------------------------------------------------------------
+		virtual PortraitId GetCover(ImageSize size) sealed;
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>   Create a <see cref="SpotiFire.Link"/> object representing the album. </summary>
 		///
 		/// <remarks>   You need to Dispose the <see cref="SpotiFire.Link"/> object when you are done with
