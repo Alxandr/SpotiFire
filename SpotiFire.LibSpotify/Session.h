@@ -352,6 +352,21 @@ namespace SpotiFire {
 		virtual property String ^RememberedUser { String ^get() sealed; }
 
 		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the country of the current user as string. </summary>
+		///
+		/// <value>	The users country as determined by libspotify. </value>
+		/// <example> "SE" </example>
+		///-------------------------------------------------------------------------------------------------
+		virtual property String ^UserCountry { String ^get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Gets the country code of the current user. </summary>
+		///
+		/// <value>	The users country code as determined by libspotify. </value>
+		///-------------------------------------------------------------------------------------------------
+		virtual property int UserCountryCode { int get() sealed; }
+
+		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Set maximum cache size. </summary>
 		///
 		/// <value>	Maximum cache size in megabytes. Setting it to 0 (the default) will let libspotify automatically resize the cache (10% of disk free space). </value>
