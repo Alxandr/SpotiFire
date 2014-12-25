@@ -418,6 +418,22 @@ String ^Session::RememberedUser::get() {
 	return UTF8(data);
 }
 
+String ^Session::UserCountry::get() {
+	logger->Trace("get_UserCountry");
+	int encodedCountry = this->UserCountryCode;
+	char country[3];
+	country[0] = encodedCountry >> 8 & 0xFF;
+	country[1] = encodedCountry & 0xFF;
+	country[2] = 0;
+	return gcnew String(country);
+}
+
+int Session::UserCountryCode::get() {
+	logger->Trace("get_UserCountryCode");
+	SPLock lock;
+	return sp_session_user_country(_ptr);
+}
+
 void Session::CacheSize::set(int size) {
 	logger->Trace("set_CacheSize");
 	SPLock lock;
