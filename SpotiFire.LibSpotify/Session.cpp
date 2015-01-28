@@ -508,14 +508,14 @@ bool Session::operator!= (Session^ left, Session^ right) {
 void Session::logged_in(Error error) {
 	logger->Trace("logged_in");
 	if(_login) {
-		_login->SetResult(error);
+		_login->TrySetResult(error);
 	}
 }
 
 void Session::logged_out() {
 	logger->Trace("logged_out");
 	if(_logout) {
-		_logout->SetResult(true);
+		_logout->TrySetResult(true);
 	}
 }
 
