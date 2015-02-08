@@ -1,0 +1,12 @@
+﻿{
+	"version": "1.0.0-*",
+	"dependencies": {
+		"SpotiFire": ""
+	},
+	"commands": {
+		"run": "run"
+	},
+	"frameworks": {
+		"net45": { }
+	}
+}

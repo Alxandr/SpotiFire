@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22512.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{42662102-E3FC-4A00-A332-7833BCEF8943}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SpotiFire", "src\SpotiFire\SpotiFire.kproj", "{8A4A646E-416E-43F6-ABA2-B2C77A00E14D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF737257-09BC-44BB-91A8-B2A3C5715604}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SpotiFire.Test", "src\SpotiFire.Test\SpotiFire.Test.kproj", "{7F74C1BE-2705-417D-8315-709055356DF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A4A646E-416E-43F6-ABA2-B2C77A00E14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A4A646E-416E-43F6-ABA2-B2C77A00E14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A4A646E-416E-43F6-ABA2-B2C77A00E14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A4A646E-416E-43F6-ABA2-B2C77A00E14D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F74C1BE-2705-417D-8315-709055356DF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F74C1BE-2705-417D-8315-709055356DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F74C1BE-2705-417D-8315-709055356DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F74C1BE-2705-417D-8315-709055356DF3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8A4A646E-416E-43F6-ABA2-B2C77A00E14D} = {42662102-E3FC-4A00-A332-7833BCEF8943}
+		{7F74C1BE-2705-417D-8315-709055356DF3} = {42662102-E3FC-4A00-A332-7833BCEF8943}
+	EndGlobalSection
+EndGlobal
