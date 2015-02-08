@@ -195,19 +195,40 @@ namespace SpotiFire
         #region Static Handlers
         private static void LoggedInCallback(IntPtr sessionPtr, sp_error error)
         {
-            Session s;
-            if (_sessions.TryGetValue(sessionPtr, out s))
-            {
-                s.OnLoggedIn(error);
-            }
+            RunCallback(sessionPtr, error, (s, e) => s.OnLoggedIn(e));
         }
 
         private static void NotifyMainThreadCallback(IntPtr sessionPtr)
         {
+            RunCallback(sessionPtr, s => s.NotifyMainThread());
+        }
+        #endregion
+
+        #region Utils
+        private static void RunCallback(IntPtr sessionPtr, Action<Session> callback)
+        {
+            Session s;
+            if(_sessions.TryGetValue(sessionPtr, out s))
+            {
+                Task.Run(() => callback(s));
+            }
+        }
+
+        private static void RunCallback<T1>(IntPtr sessionPtr, T1 arg1, Action<Session, T1> callback)
+        {
             Session s;
             if (_sessions.TryGetValue(sessionPtr, out s))
             {
-                s.NotifyMainThread();
+                Task.Run(() => callback(s, arg1));
+            }
+        }
+
+        private static void RunCallback<T1, T2>(IntPtr sessionPtr, T1 arg1, T2 arg2, Action<Session, T1, T2> callback)
+        {
+            Session s;
+            if (_sessions.TryGetValue(sessionPtr, out s))
+            {
+                Task.Run(() => callback(s, arg1, arg2));
             }
         }
         #endregion
