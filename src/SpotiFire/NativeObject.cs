@@ -98,6 +98,9 @@ namespace SpotiFire
 
         protected abstract void Free();
 
+        // TODO: These two methods should be made to handle
+        // UTF8. And they should also be moved to the
+        // NativeContext.
         internal static IntPtr MakeString(string str)
         {
             if (str == null)
