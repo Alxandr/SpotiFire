@@ -284,8 +284,7 @@ Task<Session ^> ^Session::Create(array<byte> ^applicationKey, String ^cacheLocat
 	create->settingsLocation = settingsLocation;
 	create->userAgent = userAgent;
 
-	return Task::Factory->StartNew(gcnew Func<Session ^>(create, &$session$create::run),
-		CancellationToken::None, System::Threading::Tasks::TaskCreationOptions::None, TaskScheduler::Default);
+	return Task::Run(gcnew Func<Session ^>(create, &$session$create::run));
 }
 
 Session ^Session::SelfSession::get() {
@@ -507,15 +506,17 @@ bool Session::operator!= (Session^ left, Session^ right) {
 //------------------ Event Handlers ------------------//
 void Session::logged_in(Error error) {
 	logger->Trace("logged_in");
-	if(_login) {
-		_login->SetResult(error);
+	TaskCompletionSource<SpotiFire::Error>^ tcs = this->_login;
+	if (tcs) {
+		tcs->TrySetResult(error);
 	}
 }
 
 void Session::logged_out() {
 	logger->Trace("logged_out");
-	if(_logout) {
-		_logout->SetResult(true);
+	TaskCompletionSource<bool>^ tcs = this->_logout;
+	if (tcs) {
+		tcs->TrySetResult(true);
 	}
 }
 
