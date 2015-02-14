@@ -67,7 +67,7 @@ namespace SpotiFire
                     var w = waiting[i];
                     if (w.Item1.IsLoaded && w.Item1.IsReady)
                     {
-                        w.Item2.SetResult(w.Item1);
+                        w.Item2.TrySetResult(w.Item1);
                         waiting.RemoveAt(i);
                         i--;
                     }
