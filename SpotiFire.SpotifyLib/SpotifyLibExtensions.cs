@@ -62,14 +62,13 @@ namespace SpotiFire
 
             if (waiting.Count > 0)
             {
-                for (var i = 0; i < waiting.Count; i++)
+                for (var i = waiting.Count; i-- > 0; )
                 {
                     var w = waiting[i];
                     if (w.Item1.IsLoaded && w.Item1.IsReady)
                     {
                         w.Item2.TrySetResult(w.Item1);
                         waiting.RemoveAt(i);
-                        i--;
                     }
                 }
             }
