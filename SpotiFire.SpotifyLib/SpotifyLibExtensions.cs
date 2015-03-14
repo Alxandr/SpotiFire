@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace SpotiFire
 {
-
     public static class SessionExtensions
     {
         public static void Save(this Image image, string location)
@@ -44,43 +43,34 @@ namespace SpotiFire
             return Search(session, query, 0, 0, 0, 0, 0, 0, playlistOffset, playlistCount, SearchType.Standard);
         }
 
-        private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> _waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
-        private readonly static Timer _timer = new Timer(_timer_Tick, new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>(), Timeout.Infinite, 100);
-        private volatile static bool _running = false;
+        private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
 
-        private static void _timer_Tick(object _state)
+        private readonly static Timer _timer = new Timer(OnTimerTick, null, Timeout.Infinite, 100);
+
+        private static void OnTimerTick(object state)
         {
-            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = (List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>)_state;
-            lock (_waiting)
+            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> finished = null;
+            lock (waiting)
             {
-                if (_waiting.Count > 0)
+                if (waiting.Any())
                 {
-                    waiting.AddRange(_waiting);
-                    _waiting.Clear();
+                    finished = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
+                    foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in waiting)
+                    {
+                        if (t.Item1.IsLoaded && t.Item1.IsReady)
+                        {
+                            finished.Add(t);
+                            waiting.Remove(t);
+                        }
+                    }
                 }
             }
 
-            if (waiting.Count > 0)
+            if (finished != null)
             {
-                for (var i = waiting.Count; i-- > 0; )
+                foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in finished)
                 {
-                    var w = waiting[i];
-                    if (w.Item1.IsLoaded && w.Item1.IsReady)
-                    {
-                        w.Item2.TrySetResult(w.Item1);
-                        waiting.RemoveAt(i);
-                    }
-                }
-            }
-            else
-            {
-                lock (_waiting)
-                {
-                    if (_waiting.Count == 0)
-                    {
-                        _timer.Change(Timeout.Infinite, 100);
-                        _running = false;
-                    }
+                    t.Item2.TrySetResult(t.Item1);
                 }
             }
         }
@@ -95,14 +85,9 @@ namespace SpotiFire
             }
             else
             {
-                lock (_waiting)
+                lock (waiting)
                 {
-                    _waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
-                    if (!_running)
-                    {
-                        _running = true;
-                        _timer.Change(0, 100);
-                    }
+                    waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
                 }
             }
             return tcs.Task;
@@ -184,18 +169,11 @@ namespace SpotiFire
         }        
     }
 
-
-
     public static class PlaylistExtensions
     {
-
         public static bool AllTracksLoaded(this Playlist playlist)
         {
             return playlist.Tracks.All(t => t.IsLoaded);
         }
-
-
     }
-
-
 }
