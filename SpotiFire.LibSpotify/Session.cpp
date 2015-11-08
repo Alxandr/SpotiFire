@@ -343,6 +343,10 @@ void Session::FlushCaches() {
 	SP_ERR(sp_session_flush_caches(_ptr));
 }
 
+Link ^Session::GetLink(String ^link) {
+	return Link::Create(this, link);
+}
+
 void Session::PlayerLoad(Track ^track) {
 	logger->Trace("PlayerLoad");
 	SPLock lock;
