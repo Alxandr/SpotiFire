@@ -14,6 +14,7 @@ namespace SpotiFire {
 	ref class Track;
 	ref class PlaylistContainer;
 	ref class Playlist;
+	ref class Link;
 
 	///-------------------------------------------------------------------------------------------------
 	/// <summary>	Delegate for handling Session events. </summary>
@@ -225,6 +226,15 @@ namespace SpotiFire {
 		/// <remarks>	This will make libspotify write all data that is meant to be stored on disk to the disk immediately. libspotify does this periodically by itself and also on logout. So under normal conditions this should never need to be used. </remarks>
 		///-------------------------------------------------------------------------------------------------
 		virtual void FlushCaches() sealed;
+
+		///-------------------------------------------------------------------------------------------------
+		/// <summary>	Get a link from an externally provided text ID.  </summary>
+		///
+		/// <remarks>	Brian Collins, 08.11.2015. </remarks>
+		///
+		/// <remarks>	This allows inter-working with the web API. </remarks>
+		///-------------------------------------------------------------------------------------------------
+		virtual Link ^GetLink(String ^link) sealed;
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Loads the specified track. </summary>
