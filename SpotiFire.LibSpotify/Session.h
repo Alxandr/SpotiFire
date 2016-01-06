@@ -189,16 +189,16 @@ namespace SpotiFire {
 		virtual Task<Error> ^Login(String ^username, String ^blob) sealed;
 
 		///-------------------------------------------------------------------------------------------------
-		/// <summary>	Logs the user back in. </summary>
+		/// <summary>	Attempts to log the user back in. </summary>
 		///
 		/// <remarks>	Aleksander, 30.01.2013. </remarks>
 		///
 		/// <seealso cref="Login" />
 		/// <seealso cref="Logout" />
-		/// 										///
-		/// <returns>	The pending login-task. </returns>
+		/// 										
+		/// <returns>	<c>true</c> if the user was logged back in, otherwise <c>false</c>. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual Task<Error> ^Relogin();
+		virtual Error Relogin();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Logs out the currently logged in user. Allwasy call this before terminating the application,

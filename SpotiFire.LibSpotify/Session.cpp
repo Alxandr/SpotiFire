@@ -315,12 +315,10 @@ Task<Error> ^Session::Login(String ^username, String ^credentials) {
 	return _login->Task;
 }
 
-Task<Error> ^Session::Relogin() {
+Error Session::Relogin() {
 	logger->Trace("Relogin");
 	SPLock lock;
-	_login = gcnew TaskCompletionSource<Error>();
-	sp_session_relogin(_ptr);
-	return _login->Task;
+	return ENUM(Error, sp_session_relogin(_ptr));
 }
 
 Task ^Session::Logout() {
