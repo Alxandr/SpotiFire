@@ -315,10 +315,14 @@ Task<Error> ^Session::Login(String ^username, String ^credentials) {
 	return _login->Task;
 }
 
-Error Session::Relogin() {
+Task<Error> ^Session::Relogin() {
 	logger->Trace("Relogin");
 	SPLock lock;
-	return ENUM(Error, sp_session_relogin(_ptr));
+	_login = gcnew TaskCompletionSource<Error>();
+	if (sp_session_relogin(_ptr) == SP_ERROR_NO_CREDENTIALS) {
+		_login->TrySetResult(ENUM(Error, SP_ERROR_NO_CREDENTIALS));
+	}
+	return _login->Task;
 }
 
 Task ^Session::Logout() {
