@@ -319,8 +319,9 @@ Task<Error> ^Session::Relogin() {
 	logger->Trace("Relogin");
 	SPLock lock;
 	_login = gcnew TaskCompletionSource<Error>();
-	if (sp_session_relogin(_ptr) == SP_ERROR_NO_CREDENTIALS) {
-		_login->TrySetResult(ENUM(Error, SP_ERROR_NO_CREDENTIALS));
+	sp_error result = sp_session_relogin(_ptr);
+	if (result != SP_ERROR_OK) {
+		_login->TrySetResult(ENUM(Error, result));
 	}
 	return _login->Task;
 }
