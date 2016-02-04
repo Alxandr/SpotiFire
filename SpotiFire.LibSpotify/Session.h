@@ -196,9 +196,9 @@ namespace SpotiFire {
 		/// <seealso cref="Login" />
 		/// <seealso cref="Logout" />
 		/// 										
-		/// <returns>	<c>true</c> if the user was logged back in, otherwise <c>false</c>. </returns>
+		/// <returns>	<see cref="Error.OK"/> if the user was logged in, otherwise <see cref="Error.NO_CREDENTIALS"/>. </returns>
 		///-------------------------------------------------------------------------------------------------
-		virtual Error Relogin();
+		virtual Task<Error> ^Relogin();
 
 		///-------------------------------------------------------------------------------------------------
 		/// <summary>	Logs out the currently logged in user. Allwasy call this before terminating the application,
