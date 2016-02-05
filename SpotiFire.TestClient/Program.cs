@@ -107,7 +107,10 @@ namespace SpotiFire.TestClient
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
             session.PreferredBitrate = BitRate.Bitrate320k;
 
-            await TestAwaitLink("spotify:track:0yA1MBQ60SoiYt7xqdS3H1", session);
+            TestAwaitLink("spotify:track:0yA1MBQ60SoiYt7xqdS3H1", session);
+            TestAwaitLink("spotify:track:3lcP1anKWxdp6IRNF9vGhu", session);
+            TestAwaitLink("spotify:track:0cthN0HhrEtp1gIUPhNv2W", session); 
+            TestAwaitLink("spotify:track:2hlYLICCS20aLk9IfBqMCE", session);
 
             await session.PlaylistContainer;
             while (session.PlaylistContainer.Playlists.Count < 1)

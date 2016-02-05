@@ -54,27 +54,22 @@ namespace SpotiFire
 
         private static void OnTimerTick(object state)
         {
-            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> awaited;
             lock (waiting)
             {
-                // let's make a copy of the list so we don't run into problems removing items while iterating over it
-                awaited = waiting.ToList();
-            }
-            if (awaited.Any())
-            {
-                foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in awaited)
+                if (waiting.Any())
                 {
-                    if (t.Item1.IsLoaded && t.Item1.IsReady)
+                    for (int i = waiting.Count - 1; i >= 0; i--)
                     {
-                        t.Item2.TrySetResult(t.Item1);
-                        lock (waiting) {
-                           waiting.Remove(t);
+                        Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t = waiting[i];
+                        if (t.Item1.IsLoaded && t.Item1.IsReady)
+                        {
+                            t.Item2.TrySetResult(t.Item1);
+                            waiting.RemoveAt(i);
                         }
                     }
                 }
-            }
-            lock (waiting) {
-                if (waiting.Count == 0) {
+                if (!waiting.Any())
+                {
                     lock (_timer) {
                         // stop the time as long as it's not needed
                         _timer.Stop();
