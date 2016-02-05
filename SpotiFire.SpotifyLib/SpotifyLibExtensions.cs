@@ -54,8 +54,6 @@ namespace SpotiFire
 
         private static void OnTimerTick(object state)
         {
-            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> finished = null;
-
             List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> awaited;
             lock (waiting)
             {
@@ -64,33 +62,26 @@ namespace SpotiFire
             }
             if (awaited.Any())
             {
-                finished = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
                 foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in awaited)
                 {
                     if (t.Item1.IsLoaded && t.Item1.IsReady)
                     {
-                        finished.Add(t);
-                        waiting.Remove(t);
+                        t.Item2.TrySetResult(t.Item1);
+                        lock (waiting) {
+                           waiting.Remove(t);
+                        }
                     }
                 }
             }
-            if (finished != null)
-            {
-                foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in finished)
-                {
-                    t.Item2.TrySetResult(t.Item1);
-                }
-            }
-
             lock (waiting) {
                 if (waiting.Count == 0) {
-                    // stop the time as long as it's not needed
-                    _timer.Stop();
+                    lock (_timer) {
+                        // stop the time as long as it's not needed
+                        _timer.Stop();
+                    }
                 }
             }
         }
-
-
 
         // Load made a task
         private static Task<IAsyncLoaded> Load(this IAsyncLoaded loadable)
@@ -106,8 +97,10 @@ namespace SpotiFire
                 {
                     waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
                 }
-                if (!_timer.Enabled) {
-                    _timer.Start();
+                lock (_timer) {
+                    if (!_timer.Enabled) {
+                        _timer.Start();
+                    }
                 }
             }
             return tcs.Task;
