@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace SpotiFire
 {
@@ -45,32 +45,35 @@ namespace SpotiFire
 
         private readonly static List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> waiting = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
 
-        private readonly static Timer _timer = new Timer(OnTimerTick, null, Timeout.Infinite, 100);
+        private readonly static Timer _timer = new Timer(20);
+
+        static SessionExtensions()
+        {
+            _timer.Elapsed += (sender, args) => OnTimerTick(null);
+        }
 
         private static void OnTimerTick(object state)
         {
-            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> finished = null;
             lock (waiting)
             {
                 if (waiting.Any())
                 {
-                    finished = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
-                    foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in waiting)
+                    for (int i = waiting.Count - 1; i >= 0; i--)
                     {
+                        Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t = waiting[i];
                         if (t.Item1.IsLoaded && t.Item1.IsReady)
                         {
-                            finished.Add(t);
-                            waiting.Remove(t);
+                            t.Item2.TrySetResult(t.Item1);
+                            waiting.RemoveAt(i);
                         }
                     }
                 }
-            }
-
-            if (finished != null)
-            {
-                foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in finished)
+                if (!waiting.Any())
                 {
-                    t.Item2.TrySetResult(t.Item1);
+                    lock (_timer) {
+                        // stop the time as long as it's not needed
+                        _timer.Stop();
+                    }
                 }
             }
         }
@@ -88,6 +91,11 @@ namespace SpotiFire
                 lock (waiting)
                 {
                     waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
+                }
+                lock (_timer) {
+                    if (!_timer.Enabled) {
+                        _timer.Start();
+                    }
                 }
             }
             return tcs.Task;
@@ -166,7 +174,7 @@ namespace SpotiFire
             session.PlayerPlay();
 
             return tcs.Task;
-        }        
+        }
     }
 
     public static class PlaylistExtensions

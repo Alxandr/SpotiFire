@@ -107,6 +107,11 @@ namespace SpotiFire.TestClient
             await session.Login(Console.ReadLine(), Console.ReadLine(), false);
             session.PreferredBitrate = BitRate.Bitrate320k;
 
+            TestAwaitLink("spotify:track:0yA1MBQ60SoiYt7xqdS3H1", session);
+            TestAwaitLink("spotify:track:3lcP1anKWxdp6IRNF9vGhu", session);
+            TestAwaitLink("spotify:track:0cthN0HhrEtp1gIUPhNv2W", session); 
+            TestAwaitLink("spotify:track:2hlYLICCS20aLk9IfBqMCE", session);
+
             await session.PlaylistContainer;
             while (session.PlaylistContainer.Playlists.Count < 1)
             {
@@ -165,6 +170,14 @@ namespace SpotiFire.TestClient
                 Console.WriteLine("No matching tracks.");
             }
             await session.Logout();
+        }
+
+        private static async Task TestAwaitLink(string trackUri, Session session)
+        {
+            var link = session.ParseLink(trackUri);
+            Console.WriteLine("Awaiting the Link as a Track. Should write Track title next.");
+            var track = await link.AsTrack();
+            Console.WriteLine("Successfully awaited Track with title {0}.", track.Name);
         }
 
         static async Task PlayPlaylistForever(Session session, Playlist starred)
