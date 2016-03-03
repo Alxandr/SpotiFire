@@ -54,6 +54,7 @@ namespace SpotiFire
 
         private static void OnTimerTick(object state)
         {
+            List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>> finished = null;
             lock (waiting)
             {
                 if (waiting.Any())
@@ -63,17 +64,27 @@ namespace SpotiFire
                         Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t = waiting[i];
                         if (t.Item1.IsLoaded && t.Item1.IsReady)
                         {
-                            t.Item2.TrySetResult(t.Item1);
+                            if (finished == null) 
+                            {
+                                finished = new List<Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>>();
+                            }
+                            finished.Add(t);
                             waiting.RemoveAt(i);
                         }
                     }
                 }
                 if (!waiting.Any())
                 {
-                    lock (_timer) {
-                        // stop the time as long as it's not needed
-                        _timer.Stop();
-                    }
+                    // stop the time as long as it's not needed
+                    _timer.Stop();
+                }
+            }
+
+            if (finished != null) 
+            {
+                foreach (Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>> t in finished) 
+                {
+                    t.Item2.TrySetResult(t.Item1);
                 }
             }
         }
@@ -81,24 +92,23 @@ namespace SpotiFire
         // Load made a task
         private static Task<IAsyncLoaded> Load(this IAsyncLoaded loadable)
         {
-            TaskCompletionSource<IAsyncLoaded> tcs = new TaskCompletionSource<IAsyncLoaded>();
             if (loadable.IsLoaded && loadable.IsReady)
             {
-                tcs.SetResult(loadable);
+                return Task.FromResult(loadable);
             }
-            else
+            else 
             {
+                TaskCompletionSource<IAsyncLoaded> tcs = new TaskCompletionSource<IAsyncLoaded>();
                 lock (waiting)
                 {
                     waiting.Add(new Tuple<IAsyncLoaded, TaskCompletionSource<IAsyncLoaded>>(loadable, tcs));
-                }
-                lock (_timer) {
-                    if (!_timer.Enabled) {
+                    if (!_timer.Enabled) 
+                    {
                         _timer.Start();
                     }
                 }
+                return tcs.Task;
             }
-            return tcs.Task;
         }
 
         public static TaskAwaiter<Track> GetAwaiter(this Track track)
